@@ -21,14 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Allwize.h"
 
-#ifdef ARDUINO
-    #if (ARDUINO >= 100)
-        #include <Arduino.h>
-    #else  //  ARDUINO >= 100
-        #include <WProgram.h>
-    #endif  //  ARDUINO  >= 100
-#endif  //  ARDUINO
-
 // -----------------------------------------------------------------------------
 // Public
 // -----------------------------------------------------------------------------
@@ -38,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param {Stream&} stream      Serial stream to communicate with the module
  * @param {uint8_t} _reset_gpio GPIO connected to the module RESET pin
  */
-Allwize(Stream & stream, uint8_t reset_gpio = 0xFF) : _stream(stream), _reset_gpio(reset_gpio) {
+Allwize::Allwize(Stream& stream, uint8_t reset_gpio) : _stream(stream), _reset_gpio(reset_gpio) {
     if (0xFF != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
         digitalWrite(_reset_gpio, HIGH);
@@ -51,9 +43,9 @@ Allwize(Stream & stream, uint8_t reset_gpio = 0xFF) : _stream(stream), _reset_gp
 void Allwize::begin() {
 
     //  Start serial interface.
-    _stream->begin(MODEM_BAUDRATE);
+    //_stream.begin(MODEM_BAUDRATE);
     delay(200);
-    _stream->flush();
+    _stream.flush();
 
 }
 
@@ -61,9 +53,9 @@ void Allwize::begin() {
  * Timeout in ms for module readings
  * @param {uint32_t} timeout    Timeout in milliseconds
  */
-void Allwize::setTimeout(uint32_t timeout) {
-    _stream->timeout(timeout);
-}
+//void Allwize::setTimeout(uint32_t timeout) {
+    //_stream.timeout(timeout);
+//}
 
 /**
  * Resets the radio module
@@ -81,7 +73,7 @@ void Allwize::reset() {
  * Sets the communications channel
  * @param {uint8_t} channel     Channel number
  */
-    void Allwize::setChannel(uint8_t channel) {
+void Allwize::setChannel(uint8_t channel) {
     _sendCommand(CMD_CHANNEL, channel);
 }
 
@@ -94,15 +86,16 @@ void Allwize::reset() {
  * @param {bool} value      True to enter config mode
  * @protected
 */
-void Allwize::_setConfig(bool value) {
-    if (value == _config) return;
-    if (value) {
-        _sendWait(CMD_ENTER_CONFIG);
-    } else {
-        _send(CMD_EXIT_CONFIG);
+bool Allwize::_setConfig(bool value) {
+    if (value != _config) {
+        if (value) {
+            _sendWait(CMD_ENTER_CONFIG);
+        } else {
+            _send(CMD_EXIT_CONFIG);
+        }
+        _config = value;
     }
-    _config = value;
-
+    return _config;
 }
 
 /**
@@ -166,7 +159,18 @@ void Allwize::_setMemory(uint8_t address, uint8_t value) {
  * Flushes the serial line to the module
  */
 void Allwize::_flush() {
-    _stream->flush();
+    _stream.flush();
+}
+
+/**
+ * Sends a single byte to the module UART.
+ * Returns the number of bytes actually sent.
+ * @param {uint8_t} ch          Byte to send
+ * @return size_t
+ * @protected
+ */
+size_t Allwize::_send(uint8_t ch) {
+    return _stream.write(ch);
 }
 
 /**
@@ -178,18 +182,11 @@ void Allwize::_flush() {
  * @protected
  */
 size_t Allwize::_send(uint8_t * buffer, size_t len) {
-    return _stream->write(buffer, len);
-}
-
-/**
- * Sends a single byte to the module UART.
- * Returns the number of bytes actually sent.
- * @param {uint8_t} ch          Byte to send
- * @return size_t
- * @protected
- */
-size_t Allwize::_send(uint8_t ch) {
-    return _stream->write(ch);
+    size_t n = 0;
+    for (uint8_t i=0; i<len; i++) {
+        if (_send(buffer[i])) n++;
+    }
+    return n;
 }
 
 /**
@@ -199,7 +196,7 @@ size_t Allwize::_send(uint8_t ch) {
  * @protected
  */
 size_t Allwize::_receive() {
-    return _stream->readBytesUntil(END_OF_RESPONSE, _buffer, RX_BUFFER_SIZE);
+    return _stream.readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
 }
 
 /**
@@ -251,7 +248,7 @@ void Allwize::_hex2bin(char * hex, uint8_t * bin, size_t len) {
  */
 void Allwize::_bin2hex(uint8_t * bin, char * hex, size_t len) {
     for (uint8_t i=0; i<len; i++) {
-        hex[i*2]   = (bin[i] >> 4) & 0x0F + '0';
-        hex[i*2+1] = (bin[i]     ) & 0x0F + '0';
+        hex[i*2]   = ((bin[i] >> 4) & 0x0F) + '0';
+        hex[i*2+1] = ((bin[i]     ) & 0x0F) + '0';
     }
 }

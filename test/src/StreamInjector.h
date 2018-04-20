@@ -21,13 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <stdlib.h>
 #include <Stream.h>
 
 class StreamInjector : public Stream {
 
     public:
 
-        typedef std::function<void(uint8_t ch)> writeCallback;
+        typedef void (*writeCallback)(uint8_t);
 
         StreamInjector(size_t buflen = 128) : _buffer_size(buflen) {
             _buffer = new char[buflen];
@@ -39,14 +40,14 @@ class StreamInjector : public Stream {
 
         // ---------------------------------------------------------------------
 
-        virtual uint8_t inject(char ch) {
+        virtual uint16_t inject(char ch) {
             _buffer[_buffer_write] = ch;
             _buffer_write = (_buffer_write + 1) % _buffer_size;
             return 1;
         }
 
-        virtual uint8_t inject(char *data, size_t len) {
-            for (int i=0; i<len; i++) {
+        virtual uint16_t inject(char *data, size_t len) {
+            for (uint16_t i=0; i<len; i++) {
                 inject(data[i]);
             }
             return len;
@@ -60,6 +61,7 @@ class StreamInjector : public Stream {
 
         virtual size_t write(uint8_t ch) {
             if (_callback) _callback(ch);
+            return 1;
         }
 
         virtual int read() {
@@ -72,7 +74,7 @@ class StreamInjector : public Stream {
         }
 
         virtual int available() {
-            unsigned int bytes = 0;
+            int bytes = 0;
             if (_buffer_read > _buffer_write) {
                 bytes += (_buffer_write - _buffer_read + _buffer_size);
             } else if (_buffer_read < _buffer_write) {
@@ -96,9 +98,9 @@ class StreamInjector : public Stream {
     private:
 
         char * _buffer;
-        unsigned char _buffer_size;
-        unsigned char _buffer_write = 0;
-        unsigned char _buffer_read = 0;
+        size_t _buffer_size;
+        uint16_t _buffer_write = 0;
+        uint16_t _buffer_read = 0;
         writeCallback _callback = NULL;
 
 };

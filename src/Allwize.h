@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ALLWIZE_H
 #define ALLWIZE_H
 
+#include <Arduino.h>
+#include <Stream.h>
+
 #define MODEM_BAUDRATE          19200
 #define END_OF_RESPONSE         '>'
 #define CMD_ENTER_CONFIG        (char) 0x00
@@ -34,10 +37,11 @@ class Allwize {
 
     public:
 
-        Allwize(Stream & stream, uint8_t reset_gpio = 0xFF);
+        Allwize(Stream& stream, uint8_t reset_gpio = 0xFF);
 
-        bool begin();
-        void setTimeout(uint32_t timeout);
+        void begin();
+        void reset();
+        //void setTimeout(uint32_t timeout);
 
         void setChannel(uint8_t channel);
 
@@ -51,7 +55,6 @@ class Allwize {
         //size_t _getMemory(uint8_t address, size_t len, uint8_t * buffer);
         //uint8_t _getMemory(uint8_t address);
 
-        void _reset();
         void _flush();
         size_t _send(uint8_t * buffer, size_t len);
         size_t _send(uint8_t ch);
