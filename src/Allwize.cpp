@@ -77,6 +77,64 @@ void Allwize::setChannel(uint8_t channel) {
     _sendCommand(CMD_CHANNEL, channel);
 }
 
+/**
+ * Sets the module in one of the available MBus modes
+ */
+void Allwize::setMBusMode(allwize_mbus_mode_t mode) {
+    _sendCommand(CMD_MBUS_MODE, mode);
+}
+
+/**
+ * Sets the module in one of the available operations modes
+ */
+void Allwize::setOperationMode(allwize_operation_mode_t mode) {
+    _sendCommand(CMD_OP_MODE, mode);
+}
+
+/**
+ * Sets the radio module in sleep mode
+ */
+void Allwize::sleep() {
+    _sendCommand(CMD_SLEEP);
+}
+
+/**
+ * Wakes up the radio from sleep mode
+ */
+void Allwize::wakeup() {
+    _sendWait(CMD_EXIT_CONFIG);
+}
+
+/**
+ * Returns the RSSI of the last valid packet received
+ * @return {float} RSSI in dBm
+ */
+float Allwize::getRSSI() {
+    size_t response = _sendWait(CMD_RSSI);
+    if (response > 0) return -0.5 * _buffer[0];
+    return 0;
+}
+
+/**
+ * Returns the internal temperature of the module
+ * @return {uint8_t} 1-byte temperature
+ */
+uint8_t Allwize::getTemperature() {
+    size_t response = _sendWait(CMD_TEMPERATURE);
+    if (response > 0) return (_buffer[0] - 128);
+    return 0;
+}
+
+/**
+ * Returns the internal voltage of the module
+ * @return {uint16_t} Volatge in mV
+ */
+uint16_t Allwize::getVoltage() {
+    size_t response = _sendWait(CMD_VOLTAGE);
+    if (response > 0) return 30 * _buffer[0];
+    return 0;
+}
+
 // -----------------------------------------------------------------------------
 // Protected
 // -----------------------------------------------------------------------------
@@ -105,11 +163,12 @@ bool Allwize::_setConfig(bool value) {
  * @param {size_t} len          Length of the binary data
  * @protected
  */
-void Allwize::_sendCommand(uint8_t command, uint8_t * data, size_t len) {
+size_t Allwize::_sendCommand(uint8_t command, uint8_t * data, size_t len) {
     _setConfig(true);
     _sendWait(command);
-    _sendWait(data, len);
+    size_t response = _sendWait(data, len);
     _setConfig(false);
+    return response;
 }
 
 /**
@@ -118,11 +177,24 @@ void Allwize::_sendCommand(uint8_t command, uint8_t * data, size_t len) {
  * @param {uint8_t} data        Single byte
  * @protected
  */
-void Allwize::_sendCommand(uint8_t command, uint8_t data) {
+size_t Allwize::_sendCommand(uint8_t command, uint8_t data) {
     _setConfig(true);
     _sendWait(command);
-    _sendWait(data);
+    size_t response = _sendWait(data);
     _setConfig(false);
+    return response;
+}
+
+/**
+ * Sends a command with no data
+ * @param {uint8_t} command     Command key
+ * @protected
+ */
+size_t Allwize::_sendCommand(uint8_t command) {
+    _setConfig(true);
+    size_t response = _sendWait(command);
+    _setConfig(false);
+    return response;
 }
 
 /**
@@ -139,7 +211,7 @@ void Allwize::_setMemory(uint8_t address, uint8_t * data, size_t len) {
         buffer[i*2+1] = data[i];
     }
     buffer[len*2] = 0xFF;
-    _sendCommand(CMD_MEMORY, buffer, len*2+1);
+    _sendCommand(CMD_WRITE_MEMORY, buffer, len*2+1);
 }
 
 /**
@@ -150,7 +222,42 @@ void Allwize::_setMemory(uint8_t address, uint8_t * data, size_t len) {
  */
 void Allwize::_setMemory(uint8_t address, uint8_t value) {
     uint8_t buffer[3] = {address, value, 0xFF};
-    _sendCommand(CMD_MEMORY, buffer, 3);
+    _sendCommand(CMD_WRITE_MEMORY, buffer, 3);
+}
+
+/**
+ * Returns the contents of consecutive memory addresses
+ * @param {uint8_t} address     Address to start from
+ * @param {size_t} len          Number of positions to read
+ * @param {uint8_t *} buffer    Buffer with at least 'len' position to store data to
+ * @return {uint8_t} number of positions actually read
+ * @protected
+ */
+size_t Allwize::_getMemory(uint8_t address, size_t len, uint8_t * buffer) {
+    uint8_t count = 0;
+    size_t response = 0;
+    _setConfig(true);
+    for (uint8_t i=0; i<len; i++) {
+        _sendWait(CMD_READ_MEMORY);
+        response = _sendWait(address + i);
+        if (0 == response) break;
+        count++;
+        buffer[i] = _buffer[0];
+    }
+    _setConfig(false);
+    return count;
+}
+
+/**
+ * Returns the contents of single memory addresses
+ * @param {uint8_t} address     Address to start from
+ * @return {uint8_t} contents of the address
+ * @protected
+ */
+uint8_t Allwize::_getMemory(uint8_t address) {
+    uint8_t len = _sendCommand(CMD_READ_MEMORY, address);
+    if (len > 0) return _buffer[0];
+    return 0;
 }
 
 // -----------------------------------------------------------------------------
