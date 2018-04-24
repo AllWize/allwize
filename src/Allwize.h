@@ -19,6 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+/**
+ * @file Allwize library header file
+ */
+
 #ifndef ALLWIZE_H
 #define ALLWIZE_H
 
@@ -73,6 +77,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_FW_REV_NUMBER       0x73
 #define MEM_SERIAL_NUMBER       0x78
 
+/**
+ * @enum allwize_mbus_mode_t
+ */
 typedef enum {
     MBUS_MODE_S = 0,
     MBUS_MODE_T1 = 1,
@@ -82,6 +89,7 @@ typedef enum {
     MBUS_MODE_C1_T2 = 11
 } allwize_mbus_mode_t;
 
+// Operation modes
 typedef enum {
     OP_MODE_NORMAL = 0,
     OP_MODE_INSTALL = 1,
