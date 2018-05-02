@@ -19,10 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-/**
- * @file Allwize library source file
- */
-
 #include "Allwize.h"
 
 // -----------------------------------------------------------------------------
@@ -61,22 +57,42 @@ void Allwize::reset() {
 }
 
 /**
- * @brief Sets the communications channel
- * @param {uint8_t} channel     Channel number
+ * @brief Sets the module in master or slave mode
+ * @param {bool} master     True for master mode (default)
  */
-void Allwize::setChannel(uint8_t channel) {
-    _sendCommand(CMD_CHANNEL, channel);
+void Allwize::setMaster(bool master) {
+    // TODO
+}
+
+/**
+ * @brief Sets the communications channel (for MBUS_MODE_R2 only)
+ * @param {uint8_t} channel     Channel number
+ * @param {bool} persist        Persist the changes in non-volatile memory
+ */
+void Allwize::setChannel(uint8_t channel, bool persist) {
+    if (persist) {
+        _setMemory(MEM_CHANNEL, channel);
+    } else {
+        _sendCommand(CMD_CHANNEL, channel);
+    }
 }
 
 /**
  * @brief Sets the module in one of the available MBus modes
+ * @param {allwize_mbus_mode_t} mode MBus mode
+ * @param {bool} persist        Persist the changes in non-volatile memory
  */
-void Allwize::setMBusMode(allwize_mbus_mode_t mode) {
-    _sendCommand(CMD_MBUS_MODE, mode);
+void Allwize::setMBusMode(allwize_mbus_mode_t mode, bool persist) {
+    if (persist) {
+        _setMemory(MEM_MBUS_MODE, mode);
+    } else {
+        _sendCommand(CMD_MBUS_MODE, mode);
+    }
 }
 
 /**
  * @brief Sets the module in one of the available operations modes
+ * @param {allwize_operation_mode_t} mode Operation mode
  */
 void Allwize::setOperationMode(allwize_operation_mode_t mode) {
     _sendCommand(CMD_OP_MODE, mode);
@@ -201,7 +217,7 @@ void Allwize::_setMemory(uint8_t address, uint8_t * data, size_t len) {
         buffer[i*2]   = address + i;
         buffer[i*2+1] = data[i];
     }
-    buffer[len*2] = 0xFF;
+    buffer[len*2] = CMD_EXIT_MEMORY;
     _sendCommand(CMD_WRITE_MEMORY, buffer, len*2+1);
 }
 
@@ -212,7 +228,7 @@ void Allwize::_setMemory(uint8_t address, uint8_t * data, size_t len) {
  * @protected
  */
 void Allwize::_setMemory(uint8_t address, uint8_t value) {
-    uint8_t buffer[3] = {address, value, 0xFF};
+    uint8_t buffer[3] = {address, value, CMD_EXIT_MEMORY};
     _sendCommand(CMD_WRITE_MEMORY, buffer, 3);
 }
 

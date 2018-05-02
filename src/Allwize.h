@@ -32,7 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MODEM_BAUDRATE          19200
 #define END_OF_RESPONSE         '>'
 #define CMD_ENTER_CONFIG        (char) 0x00
-#define CMD_EXIT_CONFIG         (char) 0xFF
+#define CMD_EXIT_CONFIG         (char) 0x58
+#define CMD_EXIT_MEMORY         (char) 0xFF
 #define RX_BUFFER_SIZE          32
 
 #define CMD_CHANNEL             'C'
@@ -77,9 +78,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_FW_REV_NUMBER       0x73
 #define MEM_SERIAL_NUMBER       0x78
 
-/**
- * @enum allwize_mbus_mode_t
- */
+// MBus modes
 typedef enum {
     MBUS_MODE_S = 0,
     MBUS_MODE_T1 = 1,
@@ -108,8 +107,10 @@ class Allwize {
         void wakeup();
         //void setTimeout(uint32_t timeout);
 
-        void setChannel(uint8_t channel);
-        void setMBusMode(allwize_mbus_mode_t mode);
+        void setMaster(bool master = true);
+
+        void setChannel(uint8_t channel, bool persist = false);
+        void setMBusMode(allwize_mbus_mode_t mode, bool persist = false);
         void setOperationMode(allwize_operation_mode_t mode);
 
         float getRSSI();
