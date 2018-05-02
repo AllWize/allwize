@@ -4,13 +4,17 @@
 StreamInjector mock;
 Allwize * allwize;
 
+#define TEST_BUFFER_SIZE    32
 #define TEST_NAME_PADDING   30
-#define MOCK_RESPONSE_BYTE  0x80
+#define TEST_RESPONSE_BYTE  0xA0
+#define TEST_DEBUG          0
 
 // -----------------------------------------------------------------------------
 
-uint8_t _rx_buffer[32];
+uint8_t _rx_buffer[TEST_BUFFER_SIZE];
 uint8_t _rx_count = 0;
+uint8_t _tests = 0;
+uint8_t _tests_failed = 0;
 
 void _reset() {
     _rx_count = 0;
@@ -24,21 +28,44 @@ bool _compare(uint8_t * expected, size_t len) {
     return true;
 }
 
+void _mock_inject(unsigned char ch) {
+    #if TEST_DEBUG
+        Serial.print("Receive: 0x");
+        Serial.println(ch, HEX);
+    #endif
+    mock.inject(ch);
+}
+
 void _mock_response(unsigned char ch) {
 
     static uint8_t pending_payload = 0;
     static uint8_t response_size = 0;
+    static bool config_mode = false;
+
+    // Fail safe
+    if (_rx_count >= TEST_BUFFER_SIZE) return;
 
     _rx_buffer[_rx_count++] = ch;
+
+    #if TEST_DEBUG
+        Serial.print("Sent   : 0x");
+        Serial.println(ch, HEX);
+    #endif
 
     // Expected payload sizes (defaults to 1 byte)
     if (0 == pending_payload) {
 
-        // Show prompt
-        mock.inject('>');
+        // Check config mode
+        if (!config_mode & (0x00 == ch)) config_mode = true;
+        if (config_mode & (0x58 == ch)) config_mode = false;
+        if (!config_mode) return;
 
         // Handle cases
         switch (ch) {
+
+            case 0x00:
+                pending_payload = 0;
+                break;
 
             case 'A':
                 pending_payload = 2;
@@ -71,7 +98,7 @@ void _mock_response(unsigned char ch) {
             case 'U':
             case 'V':
                 pending_payload = 0;
-                mock.inject(MOCK_RESPONSE_BYTE);
+                _mock_inject(TEST_RESPONSE_BYTE);
                 break;
 
             case 'T':
@@ -93,6 +120,9 @@ void _mock_response(unsigned char ch) {
 
         }
 
+        // Show prompt
+        _mock_inject('>');
+
     } else {
 
         // Update pending payload
@@ -103,14 +133,14 @@ void _mock_response(unsigned char ch) {
 
             // Inject response
             for (uint8_t i=0; i<response_size; i++) {
-                mock.inject(MOCK_RESPONSE_BYTE);
+                _mock_inject(TEST_RESPONSE_BYTE);
             }
 
             // Reset response size
             response_size = 0;
 
             // Show prompt
-            mock.inject('>');
+            _mock_inject('>');
 
         }
 
@@ -134,6 +164,12 @@ bool test_set_channel_persist(void) {
     return _compare(expected, 6);
 }
 
+bool test_get_channel(void) {
+    allwize->getChannel();
+    uint8_t expected[] = {0x00, 'Y', 0x00, 0x58};
+    return _compare(expected, 4);
+}
+
 bool test_set_mbus_mode(void) {
     allwize_mbus_mode_t mode = MBUS_MODE_R2;
     allwize->setMBusMode(mode);
@@ -148,23 +184,100 @@ bool test_set_mbus_mode_persist(void) {
     return _compare(expected, 6);
 }
 
-bool test_set_op_mode(void) {
-    allwize_operation_mode_t mode = OP_MODE_NORMAL;
-    allwize->setOperationMode(mode);
+bool test_get_mbus_mode(void) {
+    allwize->getMBusMode();
+    uint8_t expected[] = {0x00, 'Y', 0x03, 0x58};
+    return _compare(expected, 4);
+}
+
+bool test_set_install(void) {
+    allwize_install_mode_t mode = INSTALL_MODE_NORMAL;
+    allwize->setInstallMode(mode);
     uint8_t expected[] = {0x00, 'I', mode, 0x58};
     return _compare(expected, 4);
+}
+
+bool test_set_control_field(void) {
+    uint8_t value = 0x06;
+    allwize->setControlField(value);
+    uint8_t expected[] = {0x00, 'F', value, 0x58};
+    return _compare(expected, 4);
+}
+
+bool test_set_control_field_persist(void) {
+    uint8_t value = 0x06;
+    allwize->setControlField(value, true);
+    uint8_t expected[] = {0x00, 'M', 0x3B, value, 0xFF, 0x58};
+    return _compare(expected, 6);
+}
+
+bool test_get_control_field(void) {
+    allwize->getControlField();
+    uint8_t expected[] = {0x00, 'Y', 0x3B, 0x58};
+    return _compare(expected, 4);
+}
+
+bool test_get_temperature(void) {
+    uint8_t value = allwize->getTemperature();
+    if (32 != value) return false;
+    uint8_t expected[] = {0x00, 'U', 0x58};
+    return _compare(expected, 3);
+}
+
+bool test_get_voltage(void) {
+    uint16_t value = allwize->getVoltage();
+    if (4800 != value) return false;
+    uint8_t expected[] = {0x00, 'V', 0x58};
+    return _compare(expected, 3);
+}
+
+bool test_get_rssi(void) {
+    float value = allwize->getRSSI();
+    if (-80 != value) return false;
+    uint8_t expected[] = {0x00, 'S', 0x58};
+    return _compare(expected, 3);
 }
 
 // -----------------------------------------------------------------------------
 
 void test(const char * name, bool (*callback)(void)) {
+
     _reset();
+    mock.flush();
+
+    bool response = (callback)();
+
     Serial.print(name);
     for (uint8_t i=strlen(name); i<TEST_NAME_PADDING; i++) Serial.print(".");
-    bool response = (callback)();
     Serial.println(response ? "OK" : "FAIL");
+    ++_tests;
+    if (!response) ++_tests_failed;
 
 }
+
+void tests() {
+
+    test("setChannel", test_set_channel);
+    test("setChannelPersist", test_set_channel_persist);
+    test("getChannel", test_get_channel);
+
+    test("setControlField", test_set_control_field);
+    test("setControlFieldPersist", test_set_control_field_persist);
+    test("getControlField", test_get_control_field);
+
+    test("setMBusMode", test_set_mbus_mode);
+    test("setMBusModePersist", test_set_mbus_mode_persist);
+    test("getMBusMode", test_get_mbus_mode);
+
+    test("setInstallMode", test_set_install);
+    test("getTemperature", test_get_temperature);
+    test("getVoltage", test_get_voltage);
+    test("getRSSI", test_get_rssi);
+
+}
+
+// -----------------------------------------------------------------------------
+
 void setup() {
 
     Serial.begin(115200);
@@ -177,10 +290,13 @@ void setup() {
     mock.callback(_mock_response);
     allwize = new Allwize(mock);
 
-    test("setChannel", test_set_channel);
-    test("setChannelPersist", test_set_channel_persist);
-    test("setMBusMode", test_set_mbus_mode);
-    test("setMBusModePersist", test_set_mbus_mode_persist);
+    tests();
+
+    Serial.println();
+    Serial.print(_tests_failed);
+    Serial.print("/");
+    Serial.print(_tests);
+    Serial.println(" tests failed");
 
 }
 

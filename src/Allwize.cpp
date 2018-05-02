@@ -78,6 +78,35 @@ void Allwize::setChannel(uint8_t channel, bool persist) {
 }
 
 /**
+ * @brief Gets the channel stored in non-volatile memory
+ * @return {uint8_t} Channel (1 byte)
+ */
+uint8_t Allwize::getChannel() {
+    return _getMemory(MEM_CHANNEL);
+}
+
+/**
+ * @brief Sets the control field value
+ * @param {uint8_t} value       Control field
+ * @param {bool} persist        Persist the changes in non-volatile memory
+ */
+void Allwize::setControlField(uint8_t value, bool persist) {
+    if (persist) {
+        _setMemory(MEM_CONTROL_FIELD, value);
+    } else {
+        _sendCommand(CMD_CONTROL_FIELD, value);
+    }
+}
+
+/**
+ * @brief Gets the control field value stored in non-volatile memory
+ * @return {uint8_t} Control field value (1 byte)
+ */
+uint8_t Allwize::getControlField() {
+    return _getMemory(MEM_CONTROL_FIELD);
+}
+
+/**
  * @brief Sets the module in one of the available MBus modes
  * @param {allwize_mbus_mode_t} mode MBus mode
  * @param {bool} persist        Persist the changes in non-volatile memory
@@ -91,11 +120,19 @@ void Allwize::setMBusMode(allwize_mbus_mode_t mode, bool persist) {
 }
 
 /**
- * @brief Sets the module in one of the available operations modes
- * @param {allwize_operation_mode_t} mode Operation mode
+ * @brief Gets the MBus mode stored in non-volatile memory
+ * @return {allwize_mbus_mode_t} MBus mode (1 byte)
  */
-void Allwize::setOperationMode(allwize_operation_mode_t mode) {
-    _sendCommand(CMD_OP_MODE, mode);
+allwize_mbus_mode_t Allwize::getMBusMode() {
+    return (allwize_mbus_mode_t) _getMemory(MEM_MBUS_MODE);
+}
+
+/**
+ * @brief Sets the module in one of the available operations modes
+ * @param {allwize_install_mode_t} mode Operation mode
+ */
+void Allwize::setInstallMode(allwize_install_mode_t mode) {
+    _sendCommand(CMD_INSTALL, mode);
 }
 
 /**
@@ -117,7 +154,7 @@ void Allwize::wakeup() {
  * @return {float} RSSI in dBm
  */
 float Allwize::getRSSI() {
-    size_t response = _sendWait(CMD_RSSI);
+    size_t response = _sendCommand(CMD_RSSI);
     if (response > 0) return -0.5 * _buffer[0];
     return 0;
 }
@@ -127,7 +164,7 @@ float Allwize::getRSSI() {
  * @return {uint8_t} Temperature in Celsius
  */
 uint8_t Allwize::getTemperature() {
-    size_t response = _sendWait(CMD_TEMPERATURE);
+    size_t response = _sendCommand(CMD_TEMPERATURE);
     if (response > 0) return (_buffer[0] - 128);
     return 0;
 }
@@ -137,7 +174,7 @@ uint8_t Allwize::getTemperature() {
  * @return {uint16_t} Volatge in mV
  */
 uint16_t Allwize::getVoltage() {
-    size_t response = _sendWait(CMD_VOLTAGE);
+    size_t response = _sendCommand(CMD_VOLTAGE);
     if (response > 0) return 30 * _buffer[0];
     return 0;
 }

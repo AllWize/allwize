@@ -37,8 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RX_BUFFER_SIZE          32
 
 #define CMD_CHANNEL             'C'
+#define CMD_CONTROL_FIELD       'F'
 #define CMD_MBUS_MODE           'G'
-#define CMD_OP_MODE             'I'
+#define CMD_INSTALL             'I'
 #define CMD_WRITE_MEMORY        'M'
 #define CMD_AUTO_MESSAGE_FLAGS  'O'
 #define CMD_OUTPUT_POWER        'P'
@@ -69,6 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_CONFIG_INTERFACE    0x37
 #define MEM_FREQ_CAL            0x39
 #define MEM_LED_CONTROL         0x3A
+#define MEM_CONTROL_FIELD       0x3B
 #define MEM_RX_TIMEOUT          0x3C
 #define MEM_INSTALL_MODE        0x3D
 #define MEM_ENCRYPT_FLAG        0x3E
@@ -90,10 +92,10 @@ typedef enum {
 
 // Operation modes
 typedef enum {
-    OP_MODE_NORMAL = 0,
-    OP_MODE_INSTALL = 1,
-    OP_MODE_HOST = 2
-} allwize_operation_mode_t;
+    INSTALL_MODE_NORMAL = 0,
+    INSTALL_MODE_INSTALL = 1,
+    INSTALL_MODE_HOST = 2
+} allwize_install_mode_t;
 
 class Allwize {
 
@@ -110,8 +112,13 @@ class Allwize {
         void setMaster(bool master = true);
 
         void setChannel(uint8_t channel, bool persist = false);
+        void setControlField(uint8_t value, bool persist = false);
         void setMBusMode(allwize_mbus_mode_t mode, bool persist = false);
-        void setOperationMode(allwize_operation_mode_t mode);
+        void setInstallMode(allwize_install_mode_t mode);
+
+        uint8_t getChannel();
+        uint8_t getControlField();
+        allwize_mbus_mode_t getMBusMode();
 
         float getRSSI();
         uint8_t getTemperature();
