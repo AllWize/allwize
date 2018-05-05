@@ -123,6 +123,13 @@ class Allwize {
         float getRSSI();
         uint8_t getTemperature();
         uint16_t getVoltage();
+        size_t getMID(uint8_t * buffer);
+        size_t getUID(uint8_t * buffer);
+        uint8_t getVersion();
+        uint8_t getDevice();
+
+        String getMID();
+        String getUID();
 
     protected:
 
@@ -138,9 +145,9 @@ class Allwize {
         void _flush();
         size_t _send(uint8_t * buffer, size_t len);
         size_t _send(uint8_t ch);
-        size_t _sendWait(uint8_t * buffer, size_t len);
-        size_t _sendWait(uint8_t ch);
-        size_t _receive();
+        int8_t _sendWait(uint8_t * buffer, size_t len);
+        int8_t _sendWait(uint8_t ch);
+        int8_t _receive();
 
         void _hex2bin(char * hex, uint8_t * bin, size_t len);
         void _bin2hex(uint8_t * bin, char * hex, size_t len);

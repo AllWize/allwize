@@ -171,12 +171,44 @@ uint8_t Allwize::getTemperature() {
 
 /**
  * @brief Returns the internal voltage of the module
- * @return {uint16_t} Volatge in mV
+ * @return {uint16_t} Voltage in mV
  */
 uint16_t Allwize::getVoltage() {
     size_t response = _sendCommand(CMD_VOLTAGE);
     if (response > 0) return 30 * _buffer[0];
     return 0;
+}
+
+String Allwize::getMID() {
+    uint8_t buffer[2];
+    getMID(buffer);
+    char tmp[10];
+    snprintf(tmp, sizeof(tmp), "%2X:%2X", buffer[0], buffer[1]);
+    return String(tmp);
+}
+
+String Allwize::getUID() {
+    uint8_t buffer[4];
+    getUID(buffer);
+    char tmp[20];
+    snprintf(tmp, sizeof(tmp), "%2X:%2X:%2X:%2X", buffer[0], buffer[1], buffer[2], buffer[3]);
+    return String(tmp);
+}
+
+size_t Allwize::getMID(uint8_t * buffer) {
+    return _getMemory(MEM_MANUFACTURER_ID, 2, buffer);
+}
+
+size_t Allwize::getUID(uint8_t * buffer) {
+    return _getMemory(MEM_UNIQUE_ID, 4, buffer);
+}
+
+uint8_t Allwize::getVersion() {
+    return _getMemory(MEM_VERSION);
+}
+
+uint8_t Allwize::getDevice() {
+    return _getMemory(MEM_DEVICE);
 }
 
 // -----------------------------------------------------------------------------
@@ -191,11 +223,11 @@ uint16_t Allwize::getVoltage() {
 bool Allwize::_setConfig(bool value) {
     if (value != _config) {
         if (value) {
-            _sendWait(CMD_ENTER_CONFIG);
+            if (_sendWait(CMD_ENTER_CONFIG) == 0) _config = true;
         } else {
             _send(CMD_EXIT_CONFIG);
+            _config = false;
         }
-        _config = value;
     }
     return _config;
 }
@@ -340,30 +372,34 @@ size_t Allwize::_send(uint8_t * buffer, size_t len) {
 
 /**
  * @brief Listens to incomming data from the module until timeout or END_OF_RESPONSE. Returns the number of bytes received and stored in the internal _buffer.
- * @return size_t
+ * @return int8_t   Number of bytes received, -1 if timed out
  * @protected
  */
-size_t Allwize::_receive() {
-    return _stream.readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
+int8_t Allwize::_receive() {
+    uint32_t timeout = _stream.getTimeout();
+    uint32_t start = millis();
+    size_t len = _stream.readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
+    if (millis() - start > timeout) return -1;
+    return len;
 }
 
 /**
  * @brief Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the internal _buffer.
  * @param {uint8_t *} buffer    Binary data to send
- * @param {size_t} len          Length of the binary data
+ * @param {size_t} len          Length of the binary data (-1 if timed out)
  * @protected
  */
-size_t Allwize::_sendWait(uint8_t * buffer, size_t len) {
+int8_t Allwize::_sendWait(uint8_t * buffer, size_t len) {
     _send(buffer, len);
     return _receive();
 }
 
 /**
  * @brief Sends a byte and waits for response. Returns the number of bytes received and stored in the internal _buffer.
- * @param {uint8_t} ch          Byte to send
+ * @param {uint8_t} ch          Byte to send (-1 if timed out)
  * @protected
  */
-size_t Allwize::_sendWait(uint8_t ch) {
+int8_t Allwize::_sendWait(uint8_t ch) {
     _send(ch);
     return _receive();
 }
