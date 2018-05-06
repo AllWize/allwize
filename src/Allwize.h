@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_INSTALL             'I'
 #define CMD_WRITE_MEMORY        'M'
 #define CMD_AUTO_MESSAGE_FLAGS  'O'
-#define CMD_OUTPUT_POWER        'P'
+#define CMD_RF_POWER            'P'
 #define CMD_QUALITY             'Q'
 #define CMD_READ_MAILBOX        'R'
 #define CMD_RSSI                'S'
@@ -81,21 +81,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_SERIAL_NUMBER       0x78
 
 // MBus modes
-typedef enum {
+enum {
     MBUS_MODE_S = 0,
     MBUS_MODE_T1 = 1,
     MBUS_MODE_T2 = 2,
     MBUS_MODE_R2 = 4,
     MBUS_MODE_C1_T1 = 10,
     MBUS_MODE_C1_T2 = 11
-} allwize_mbus_mode_t;
+};
 
 // Operation modes
-typedef enum {
+enum {
     INSTALL_MODE_NORMAL = 0,
     INSTALL_MODE_INSTALL = 1,
     INSTALL_MODE_HOST = 2
-} allwize_install_mode_t;
+};
+
+// Operation modes
+enum {
+    SLEEP_MODE_DISABLE = 0,
+    SLEEP_MODE_AFTER_TX = 1,
+    SLEEP_MODE_AFTER_TX_RX = 3,
+    SLEEP_MODE_AFTER_TX_TIMEOUT = 5,
+    SLEEP_MODE_AFTER_TX_RX_TIMEOUT = 7
+};
 
 class Allwize {
 
@@ -107,29 +116,31 @@ class Allwize {
         void reset();
         void sleep();
         void wakeup();
-        //void setTimeout(uint32_t timeout);
-
+        bool ready();
+        void setTimeout(uint32_t timeout);
         void setMaster(bool master = true);
 
         void setChannel(uint8_t channel, bool persist = false);
+        void setPower(uint8_t power, bool persist = false);
+        void setMBusMode(uint8_t mode, bool persist = false);
+        void setSleepMode(uint8_t mode);
         void setControlField(uint8_t value, bool persist = false);
-        void setMBusMode(allwize_mbus_mode_t mode, bool persist = false);
-        void setInstallMode(allwize_install_mode_t mode);
+        void setInstallMode(uint8_t mode);
 
         uint8_t getChannel();
+        uint8_t getPower();
+        uint8_t getMBusMode();
+        uint8_t getSleepMode();
         uint8_t getControlField();
-        allwize_mbus_mode_t getMBusMode();
 
         float getRSSI();
         uint8_t getTemperature();
         uint16_t getVoltage();
-        size_t getMID(uint8_t * buffer);
-        size_t getUID(uint8_t * buffer);
+        String getMID();
+        String getUID();
         uint8_t getVersion();
         uint8_t getDevice();
 
-        String getMID();
-        String getUID();
 
     protected:
 
@@ -161,6 +172,7 @@ class Allwize {
         Stream& _stream;
         uint8_t _reset_gpio = 0xFF;
         bool _config = false;
+        uint32_t _timeout = 2000;
 
         uint8_t _buffer[RX_BUFFER_SIZE];
 

@@ -1,3 +1,30 @@
+/*
+
+Allwize - Memory Dump Example
+
+This example uses a wrapping class around Allwize class to
+expose the getMemory method and dump the radio module memory
+byte by byte.
+This is possible since all methods in the AllWize class are either
+public or protected.
+
+Copyright (C) 2018 by Allwize <github@allwize.io>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
 #include "Allwize.h"
 
 class AllwizeWrap : public Allwize {
@@ -37,7 +64,9 @@ void setup() {
     Serial.println();
 
     module.begin(19200);
+    module.setTimeout(2000);
     allwize = new AllwizeWrap(module);
+    allwize->setTimeout(2000);
 
     char buffer[10];
 

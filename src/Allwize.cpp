@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Allwize.h"
 
 // -----------------------------------------------------------------------------
-// Public
+// Init
 // -----------------------------------------------------------------------------
 
 /**
@@ -51,7 +51,7 @@ void Allwize::begin() {
 void Allwize::reset() {
     if (0xFF != _reset_gpio) {
         digitalWrite(_reset_gpio, LOW);
-        delay(10);
+        delay(1);
         digitalWrite(_reset_gpio, HIGH);
     }
 }
@@ -63,6 +63,41 @@ void Allwize::reset() {
 void Allwize::setMaster(bool master) {
     // TODO
 }
+
+/**
+ * @brief Sets the radio module in sleep mode
+ */
+void Allwize::sleep() {
+    _sendCommand(CMD_SLEEP);
+}
+
+/**
+ * @brief Wakes up the radio from sleep mode
+ */
+void Allwize::wakeup() {
+    _sendWait(CMD_EXIT_CONFIG);
+}
+
+/**
+ * @brief Test whether the radio module is ready or not
+ */
+bool Allwize::ready() {
+    bool response = _setConfig(true);
+    if (response) _setConfig(false);
+    return response;
+}
+
+/**
+ * @brief Set the default timeout for the serial object
+ * @param {uint32_t} timeout    Timeout in milliseconds
+ */
+void Allwize::setTimeout(uint32_t timeout) {
+    _timeout = timeout;
+}
+
+// -----------------------------------------------------------------------------
+// Configuration
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Sets the communications channel (for MBUS_MODE_R2 only)
@@ -83,6 +118,66 @@ void Allwize::setChannel(uint8_t channel, bool persist) {
  */
 uint8_t Allwize::getChannel() {
     return _getMemory(MEM_CHANNEL);
+}
+
+/**
+ * @brief Sets the RF power
+ * @param {uint8_t} power       Value from 1 to 5
+ * @param {bool} persist        Persist the changes in non-volatile memory
+ */
+void Allwize::setPower(uint8_t power, bool persist) {
+    if (0 < power && power < 6) {
+        if (persist) {
+            _setMemory(MEM_RF_POWER, power);
+        } else {
+            _sendCommand(CMD_RF_POWER, power);
+        }
+    }
+}
+
+/**
+ * @brief Gets the RF power stored in non-volatile memory
+ * @return {uint8_t} RF power (1 byte)
+ */
+uint8_t Allwize::getPower() {
+    return _getMemory(MEM_RF_POWER);
+}
+
+/**
+ * @brief Sets the module in one of the available MBus modes
+ * @param {uint8_t} mode        MBus mode
+ * @param {bool} persist        Persist the changes in non-volatile memory
+ */
+void Allwize::setMBusMode(uint8_t mode, bool persist) {
+    if (persist) {
+        _setMemory(MEM_MBUS_MODE, mode);
+    } else {
+        _sendCommand(CMD_MBUS_MODE, mode);
+    }
+}
+
+/**
+ * @brief Gets the MBus mode stored in non-volatile memory
+ * @return {uint8_t} MBus mode (1 byte)
+ */
+uint8_t Allwize::getMBusMode() {
+    return _getMemory(MEM_MBUS_MODE);
+}
+
+/**
+ * @brief Sets the sleep mode
+ * @param {uint8_t} mode        One of SLEEP_MODE_*
+ */
+void Allwize::setSleepMode(uint8_t mode) {
+    _setMemory(MEM_SLEEP_MODE, mode);
+}
+
+/**
+ * @brief Gets the sleep mode stored in non-volatile memory
+ * @return {uint8_t} Sleep mode (1 byte)
+ */
+uint8_t Allwize::getSleepMode() {
+    return _getMemory(MEM_SLEEP_MODE);
 }
 
 /**
@@ -107,46 +202,11 @@ uint8_t Allwize::getControlField() {
 }
 
 /**
- * @brief Sets the module in one of the available MBus modes
- * @param {allwize_mbus_mode_t} mode MBus mode
- * @param {bool} persist        Persist the changes in non-volatile memory
- */
-void Allwize::setMBusMode(allwize_mbus_mode_t mode, bool persist) {
-    if (persist) {
-        _setMemory(MEM_MBUS_MODE, mode);
-    } else {
-        _sendCommand(CMD_MBUS_MODE, mode);
-    }
-}
-
-/**
- * @brief Gets the MBus mode stored in non-volatile memory
- * @return {allwize_mbus_mode_t} MBus mode (1 byte)
- */
-allwize_mbus_mode_t Allwize::getMBusMode() {
-    return (allwize_mbus_mode_t) _getMemory(MEM_MBUS_MODE);
-}
-
-/**
  * @brief Sets the module in one of the available operations modes
  * @param {allwize_install_mode_t} mode Operation mode
  */
-void Allwize::setInstallMode(allwize_install_mode_t mode) {
+void Allwize::setInstallMode(uint8_t mode) {
     _sendCommand(CMD_INSTALL, mode);
-}
-
-/**
- * @brief Sets the radio module in sleep mode
- */
-void Allwize::sleep() {
-    _sendCommand(CMD_SLEEP);
-}
-
-/**
- * @brief Wakes up the radio from sleep mode
- */
-void Allwize::wakeup() {
-    _sendWait(CMD_EXIT_CONFIG);
 }
 
 /**
@@ -179,34 +239,42 @@ uint16_t Allwize::getVoltage() {
     return 0;
 }
 
+/**
+ * @brief Returns the Manufacturer ID string
+ * @return {String} 2-byte hex string with the manufacturer ID
+ */
 String Allwize::getMID() {
-    uint8_t buffer[2];
-    getMID(buffer);
-    char tmp[10];
-    snprintf(tmp, sizeof(tmp), "%2X:%2X", buffer[0], buffer[1]);
-    return String(tmp);
+    uint8_t bin[2] = {0};
+    char hex[5] = {0};
+    _getMemory(MEM_MANUFACTURER_ID, 2, bin);
+    _bin2hex(bin, hex, 2);
+    return String(hex);
 }
 
+/**
+ * @brief Returns the Unique ID string
+ * @return {String} 4-byte hex string with the unique ID
+ */
 String Allwize::getUID() {
-    uint8_t buffer[4];
-    getUID(buffer);
-    char tmp[20];
-    snprintf(tmp, sizeof(tmp), "%2X:%2X:%2X:%2X", buffer[0], buffer[1], buffer[2], buffer[3]);
-    return String(tmp);
+    uint8_t bin[4] = {0};
+    char hex[9] = {0};
+    _getMemory(MEM_UNIQUE_ID, 4, bin);
+    _bin2hex(bin, hex, 4);
+    return String(hex);
 }
 
-size_t Allwize::getMID(uint8_t * buffer) {
-    return _getMemory(MEM_MANUFACTURER_ID, 2, buffer);
-}
-
-size_t Allwize::getUID(uint8_t * buffer) {
-    return _getMemory(MEM_UNIQUE_ID, 4, buffer);
-}
-
+/**
+ * @brief Returns the module version from non-volatile memory
+ * @return {uint8_t} Version
+ */
 uint8_t Allwize::getVersion() {
     return _getMemory(MEM_VERSION);
 }
 
+/**
+ * @brief Returns the device version from non-volatile memory
+ * @return {uint8_t} Version
+ */
 uint8_t Allwize::getDevice() {
     return _getMemory(MEM_DEVICE);
 }
@@ -376,10 +444,9 @@ size_t Allwize::_send(uint8_t * buffer, size_t len) {
  * @protected
  */
 int8_t Allwize::_receive() {
-    //uint32_t timeout = _stream.getTimeout();
-    //uint32_t start = millis();
+    uint32_t start = millis();
     size_t len = _stream.readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
-    //if (millis() - start > timeout) return -1;
+    if (millis() - start > _timeout) return -1;
     return len;
 }
 
