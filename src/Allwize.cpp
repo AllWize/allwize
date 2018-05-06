@@ -376,10 +376,10 @@ size_t Allwize::_send(uint8_t * buffer, size_t len) {
  * @protected
  */
 int8_t Allwize::_receive() {
-    uint32_t timeout = _stream.getTimeout();
-    uint32_t start = millis();
+    //uint32_t timeout = _stream.getTimeout();
+    //uint32_t start = millis();
     size_t len = _stream.readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
-    if (millis() - start > timeout) return -1;
+    //if (millis() - start > timeout) return -1;
     return len;
 }
 

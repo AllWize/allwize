@@ -1,8 +1,4 @@
 #include "Allwize.h"
-#include <SoftwareSerial.h>
-
-#define RX_PIN  8
-#define TX_PIN  9
 
 class AllwizeWrap : public Allwize {
     public:
@@ -12,7 +8,24 @@ class AllwizeWrap : public Allwize {
 };
 
 AllwizeWrap * allwize;
-SoftwareSerial * radio;
+
+#ifdef ARDUINO_AVR_UNO
+    #define RX_PIN      8
+    #define TX_PIN      9
+    #include <SoftwareSerial.h>
+    SoftwareSerial module(RX_PIN, TX_PIN);
+#endif
+
+#ifdef ARDUINO_AVR_LEONARDO
+    #define module      Serial1
+#endif
+
+#ifdef ARDUINO_ARCH_ESP8266
+    #define RX_PIN      12
+    #define TX_PIN      13
+    #include <SoftwareSerial.h>
+    SoftwareSerial module(RX_PIN, TX_PIN);
+#endif
 
 void setup() {
 
@@ -23,9 +36,8 @@ void setup() {
     Serial.println("Allwize - Module Memory Dump");
     Serial.println();
 
-    radio = new SoftwareSerial(RX_PIN, TX_PIN);
-    radio->begin(19200);
-    allwize = new AllwizeWrap(*radio);
+    module.begin(19200);
+    allwize = new AllwizeWrap(module);
 
     char buffer[10];
 
