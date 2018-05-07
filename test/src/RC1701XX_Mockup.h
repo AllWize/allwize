@@ -92,6 +92,16 @@ class RC1701XX_Mockup : public Stream {
             delete _rx;
         }
 
+        void reset() {
+            _pending_payload = 0;
+            _pending_response = 0;
+            _config_mode = false;
+            _memory_mode = false;
+            _command_mode = false;
+            _rx->flush();
+            _tx->flush();
+        }
+
         // ---------------------------------------------------------------------
         // Stream interface
         // ---------------------------------------------------------------------
@@ -159,26 +169,22 @@ class RC1701XX_Mockup : public Stream {
 
         void _process(uint8_t ch) {
 
-            static uint8_t pending_payload = 0;
-            static uint8_t response_size = 0;
-            static bool config_mode = false;
-            static bool memory_mode = false;
-
             // Expected payload sizes (defaults to 1 byte)
-            if (0 == pending_payload) {
+            if (0 == _pending_payload) {
 
                 // Check config mode
-                if (!config_mode & (0x00 == ch)) config_mode = true;
-                if (config_mode & (0x58 == ch)) config_mode = false;
-                if (!config_mode) return;
+                if (!_config_mode & (0x00 == ch)) _config_mode = true;
+                if (_config_mode & (0x58 == ch)) _config_mode = false;
+                if (!_config_mode) return;
+                if (_command_mode) return;
 
                 // Memory mode
-                if (memory_mode) {
+                if (_memory_mode) {
                     if (0xFF == ch) {
-                        memory_mode = false;
+                        _memory_mode = false;
                         rx_write('>');
                     } else {
-                        pending_payload = 1;
+                        _pending_payload = 1;
                     }
                     return;
                 }
@@ -187,46 +193,50 @@ class RC1701XX_Mockup : public Stream {
                 switch (ch) {
 
                     case 0x00:
-                        pending_payload = 0;
+                        _pending_payload = 0;
                         break;
 
+                    case '@':
+                        _command_mode = true;
+                        return;
+
                     case 'A':
-                        pending_payload = 2;
+                        _pending_payload = 2;
                         break;
 
                     case 'B':
-                        pending_payload = 8;
+                        _pending_payload = 8;
                         break;
 
                     case 'K':
-                        pending_payload = 17;
+                        _pending_payload = 17;
                         break;
 
                     case 'L':
-                        pending_payload = 1;
-                        response_size = 8;
+                        _pending_payload = 1;
+                        _pending_response = 8;
                         break;
 
                     case 'M':
-                        memory_mode = true;
-                        pending_payload = 2;
+                        _memory_mode = true;
+                        _pending_payload = 2;
                         break;
 
                     case 'O':
-                        pending_payload = 1;
-                        response_size = 2;
+                        _pending_payload = 1;
+                        _pending_response = 2;
                         break;
 
                     case 'Q':
                     case 'S':
                     case 'U':
                     case 'V':
-                        pending_payload = 0;
+                        _pending_payload = 0;
                         rx_write(MOCKUP_RESPONSE_BYTE);
                         break;
 
                     case 'T':
-                        pending_payload = 8;
+                        _pending_payload = 8;
                         break;
 
                     case 'W':
@@ -234,12 +244,12 @@ class RC1701XX_Mockup : public Stream {
                         break;
 
                     case 'Y':
-                        pending_payload = 1;
-                        response_size = 1;
+                        _pending_payload = 1;
+                        _pending_response = 1;
                         break;
 
                     default:
-                        pending_payload = 1;
+                        _pending_payload = 1;
                         break;
 
                 }
@@ -250,21 +260,21 @@ class RC1701XX_Mockup : public Stream {
             } else {
 
                 // Update pending payload
-                --pending_payload;
+                --_pending_payload;
 
                 // Memory mode
-                if (memory_mode) return;
+                if (_memory_mode || _command_mode) return;
 
                 // If no more payload
-                if (0 == pending_payload) {
+                if (0 == _pending_payload) {
 
                     // Inject response
-                    for (uint8_t i=0; i<response_size; i++) {
+                    for (uint8_t i=0; i<_pending_response; i++) {
                         rx_write(MOCKUP_RESPONSE_BYTE);
                     }
 
                     // Reset response size
-                    response_size = 0;
+                    _pending_response = 0;
 
                     // Show prompt
                     rx_write('>');
@@ -276,5 +286,11 @@ class RC1701XX_Mockup : public Stream {
 
         CircularBuffer * _rx;  // Chars sent to the module (using write)
         CircularBuffer * _tx;  // Chars sent by the module (read-able)
+
+        uint8_t _pending_payload = 0;
+        uint8_t _pending_response = 0;
+        bool _config_mode = false;
+        bool _memory_mode = false;
+        bool _command_mode = false;
 
 };

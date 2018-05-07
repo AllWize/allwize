@@ -49,18 +49,19 @@ void Allwize::begin() {
  * @brief Resets the radio module.
  */
 void Allwize::reset() {
-    if (0xFF != _reset_gpio) {
-        digitalWrite(_reset_gpio, LOW);
-        delay(1);
-        digitalWrite(_reset_gpio, HIGH);
-    } else {
+    if (0xFF == _reset_gpio) {
         _setMemory(MEM_CONFIG_INTERFACE, 1);
         if (_setConfig(true)) {
             _send('@');
             _send('R');
             _send('R');
         }
+    } else {
+        digitalWrite(_reset_gpio, LOW);
+        delay(1);
+        digitalWrite(_reset_gpio, HIGH);
     }
+    _config = false;
 }
 
 /**
@@ -73,6 +74,7 @@ void Allwize::factoryReset() {
         _send('R');
         _send('C');
     }
+    _config = false;
 }
 
 /**
@@ -416,7 +418,7 @@ uint8_t Allwize::getVersion() {
 
 /**
  * @brief Returns the device version from non-volatile memory
- * @return {uint8_t} Version
+ * @return {uint8_t} Device
  */
 uint8_t Allwize::getDevice() {
     return _getMemory(MEM_DEVICE);

@@ -27,6 +27,12 @@ bool _compare(uint8_t * expected, size_t len) {
 
 // -----------------------------------------------------------------------------
 
+bool test_reset(void) {
+    allwize->reset();
+    uint8_t expected[] = {0x00, 'M', 0x37, 1, 0xFF, 0x58, 0x00, '@', 'R', 'R'};
+    return _compare(expected, sizeof(expected));
+}
+
 bool test_set_channel(void) {
     uint8_t channel = 3;
     allwize->setChannel(channel);
@@ -134,8 +140,7 @@ bool test_get_rssi(void) {
 
 void test(const char * name, bool (*callback)(void)) {
 
-    mock.flush();
-    mock.rx_flush();
+    mock.reset();
 
     bool response = (callback)();
     if (!response) ++_tests_failed;
@@ -148,6 +153,8 @@ void test(const char * name, bool (*callback)(void)) {
 }
 
 void tests() {
+
+    test("reset", test_reset);
 
     test("setChannel", test_set_channel);
     test("setChannelPersist", test_set_channel_persist);
