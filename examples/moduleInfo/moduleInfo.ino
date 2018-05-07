@@ -89,10 +89,7 @@ void setup() {
     delay(5000);
 
     module.begin(19200);
-    module.setTimeout(2000);
-
     allwize = new Allwize(module);
-    allwize->setTimeout(2000);
 
     Serial.println();
     Serial.println("Allwize - Module Info");

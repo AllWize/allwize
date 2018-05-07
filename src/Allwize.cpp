@@ -75,7 +75,7 @@ void Allwize::sleep() {
  * @brief Wakes up the radio from sleep mode
  */
 void Allwize::wakeup() {
-    _sendWait(CMD_EXIT_CONFIG);
+    _sendAndReceive(CMD_EXIT_CONFIG);
 }
 
 /**
@@ -214,7 +214,7 @@ void Allwize::setInstallMode(uint8_t mode) {
  * @return {float} RSSI in dBm
  */
 float Allwize::getRSSI() {
-    size_t response = _sendCommand(CMD_RSSI);
+    uint8_t response = _sendCommand(CMD_RSSI);
     if (response > 0) return -0.5 * _buffer[0];
     return 0;
 }
@@ -224,7 +224,7 @@ float Allwize::getRSSI() {
  * @return {uint8_t} Temperature in Celsius
  */
 uint8_t Allwize::getTemperature() {
-    size_t response = _sendCommand(CMD_TEMPERATURE);
+    uint8_t response = _sendCommand(CMD_TEMPERATURE);
     if (response > 0) return (_buffer[0] - 128);
     return 0;
 }
@@ -234,7 +234,7 @@ uint8_t Allwize::getTemperature() {
  * @return {uint16_t} Voltage in mV
  */
 uint16_t Allwize::getVoltage() {
-    size_t response = _sendCommand(CMD_VOLTAGE);
+    uint8_t response = _sendCommand(CMD_VOLTAGE);
     if (response > 0) return 30 * _buffer[0];
     return 0;
 }
@@ -286,12 +286,15 @@ uint8_t Allwize::getDevice() {
 /**
  * @brief Sets or unsets config mode
  * @param {bool} value      True to enter config mode
+ * @return {bool}           True if in config mode
  * @protected
 */
 bool Allwize::_setConfig(bool value) {
     if (value != _config) {
         if (value) {
-            if (_sendWait(CMD_ENTER_CONFIG) == 0) _config = true;
+            if (_sendAndReceive(CMD_ENTER_CONFIG) == 0) {
+                _config = true;
+            }
         } else {
             _send(CMD_EXIT_CONFIG);
             _config = false;
@@ -304,13 +307,15 @@ bool Allwize::_setConfig(bool value) {
  * @brief Sends a command with the given data
  * @param {uint8_t} command     Command key
  * @param {uint8_t *} data      Binary data to send
- * @param {size_t} len          Length of the binary data
+ * @param {uint8_t} len         Length of the binary data
  * @protected
  */
-size_t Allwize::_sendCommand(uint8_t command, uint8_t * data, size_t len) {
-    _setConfig(true);
-    _sendWait(command);
-    size_t response = _sendWait(data, len);
+int8_t Allwize::_sendCommand(uint8_t command, uint8_t * data, uint8_t len) {
+    int8_t response = -1;
+    if (!_setConfig(true)) return response;
+    if (_sendAndReceive(command) != -1) {
+        response = _sendAndReceive(data, len);
+    }
     _setConfig(false);
     return response;
 }
@@ -319,12 +324,15 @@ size_t Allwize::_sendCommand(uint8_t command, uint8_t * data, size_t len) {
  * @brief Sends a command with the given data
  * @param {uint8_t} command     Command key
  * @param {uint8_t} data        Single byte
+ * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
  * @protected
  */
-size_t Allwize::_sendCommand(uint8_t command, uint8_t data) {
-    _setConfig(true);
-    _sendWait(command);
-    size_t response = _sendWait(data);
+int8_t Allwize::_sendCommand(uint8_t command, uint8_t data) {
+    int8_t response = -1;
+    if (!_setConfig(true)) return response;
+    if (_sendAndReceive(command) != -1) {
+        response = _sendAndReceive(data);
+    }
     _setConfig(false);
     return response;
 }
@@ -332,11 +340,13 @@ size_t Allwize::_sendCommand(uint8_t command, uint8_t data) {
 /**
  * @brief Sends a command with no data
  * @param {uint8_t} command     Command key
+ * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
  * @protected
  */
-size_t Allwize::_sendCommand(uint8_t command) {
-    _setConfig(true);
-    size_t response = _sendWait(command);
+int8_t Allwize::_sendCommand(uint8_t command) {
+    int8_t response = -1;
+    if (!_setConfig(true)) return response;
+    response = _sendAndReceive(command);
     _setConfig(false);
     return response;
 }
@@ -345,57 +355,58 @@ size_t Allwize::_sendCommand(uint8_t command) {
  * @brief Sets non-volatile memory contents starting from given address
  * @param {uint8_t} address     Command key
  * @param {uint8_t *} data      Binary data to store
- * @param {size_t} len          Length of the binary data
+ * @param {uint8_t} len         Length of the binary data
+ * @return {bool}               True if the data was successfully saved
  * @protected
  */
-void Allwize::_setMemory(uint8_t address, uint8_t * data, size_t len) {
+bool Allwize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
     uint8_t buffer[len*2+1];
     for (uint8_t i=0; i<len; i++) {
         buffer[i*2]   = address + i;
         buffer[i*2+1] = data[i];
     }
     buffer[len*2] = CMD_EXIT_MEMORY;
-    _sendCommand(CMD_WRITE_MEMORY, buffer, len*2+1);
+    return (_sendCommand(CMD_WRITE_MEMORY, buffer, len*2+1) != -1);
 }
 
 /**
  * @brief Sets non-volatile memory contents starting from given address
  * @param {uint8_t} address     Command key
  * @param {uint8_t} data        Single byte to store at given address
+ * @return {bool}               True if the data was successfully saved
  * @protected
  */
-void Allwize::_setMemory(uint8_t address, uint8_t value) {
+bool Allwize::_setMemory(uint8_t address, uint8_t value) {
     uint8_t buffer[3] = {address, value, CMD_EXIT_MEMORY};
-    _sendCommand(CMD_WRITE_MEMORY, buffer, 3);
+    return (_sendCommand(CMD_WRITE_MEMORY, buffer, 3) != -1);
 }
 
 /**
  * @brief Returns the contents of consecutive memory addresses
  * @param {uint8_t} address     Address to start from
- * @param {size_t} len          Number of positions to read
+ * @param {uint8_t} len         Number of positions to read
  * @param {uint8_t *} buffer    Buffer with at least 'len' position to store data to
- * @return {uint8_t} number of positions actually read
+ * @return {uint8_t}            Number of positions actually read
  * @protected
  */
-size_t Allwize::_getMemory(uint8_t address, size_t len, uint8_t * buffer) {
+uint8_t Allwize::_getMemory(uint8_t address, uint8_t len, uint8_t * buffer) {
     uint8_t count = 0;
-    size_t response = 0;
-    _setConfig(true);
-    for (uint8_t i=0; i<len; i++) {
-        _sendWait(CMD_READ_MEMORY);
-        response = _sendWait(address + i);
-        if (1 != response) break;
-        count++;
-        buffer[i] = _buffer[0];
+    if (_setConfig(true)) {
+        for (uint8_t i=0; i<len; i++) {
+            if (_sendAndReceive(CMD_READ_MEMORY) == -1) break;
+            if (_sendAndReceive(address + i) != 1) break;
+            count++;
+            buffer[i] = _buffer[0];
+        }
+        _setConfig(false);
     }
-    _setConfig(false);
     return count;
 }
 
 /**
  * @brief Returns the contents of single memory addresses
  * @param {uint8_t} address     Address to start from
- * @return {uint8_t} contents of the address
+ * @return {uint8_t}            Contents of the address, 0 if error
  * @protected
  */
 uint8_t Allwize::_getMemory(uint8_t address) {
@@ -408,6 +419,7 @@ uint8_t Allwize::_getMemory(uint8_t address) {
 
 /**
  * @brief Flushes the serial line to the module
+ * @protected
  */
 void Allwize::_flush() {
     _stream.flush();
@@ -416,22 +428,22 @@ void Allwize::_flush() {
 /**
  * @brief Sends a single byte to the module UART. Returns the number of bytes actually sent.
  * @param {uint8_t} ch          Byte to send
- * @return size_t
+ * @return {uint8_t}            Number of bytes actually sent
  * @protected
  */
-size_t Allwize::_send(uint8_t ch) {
+uint8_t Allwize::_send(uint8_t ch) {
     return _stream.write(ch);
 }
 
 /**
  * @brief Sends a binary buffer to the module UART. Returns the number of bytes actually sent.
  * @param {uint8_t *} buffer    Binary data to send
- * @param {size_t} len          Length of the binary data
- * @return size_t
+ * @param {uint8_t} len         Length of the binary data
+ * @return {uint8_t}            Number of bytes actually sent
  * @protected
  */
-size_t Allwize::_send(uint8_t * buffer, size_t len) {
-    size_t n = 0;
+uint8_t Allwize::_send(uint8_t * buffer, uint8_t len) {
+    uint8_t n = 0;
     for (uint8_t i=0; i<len; i++) {
         if (_send(buffer[i])) n++;
     }
@@ -440,34 +452,33 @@ size_t Allwize::_send(uint8_t * buffer, size_t len) {
 
 /**
  * @brief Listens to incomming data from the module until timeout or END_OF_RESPONSE. Returns the number of bytes received and stored in the internal _buffer.
- * @return int8_t   Number of bytes received, -1 if timed out
+ * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
  * @protected
  */
 int8_t Allwize::_receive() {
-    uint32_t start = millis();
-    size_t len = _stream.readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
-    if (millis() - start > _timeout) return -1;
-    return len;
+    return _readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
 }
 
 /**
  * @brief Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the internal _buffer.
  * @param {uint8_t *} buffer    Binary data to send
- * @param {size_t} len          Length of the binary data (-1 if timed out)
+ * @param {uint8_t} len         Length of the binary data
+ * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
  * @protected
  */
-int8_t Allwize::_sendWait(uint8_t * buffer, size_t len) {
-    _send(buffer, len);
+int8_t Allwize::_sendAndReceive(uint8_t * buffer, uint8_t len) {
+    if (_send(buffer, len) != len) return -1;
     return _receive();
 }
 
 /**
  * @brief Sends a byte and waits for response. Returns the number of bytes received and stored in the internal _buffer.
  * @param {uint8_t} ch          Byte to send (-1 if timed out)
+ * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
  * @protected
  */
-int8_t Allwize::_sendWait(uint8_t ch) {
-    _send(ch);
+int8_t Allwize::_sendAndReceive(uint8_t ch) {
+    if (_send(ch) != 1) return -1;
     return _receive();
 }
 
@@ -476,13 +487,48 @@ int8_t Allwize::_sendWait(uint8_t ch) {
 // -----------------------------------------------------------------------------
 
 /**
+ * @brief Reads a byte from the stream with a timeout
+ * @returns {int}               Read char or -1 if timed out
+ * @protected
+ */
+int Allwize::_timedRead() {
+    uint32_t _start = millis();
+    while (millis() - _start < _timeout) {
+        int ch = _stream.read();
+        if (ch >= 0) return ch;
+    };
+    return -1;
+}
+
+/**
+ * @brief Reads the stream buffer up to a certain char or times out
+ * @param {char} terminator     Terminating char
+ * @param {char *} buffer       Buffer to store the values to
+ * @param {uint8_t} len         Max number of bytes to read
+ * @returns {int}               Number of bytes read or -1 if timed out
+ * @protected
+ */
+int Allwize::_readBytesUntil(char terminator, char * buffer, uint8_t len) {
+    if (len < 1) return 0;
+    size_t index = 0;
+    while (index < len) {
+        int ch = _timedRead();
+        if (ch < 0) return ch;
+        if (ch == terminator) break;
+        *buffer++ = (char) ch;
+        index++;
+    }
+    return index;
+}
+
+/**
  * @brief Converts a hex c-string to a binary buffer.
  * @param {char *} hex          C-string with the hex values
  * @param {uint8_t *} bin       Buffer to store the converted values in
- * @param {size_t} len          Length of the hex c-string
+ * @param {uint8_t} len         Length of the hex c-string
  * @protected
  */
-void Allwize::_hex2bin(char * hex, uint8_t * bin, size_t len) {
+void Allwize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
     for (uint8_t i=0; i<len; i+=2) {
         bin[i/2] = ((hex[i] - '0') * 16 + (hex[i+1] - '0')) & 0xFF;
     }
@@ -492,10 +538,10 @@ void Allwize::_hex2bin(char * hex, uint8_t * bin, size_t len) {
  * @brief Converts a binary buffer to an hex c-string.
  * @param {uint8_t *} bin       Buffer to read the values from
  * @param {char *} hex          C-string to store the hex values
- * @param {size_t} len          Length of the input buffer
+ * @param {uint8_t} len         Length of the input buffer
  * @protected
  */
-void Allwize::_bin2hex(uint8_t * bin, char * hex, size_t len) {
+void Allwize::_bin2hex(uint8_t * bin, char * hex, uint8_t len) {
     for (uint8_t i=0; i<len; i++) {
         hex[i*2]   = ((bin[i] >> 4) & 0x0F) + '0';
         hex[i*2+1] = ((bin[i]     ) & 0x0F) + '0';

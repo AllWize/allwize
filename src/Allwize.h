@@ -29,82 +29,88 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Arduino.h>
 #include <Stream.h>
 
-#define MODEM_BAUDRATE          19200
-#define END_OF_RESPONSE         '>'
-#define CMD_ENTER_CONFIG        (char) 0x00
-#define CMD_EXIT_CONFIG         (char) 0x58
-#define CMD_EXIT_MEMORY         (char) 0xFF
-#define RX_BUFFER_SIZE          32
+// -----------------------------------------------------------------------------
+// Types & definitions
+// -----------------------------------------------------------------------------
 
-#define CMD_CHANNEL             'C'
-#define CMD_CONTROL_FIELD       'F'
-#define CMD_MBUS_MODE           'G'
-#define CMD_INSTALL             'I'
-#define CMD_WRITE_MEMORY        'M'
-#define CMD_AUTO_MESSAGE_FLAGS  'O'
-#define CMD_RF_POWER            'P'
-#define CMD_QUALITY             'Q'
-#define CMD_READ_MAILBOX        'R'
-#define CMD_RSSI                'S'
-#define CMD_TEMPERATURE         'U'
-#define CMD_VOLTAGE             'V'
-#define CMD_READ_MEMORY         'Y'
-#define CMD_SLEEP               'Z'
+// General
+#define MODEM_BAUDRATE                  19200
+#define END_OF_RESPONSE                 '>'
+#define CMD_ENTER_CONFIG                (char) 0x00
+#define CMD_EXIT_CONFIG                 (char) 0x58
+#define CMD_EXIT_MEMORY                 (char) 0xFF
+#define RX_BUFFER_SIZE                  32
+#define DEFAULT_TIMEOUT                 1000
 
-#define MEM_CHANNEL             0x00
-#define MEM_RF_POWER            0x01
-#define MEM_MBUS_MODE           0x03
-#define MEM_SLEEP_MODE          0x04
-#define MEM_RSSI_MODE           0x05
-#define MEM_PREAMBLE_LENGTH     0x0A
-#define MEM_TIMEOUT             0x10
-#define MEM_NETWORK_ROLE        0x12
-#define MEM_MAILBOX             0x16
-#define MEM_MANUFACTURER_ID     0x19
-#define MEM_UNIQUE_ID           0x1B
-#define MEM_VERSION             0x1F
-#define MEM_DEVICE              0x20
-#define MEM_UART_BAUD_RATE      0x30
-#define MEM_UART_FLOW_CTRL      0x35
-#define MEM_DATA_INTERFACE      0x36
-#define MEM_CONFIG_INTERFACE    0x37
-#define MEM_FREQ_CAL            0x39
-#define MEM_LED_CONTROL         0x3A
-#define MEM_CONTROL_FIELD       0x3B
-#define MEM_RX_TIMEOUT          0x3C
-#define MEM_INSTALL_MODE        0x3D
-#define MEM_ENCRYPT_FLAG        0x3E
-#define MEM_DECRYPT_FLAG        0x3F
-#define MEM_PART_NUMBER         0x61
-#define MEM_HW_REV_NUMBER       0x6E
-#define MEM_FW_REV_NUMBER       0x73
-#define MEM_SERIAL_NUMBER       0x78
+// Command keys
+#define CMD_CHANNEL                     'C'
+#define CMD_CONTROL_FIELD               'F'
+#define CMD_MBUS_MODE                   'G'
+#define CMD_INSTALL                     'I'
+#define CMD_WRITE_MEMORY                'M'
+#define CMD_AUTO_MESSAGE_FLAGS          'O'
+#define CMD_RF_POWER                    'P'
+#define CMD_QUALITY                     'Q'
+#define CMD_READ_MAILBOX                'R'
+#define CMD_RSSI                        'S'
+#define CMD_TEMPERATURE                 'U'
+#define CMD_VOLTAGE                     'V'
+#define CMD_READ_MEMORY                 'Y'
+#define CMD_SLEEP                       'Z'
+
+// Memory addresses
+#define MEM_CHANNEL                     0x00
+#define MEM_RF_POWER                    0x01
+#define MEM_MBUS_MODE                   0x03
+#define MEM_SLEEP_MODE                  0x04
+#define MEM_RSSI_MODE                   0x05
+#define MEM_PREAMBLE_LENGTH             0x0A
+#define MEM_TIMEOUT                     0x10
+#define MEM_NETWORK_ROLE                0x12
+#define MEM_MAILBOX                     0x16
+#define MEM_MANUFACTURER_ID             0x19
+#define MEM_UNIQUE_ID                   0x1B
+#define MEM_VERSION                     0x1F
+#define MEM_DEVICE                      0x20
+#define MEM_UART_BAUD_RATE              0x30
+#define MEM_UART_FLOW_CTRL              0x35
+#define MEM_DATA_INTERFACE              0x36
+#define MEM_CONFIG_INTERFACE            0x37
+#define MEM_FREQ_CAL                    0x39
+#define MEM_LED_CONTROL                 0x3A
+#define MEM_CONTROL_FIELD               0x3B
+#define MEM_RX_TIMEOUT                  0x3C
+#define MEM_INSTALL_MODE                0x3D
+#define MEM_ENCRYPT_FLAG                0x3E
+#define MEM_DECRYPT_FLAG                0x3F
+#define MEM_PART_NUMBER                 0x61
+#define MEM_HW_REV_NUMBER               0x6E
+#define MEM_FW_REV_NUMBER               0x73
+#define MEM_SERIAL_NUMBER               0x78
 
 // MBus modes
-enum {
-    MBUS_MODE_S = 0,
-    MBUS_MODE_T1 = 1,
-    MBUS_MODE_T2 = 2,
-    MBUS_MODE_R2 = 4,
-    MBUS_MODE_C1_T1 = 10,
-    MBUS_MODE_C1_T2 = 11
-};
+#define MBUS_MODE_S                     0x00
+#define MBUS_MODE_T1                    0x01
+#define MBUS_MODE_T2                    0x02
+#define MBUS_MODE_R2                    0x04
+#define MBUS_MODE_C1_T1                 0x0A
+#define MBUS_MODE_C1_T2                 0x0B
 
 // Operation modes
-enum {
-    INSTALL_MODE_NORMAL = 0,
-    INSTALL_MODE_INSTALL = 1,
-    INSTALL_MODE_HOST = 2
-};
+#define INSTALL_MODE_NORMAL             0x00
+#define INSTALL_MODE_INSTALL            0x01
+#define INSTALL_MODE_HOST               0x02
 
-// Operation modes
-enum {
-    SLEEP_MODE_DISABLE = 0,
-    SLEEP_MODE_AFTER_TX = 1,
-    SLEEP_MODE_AFTER_TX_RX = 3,
-    SLEEP_MODE_AFTER_TX_TIMEOUT = 5,
-    SLEEP_MODE_AFTER_TX_RX_TIMEOUT = 7
-};
+// Sleep modes
+#define SLEEP_MODE_DISABLE              0x00
+#define SLEEP_MODE_AFTER_TX             0x01
+#define SLEEP_MODE_AFTER_TX_RX          0x03
+#define SLEEP_MODE_AFTER_TX_TIMEOUT     0x05
+#define SLEEP_MODE_AFTER_TX_RX_TIMEOUT  0x07
+
+// -----------------------------------------------------------------------------
+// Class prototype
+// -----------------------------------------------------------------------------
 
 class Allwize {
 
@@ -145,34 +151,36 @@ class Allwize {
     protected:
 
         bool _setConfig(bool value);
-        size_t _sendCommand(uint8_t command, uint8_t * data, size_t len);
-        size_t _sendCommand(uint8_t command, uint8_t data);
-        size_t _sendCommand(uint8_t command);
-        void _setMemory(uint8_t address, uint8_t * data, size_t len);
-        void _setMemory(uint8_t address, uint8_t data);
-        size_t _getMemory(uint8_t address, size_t len, uint8_t * buffer);
+        int8_t _sendCommand(uint8_t command, uint8_t * data, uint8_t len);
+        int8_t _sendCommand(uint8_t command, uint8_t data);
+        int8_t _sendCommand(uint8_t command);
+        bool _setMemory(uint8_t address, uint8_t * data, uint8_t len);
+        bool _setMemory(uint8_t address, uint8_t data);
+        uint8_t _getMemory(uint8_t address, uint8_t len, uint8_t * buffer);
         uint8_t _getMemory(uint8_t address);
 
         void _flush();
-        size_t _send(uint8_t * buffer, size_t len);
-        size_t _send(uint8_t ch);
-        int8_t _sendWait(uint8_t * buffer, size_t len);
-        int8_t _sendWait(uint8_t ch);
+        uint8_t _send(uint8_t * buffer, uint8_t len);
+        uint8_t _send(uint8_t ch);
         int8_t _receive();
+        int8_t _sendAndReceive(uint8_t * buffer, uint8_t len);
+        int8_t _sendAndReceive(uint8_t ch);
 
-        void _hex2bin(char * hex, uint8_t * bin, size_t len);
-        void _bin2hex(uint8_t * bin, char * hex, size_t len);
+        int _timedRead();
+        int _readBytesUntil(char terminator, char * buffer, uint8_t len);
+        void _hex2bin(char * hex, uint8_t * bin, uint8_t len);
+        void _bin2hex(uint8_t * bin, char * hex, uint8_t len);
 
     private:
 
     // -------------------------------------------------------------------------
 
-    private:
+    protected:
 
         Stream& _stream;
         uint8_t _reset_gpio = 0xFF;
         bool _config = false;
-        uint32_t _timeout = 2000;
+        uint32_t _timeout = DEFAULT_TIMEOUT;
 
         uint8_t _buffer[RX_BUFFER_SIZE];
 

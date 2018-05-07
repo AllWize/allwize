@@ -75,14 +75,12 @@ void setup() {
     Serial.begin(115200);
     delay(5000);
 
+    module.begin(19200);
+    allwize = new AllwizeWrap(module);
+
     Serial.println();
     Serial.println("Allwize - Module Memory Dump");
     Serial.println();
-
-    module.begin(19200);
-    module.setTimeout(2000);
-    allwize = new AllwizeWrap(module);
-    allwize->setTimeout(2000);
 
     char buffer[10];
 
