@@ -30,23 +30,23 @@ class StreamInjector : public Stream {
 
         typedef void (*writeCallback)(uint8_t);
 
-        StreamInjector(size_t buflen = 128) : _buffer_size(buflen) {
-            _buffer = new char[buflen];
+        StreamInjector(uint8_t tx_buffer_size = 128) : _tx_buffer_size(tx_buffer_size) {
+            _tx_buffer = new char[tx_buffer_size];
         }
 
         ~StreamInjector() {
-            delete[] _buffer;
+            delete[] _tx_buffer;
         }
 
         // ---------------------------------------------------------------------
 
         virtual uint16_t inject(char ch) {
-            _buffer[_buffer_write] = ch;
-            _buffer_write = (_buffer_write + 1) % _buffer_size;
+            _tx_buffer[_tx_buffer_write] = ch;
+            _tx_buffer_write = (_tx_buffer_write + 1) % _tx_buffer_size;
             return 1;
         }
 
-        virtual uint16_t inject(char *data, size_t len) {
+        virtual uint16_t inject(char *data, uint16_t len) {
             for (uint16_t i=0; i<len; i++) {
                 inject(data[i]);
             }
@@ -66,41 +66,41 @@ class StreamInjector : public Stream {
 
         virtual int read() {
             int ch = -1;
-            if (_buffer_read != _buffer_write) {
-                ch = _buffer[_buffer_read];
-                _buffer_read = (_buffer_read + 1) % _buffer_size;
+            if (_tx_buffer_read != _tx_buffer_write) {
+                ch = (uint8_t) _tx_buffer[_tx_buffer_read];
+                _tx_buffer_read = (_tx_buffer_read + 1) % _tx_buffer_size;
             }
             return ch;
         }
 
         virtual int available() {
             int bytes = 0;
-            if (_buffer_read > _buffer_write) {
-                bytes += (_buffer_write - _buffer_read + _buffer_size);
-            } else if (_buffer_read < _buffer_write) {
-                bytes += (_buffer_write - _buffer_read);
+            if (_tx_buffer_read > _tx_buffer_write) {
+                bytes += (_tx_buffer_write - _tx_buffer_read + _tx_buffer_size);
+            } else if (_tx_buffer_read < _tx_buffer_write) {
+                bytes += (_tx_buffer_write - _tx_buffer_read);
             }
             return bytes;
         }
 
         virtual int peek() {
             int ch = -1;
-            if (_buffer_read != _buffer_write) {
-                ch = _buffer[_buffer_read];
+            if (_tx_buffer_read != _tx_buffer_write) {
+                ch = _tx_buffer[_tx_buffer_read];
             }
             return ch;
         }
 
         virtual void flush() {
-            _buffer_read = _buffer_write;
+            _tx_buffer_read = _tx_buffer_write;
         }
 
     private:
 
-        char * _buffer;
-        size_t _buffer_size;
-        uint16_t _buffer_write = 0;
-        uint16_t _buffer_read = 0;
+        char * _tx_buffer;
+        uint16_t _tx_buffer_size;
+        uint16_t _tx_buffer_write = 0;
+        uint16_t _tx_buffer_read = 0;
         writeCallback _callback = NULL;
 
 };
