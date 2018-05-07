@@ -1,163 +1,26 @@
 #include "Allwize.h"
-#include "StreamInjector.h"
+#include "RC1701XX_Mockup.h"
 
-StreamInjector mock;
+RC1701XX_Mockup mock;
 Allwize * allwize;
 
-#define TEST_BUFFER_SIZE    32
 #define TEST_NAME_PADDING   30
 #define TEST_RESPONSE_BYTE  0xA0
-#define TEST_DEBUG          0
 
 // -----------------------------------------------------------------------------
 
-uint8_t _rx_buffer[TEST_BUFFER_SIZE];
-uint8_t _rx_read = 0;
-uint8_t _rx_write = 0;
 uint8_t _tests = 0;
 uint8_t _tests_failed = 0;
 
-void _reset() {
-    _rx_write = _rx_read = 0;
-}
-
-uint8_t available() {
-    if (_rx_write >= _rx_read) return _rx_write - _rx_read;
-    return TEST_BUFFER_SIZE - _rx_read + _rx_write;
-}
-
 bool _compare(uint8_t * expected, size_t len) {
 
-    bool response = true;
-
-    Serial.print(len); Serial.print(available());
-    if (available() != len) response = false;
-    if (available() != len) Serial.println("does not match");
+    if ((size_t) mock.rx_available() != len) return false;
 
     for (uint8_t i=0; i<len; i++) {
-        if (_rx_buffer[_rx_read] != expected[i]) response = false;
-        _rx_read = (_rx_read + 1) % TEST_BUFFER_SIZE;
+        uint8_t ch = mock.rx_read();
+        if (ch != expected[i]) return false;
     }
-    return response;
-}
-
-void _mock_inject(unsigned char ch) {
-    #if TEST_DEBUG
-        Serial.print("Receive: 0x");
-        Serial.println(ch, HEX);
-    #endif
-    mock.inject(ch);
-}
-
-void _mock_response(unsigned char ch) {
-
-    static uint8_t pending_payload = 0;
-    static uint8_t response_size = 0;
-    static bool config_mode = false;
-
-    #if TEST_DEBUG
-        Serial.print("Sent   : 0x");
-        Serial.println(ch, HEX);
-    #endif
-
-    // Buffer
-    _rx_buffer[_rx_write] = ch;
-    _rx_write = (_rx_write + 1) % TEST_BUFFER_SIZE;
-
-    // Expected payload sizes (defaults to 1 byte)
-    if (0 == pending_payload) {
-
-        // Check config mode
-        if (!config_mode & (0x00 == ch)) config_mode = true;
-        if (config_mode & (0x58 == ch)) config_mode = false;
-        if (!config_mode) return;
-
-        // Handle cases
-        switch (ch) {
-
-            case 0x00:
-                pending_payload = 0;
-                break;
-
-            case 'A':
-                pending_payload = 2;
-                break;
-
-            case 'B':
-                pending_payload = 8;
-                break;
-
-            case 'K':
-                pending_payload = 17;
-                break;
-
-            case 'L':
-                pending_payload = 1;
-                response_size = 8;
-                break;
-
-            case 'M':
-                // TODO
-                break;
-
-            case 'O':
-                pending_payload = 1;
-                response_size = 2;
-                break;
-
-            case 'Q':
-            case 'S':
-            case 'U':
-            case 'V':
-                pending_payload = 0;
-                _mock_inject(TEST_RESPONSE_BYTE);
-                break;
-
-            case 'T':
-                pending_payload = 8;
-                break;
-
-            case 'W':
-                // TODO
-                break;
-
-            case 'Y':
-                pending_payload = 1;
-                response_size = 1;
-                break;
-
-            default:
-                pending_payload = 1;
-                break;
-
-        }
-
-        // Show prompt
-        _mock_inject('>');
-
-    } else {
-
-        // Update pending payload
-        --pending_payload;
-
-        // If no more payload
-        if (0 == pending_payload) {
-
-            // Inject response
-            for (uint8_t i=0; i<response_size; i++) {
-                _mock_inject(TEST_RESPONSE_BYTE);
-            }
-
-            // Reset response size
-            response_size = 0;
-
-            // Show prompt
-            _mock_inject('>');
-
-        }
-
-    }
-
+    return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -254,8 +117,8 @@ bool test_get_rssi(void) {
 
 void test(const char * name, bool (*callback)(void)) {
 
-    _reset();
     mock.flush();
+    mock.rx_flush();
 
     bool response = (callback)();
 
@@ -299,7 +162,6 @@ void setup() {
     for (uint8_t i=0; i<TEST_NAME_PADDING+4; i++) Serial.print("-");
     Serial.println();
 
-    mock.callback(_mock_response);
     allwize = new Allwize(mock);
 
     tests();
