@@ -20,7 +20,9 @@ bool _compare(uint8_t * expected, size_t len) {
         uint8_t ch = mock.rx_read();
         if (ch != expected[i]) return false;
     }
+
     return true;
+
 }
 
 // -----------------------------------------------------------------------------
@@ -46,14 +48,14 @@ bool test_get_channel(void) {
 }
 
 bool test_set_mbus_mode(void) {
-    uint8_t mode = MBUS_MODE_R2;
+    uint8_t mode = MBUS_MODE_OSP;
     allwize->setMBusMode(mode);
     uint8_t expected[] = {0x00, 'G', mode, 0x58};
     return _compare(expected, sizeof(expected));
 }
 
 bool test_set_mbus_mode_persist(void) {
-    uint8_t mode = MBUS_MODE_R2;
+    uint8_t mode = MBUS_MODE_OSP;
     allwize->setMBusMode(mode, true);
     uint8_t expected[] = {0x00, 'M', 0x03, mode, 0xFF, 0x58};
     return _compare(expected, sizeof(expected));
@@ -92,6 +94,21 @@ bool test_get_control_field(void) {
     return _compare(expected, sizeof(expected));
 }
 
+bool test_set_default_key(void) {
+    uint8_t key[16];
+    for (uint8_t i=0; i<16; i++) key[i] = 0x10;
+    allwize->setDefaultKey(key);
+    uint8_t expected[] = {
+        0x00, 'M',
+        0x40, 0x10, 0x41, 0x10, 0x42, 0x10, 0x43, 0x10,
+        0x44, 0x10, 0x45, 0x10, 0x46, 0x10, 0x47, 0x10,
+        0x48, 0x10, 0x49, 0x10, 0x4A, 0x10, 0x4B, 0x10,
+        0x4C, 0x10, 0x4D, 0x10, 0x4E, 0x10, 0x4F, 0x10,
+        0xFF, 0x58
+    };
+    return _compare(expected, sizeof(expected));
+}
+
 bool test_get_temperature(void) {
     uint8_t value = allwize->getTemperature();
     if (32 != value) return false;
@@ -121,12 +138,12 @@ void test(const char * name, bool (*callback)(void)) {
     mock.rx_flush();
 
     bool response = (callback)();
+    if (!response) ++_tests_failed;
+    ++_tests;
 
     Serial.print(name);
     for (uint8_t i=strlen(name); i<TEST_NAME_PADDING; i++) Serial.print(".");
     Serial.println(response ? "OK" : "FAIL");
-    ++_tests;
-    if (!response) ++_tests_failed;
 
 }
 
@@ -144,6 +161,8 @@ void tests() {
     test("setMBusModePersist", test_set_mbus_mode_persist);
     test("getMBusMode", test_get_mbus_mode);
 
+    test("setDefaultKey", test_set_default_key);
+
     test("setInstallMode", test_set_install);
     test("getTemperature", test_get_temperature);
     test("getVoltage", test_get_voltage);
@@ -157,6 +176,7 @@ void setup() {
 
     Serial.begin(115200);
     while (!Serial);
+
     Serial.println();
     Serial.println("Allwize library test suite");
     for (uint8_t i=0; i<TEST_NAME_PADDING+4; i++) Serial.print("-");

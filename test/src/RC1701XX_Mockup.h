@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Stream.h>
 
 #define MOCKUP_RESPONSE_BYTE        0xA0
+#define MOCKUP_DEBUG                0
 
 class CircularBuffer {
 
@@ -96,8 +97,15 @@ class RC1701XX_Mockup : public Stream {
         // ---------------------------------------------------------------------
 
         virtual size_t write(uint8_t ch) {
+
+            #if MOCKUP_DEBUG
+                Serial.print("Received: 0x");
+                Serial.println((uint8_t) ch, HEX);
+            #endif
+
             _process(ch);
             return _rx->write(ch);
+
         }
 
         virtual int read() {
@@ -120,6 +128,17 @@ class RC1701XX_Mockup : public Stream {
         // Inverted stream
         // ---------------------------------------------------------------------
 
+        virtual size_t rx_write(uint8_t ch) {
+
+            #if MOCKUP_DEBUG
+                Serial.print("Sending : 0x");
+                Serial.println((uint8_t) ch, HEX);
+            #endif
+
+            return _tx->write(ch);
+
+        }
+
         virtual int rx_read() {
             return _rx->read();
         }
@@ -138,11 +157,12 @@ class RC1701XX_Mockup : public Stream {
         // Data processing
         // ---------------------------------------------------------------------
 
-        void _process(char ch) {
+        void _process(uint8_t ch) {
 
             static uint8_t pending_payload = 0;
             static uint8_t response_size = 0;
             static bool config_mode = false;
+            static bool memory_mode = false;
 
             // Expected payload sizes (defaults to 1 byte)
             if (0 == pending_payload) {
@@ -151,6 +171,17 @@ class RC1701XX_Mockup : public Stream {
                 if (!config_mode & (0x00 == ch)) config_mode = true;
                 if (config_mode & (0x58 == ch)) config_mode = false;
                 if (!config_mode) return;
+
+                // Memory mode
+                if (memory_mode) {
+                    if (0xFF == ch) {
+                        memory_mode = false;
+                        rx_write('>');
+                    } else {
+                        pending_payload = 1;
+                    }
+                    return;
+                }
 
                 // Handle cases
                 switch (ch) {
@@ -177,7 +208,8 @@ class RC1701XX_Mockup : public Stream {
                         break;
 
                     case 'M':
-                        // TODO
+                        memory_mode = true;
+                        pending_payload = 2;
                         break;
 
                     case 'O':
@@ -190,7 +222,7 @@ class RC1701XX_Mockup : public Stream {
                     case 'U':
                     case 'V':
                         pending_payload = 0;
-                        _tx->write(MOCKUP_RESPONSE_BYTE);
+                        rx_write(MOCKUP_RESPONSE_BYTE);
                         break;
 
                     case 'T':
@@ -213,26 +245,29 @@ class RC1701XX_Mockup : public Stream {
                 }
 
                 // Show prompt
-                _tx->write('>');
+                rx_write('>');
 
             } else {
 
                 // Update pending payload
                 --pending_payload;
 
+                // Memory mode
+                if (memory_mode) return;
+
                 // If no more payload
                 if (0 == pending_payload) {
 
                     // Inject response
                     for (uint8_t i=0; i<response_size; i++) {
-                        _tx->write(MOCKUP_RESPONSE_BYTE);
+                        rx_write(MOCKUP_RESPONSE_BYTE);
                     }
 
                     // Reset response size
                     response_size = 0;
 
                     // Show prompt
-                    _tx->write('>');
+                    rx_write('>');
 
                 }
 

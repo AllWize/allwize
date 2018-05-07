@@ -46,12 +46,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_CHANNEL                     'C'
 #define CMD_CONTROL_FIELD               'F'
 #define CMD_MBUS_MODE                   'G'
-#define CMD_INSTALL                     'I'
+#define CMD_INSTALL_MODE                'I'
 #define CMD_WRITE_MEMORY                'M'
-#define CMD_AUTO_MESSAGE_FLAGS          'O'
 #define CMD_RF_POWER                    'P'
 #define CMD_QUALITY                     'Q'
-#define CMD_READ_MAILBOX                'R'
 #define CMD_RSSI                        'S'
 #define CMD_TEMPERATURE                 'U'
 #define CMD_VOLTAGE                     'V'
@@ -83,18 +81,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_INSTALL_MODE                0x3D
 #define MEM_ENCRYPT_FLAG                0x3E
 #define MEM_DECRYPT_FLAG                0x3F
+#define MEM_DEFAULT_KEY                 0x40
 #define MEM_PART_NUMBER                 0x61
 #define MEM_HW_REV_NUMBER               0x6E
 #define MEM_FW_REV_NUMBER               0x73
 #define MEM_SERIAL_NUMBER               0x78
 
 // MBus modes
-#define MBUS_MODE_S                     0x00
+#define MBUS_MODE_S2                    0x00
 #define MBUS_MODE_T1                    0x01
 #define MBUS_MODE_T2                    0x02
-#define MBUS_MODE_R2                    0x04
-#define MBUS_MODE_C1_T1                 0x0A
-#define MBUS_MODE_C1_T2                 0x0B
+#define MBUS_MODE_S1                    0x03
+#define MBUS_MODE_R                     0x04
+#define MBUS_MODE_T1_C                  0x0A
+#define MBUS_MODE_T2_C                  0x0B
+#define MBUS_MODE_N2                    0x10
+#define MBUS_MODE_N1                    0x11
+#define MBUS_MODE_OSP                   0x12
 
 // Operation modes
 #define INSTALL_MODE_NORMAL             0x00
@@ -108,6 +111,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SLEEP_MODE_AFTER_TX_TIMEOUT     0x05
 #define SLEEP_MODE_AFTER_TX_RX_TIMEOUT  0x07
 
+// Network roles
+#define NETWORK_ROLE_SLAVE              0x01
+#define NETWORK_ROLE_MASTER             0x02
+#define NETWORK_ROLE_REPEATER           0x03
+
+// Timeouts
+#define TIMEOUT_32MS                    0x01
+#define TIMEOUT_48MS                    0x02
+#define TIMEOUT_64MS                    0x03
+#define TIMEOUT_2S                      0x7C
+#define TIMEOUT_4S                      0xF9
+
+// LED Control
+#define LED_CONTROL_DISABLED            0x00
+#define LED_CONTROL_RX_TX               0x01
+#define LED_CONTROL_UART_RF_IDLE        0x02
+
+// Encrypt/Decrypt flags
+#define ENCRYPT_DISABLED                0x00
+#define ENCRYPT_ENABLED                 0x01
+#define ENCRYPT_ENABLED_CRC             0x03
+
 // -----------------------------------------------------------------------------
 // Class prototype
 // -----------------------------------------------------------------------------
@@ -120,24 +145,42 @@ class Allwize {
 
         void begin();
         void reset();
+        void factoryReset();
         void sleep();
         void wakeup();
         bool ready();
-        void setTimeout(uint32_t timeout);
-        void setMaster(bool master = true);
+
+        void master();
+        void slave();
+        void repeater();
 
         void setChannel(uint8_t channel, bool persist = false);
         void setPower(uint8_t power, bool persist = false);
         void setMBusMode(uint8_t mode, bool persist = false);
         void setSleepMode(uint8_t mode);
+        void setAppendRSSI(bool value);
+        void setTimeout(uint8_t timeout);
+        void setNetworkRole(uint8_t role);
+        void setLEDControl(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
-        void setInstallMode(uint8_t mode);
+        void setInstallMode(uint8_t mode, bool persist = false);
+        void setEncryptFlag(uint8_t flag);
+        void setDecryptFlag(uint8_t flag);
+        void setDefaultKey(uint8_t * key);
 
         uint8_t getChannel();
         uint8_t getPower();
         uint8_t getMBusMode();
         uint8_t getSleepMode();
         uint8_t getControlField();
+        bool getAppendRSSI();
+        uint8_t getTimeout();
+        uint8_t getNetworkRole();
+        uint8_t getLEDControl();
+        uint8_t getInstallMode();
+        uint8_t getEncryptFlag();
+        uint8_t getDecryptFlag();
+        void getDefaultKey(uint8_t * key);
 
         float getRSSI();
         uint8_t getTemperature();
@@ -146,7 +189,10 @@ class Allwize {
         String getUID();
         uint8_t getVersion();
         uint8_t getDevice();
-
+        String getPartNumber();
+        String getHardwareVersion();
+        String getFirmwareVersion();
+        String getSerialNumber();
 
     protected:
 
@@ -156,8 +202,9 @@ class Allwize {
         int8_t _sendCommand(uint8_t command);
         bool _setMemory(uint8_t address, uint8_t * data, uint8_t len);
         bool _setMemory(uint8_t address, uint8_t data);
-        uint8_t _getMemory(uint8_t address, uint8_t len, uint8_t * buffer);
+        uint8_t _getMemory(uint8_t address, uint8_t * buffer, uint8_t len);
         uint8_t _getMemory(uint8_t address);
+        String _getMemoryAsHexString(uint8_t address, uint8_t len);
 
         void _flush();
         uint8_t _send(uint8_t * buffer, uint8_t len);

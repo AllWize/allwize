@@ -108,6 +108,11 @@ void setup() {
     format("Unique ID", allwize->getUID());
     format("Version", allwize->getVersion());
     format("Device", allwize->getDevice());
+    format("Part Number", allwize->getPartNumber());
+    format("Hardware Version", allwize->getHardwareVersion());
+    format("Firmware Version", allwize->getFirmwareVersion());
+    format("Serial Number", allwize->getSerialNumber());
+
     format("Temperature (C)", allwize->getTemperature());
     format("Voltage (mV)", allwize->getVoltage());
 
