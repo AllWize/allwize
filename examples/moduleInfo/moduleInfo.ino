@@ -22,28 +22,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "Allwize.h"
-Allwize * allwize;
+// -----------------------------------------------------------------------------
+// Board definitions
+// -----------------------------------------------------------------------------
 
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO)
     #define RX_PIN      8
     #define TX_PIN      9
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
-#endif
+#endif // ARDUINO_AVR_UNO
 
-#ifdef ARDUINO_AVR_LEONARDO
+#if defined(ARDUINO_AVR_LEONARDO)
     #define module      Serial1
-#endif
+#endif // ARDUINO_AVR_LEONARDO
 
-#ifdef ARDUINO_ARCH_ESP8266
+#if defined(ARDUINO_ARCH_SAMD)
+    #define module      Serial1
+#endif // ARDUINO_ARCH_SAMD
+
+#if defined(ARDUINO_ARCH_ESP8266)
     #define RX_PIN      12
     #define TX_PIN      13
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
-#endif
+#endif // ARDUINO_ARCH_ESP8266
+
+// -----------------------------------------------------------------------------
+// Config & globals
+// -----------------------------------------------------------------------------
 
 #define COLUMN_PAD  20
+
+#include "Allwize.h"
+Allwize * allwize;
+
+// -----------------------------------------------------------------------------
+// Utils
+// -----------------------------------------------------------------------------
 
 void format(const char * name, const char * value) {
     Serial.print(name);
@@ -63,24 +79,24 @@ void format(const char * name, int value) {
     format(name, buffer);
 }
 
+// -----------------------------------------------------------------------------
+// Main
+// -----------------------------------------------------------------------------
+
 void setup() {
 
     Serial.begin(115200);
-    while (!Serial);
+    delay(5000);
 
     module.begin(19200);
     module.setTimeout(2000);
+
     allwize = new Allwize(module);
     allwize->setTimeout(2000);
 
     Serial.println();
-    Serial.println("Allwize - Module Memory Dump");
+    Serial.println("Allwize - Module Info");
     Serial.println();
-
-    if (!allwize->ready()) {
-        Serial.println("Module not ready");
-        return;
-    }
 
     format("Property", "Value");
     Serial.println("------------------------------");

@@ -25,6 +25,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+// -----------------------------------------------------------------------------
+// Board definitions
+// -----------------------------------------------------------------------------
+
+#if defined(ARDUINO_AVR_UNO)
+    #define RX_PIN      8
+    #define TX_PIN      9
+    #include <SoftwareSerial.h>
+    SoftwareSerial module(RX_PIN, TX_PIN);
+#endif // ARDUINO_AVR_UNO
+
+#if defined(ARDUINO_AVR_LEONARDO)
+    #define module      Serial1
+#endif // ARDUINO_AVR_LEONARDO
+
+#if defined(ARDUINO_ARCH_SAMD)
+    #define module      Serial1
+#endif // ARDUINO_ARCH_SAMD
+
+#if defined(ARDUINO_ARCH_ESP8266)
+    #define RX_PIN      12
+    #define TX_PIN      13
+    #include <SoftwareSerial.h>
+    SoftwareSerial module(RX_PIN, TX_PIN);
+#endif // ARDUINO_ARCH_ESP8266
+
+// -----------------------------------------------------------------------------
+// Allwize class wrapper
+// -----------------------------------------------------------------------------
+
 #include "Allwize.h"
 
 class AllwizeWrap : public Allwize {
@@ -36,28 +66,14 @@ class AllwizeWrap : public Allwize {
 
 AllwizeWrap * allwize;
 
-#ifdef ARDUINO_AVR_UNO
-    #define RX_PIN      8
-    #define TX_PIN      9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-#endif
-
-#ifdef ARDUINO_AVR_LEONARDO
-    #define module      Serial1
-#endif
-
-#ifdef ARDUINO_ARCH_ESP8266
-    #define RX_PIN      12
-    #define TX_PIN      13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-#endif
+// -----------------------------------------------------------------------------
+// Main
+// -----------------------------------------------------------------------------
 
 void setup() {
 
     Serial.begin(115200);
-    while (!Serial);
+    delay(5000);
 
     Serial.println();
     Serial.println("Allwize - Module Memory Dump");
