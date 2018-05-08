@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58
 #define CMD_EXIT_MEMORY                 (char) 0xFF
-#define RX_BUFFER_SIZE                  32
+#define RX_BUFFER_SIZE                  128
 #define DEFAULT_TIMEOUT                 1000
 
 // Command keys

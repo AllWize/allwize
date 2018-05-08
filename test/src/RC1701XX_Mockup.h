@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MOCKUP_RESPONSE_BYTE        0xA0
 #define MOCKUP_DEBUG                0
+#define MOCKUP_BUFFER_SIZE          128
 
 class CircularBuffer {
 
@@ -35,33 +36,33 @@ class CircularBuffer {
             _buffer = new char[size];
         }
 
-        ~CircularBuffer() {
+        virtual ~CircularBuffer() {
             delete[] _buffer;
         }
 
-        void flush() {
+        virtual void flush() {
             _read = _write = 0;
         }
 
-        uint8_t available() {
+        virtual uint8_t available() {
             if (_write >= _read) return _write - _read;
             return _size - _read + _write;
         }
 
-        int write(char ch) {
+        virtual int write(char ch) {
             _buffer[_write] = ch;
             _write = (_write + 1) % _size;
             return 1;
         }
 
-        int read() {
+        virtual int read() {
             if (_write == _read) return -1;
             uint8_t ch = _buffer[_read];
             _read = (_read + 1) % _size;
             return ch;
         }
 
-        int peek() {
+        virtual int peek() {
             if (_write == _read) return -1;
             return (uint8_t) _buffer[_read];
         }
@@ -83,16 +84,16 @@ class RC1701XX_Mockup : public Stream {
         // ---------------------------------------------------------------------
 
         RC1701XX_Mockup() {
-            _rx = new CircularBuffer(128);
-            _tx = new CircularBuffer(128);
+            _rx = new CircularBuffer(MOCKUP_BUFFER_SIZE);
+            _tx = new CircularBuffer(MOCKUP_BUFFER_SIZE);
         }
 
-        ~RC1701XX_Mockup() {
+        virtual ~RC1701XX_Mockup() {
             delete _rx;
-            delete _rx;
+            delete _tx;
         }
 
-        void reset() {
+        virtual void reset() {
             _pending_payload = 0;
             _pending_response = 0;
             _config_mode = false;
