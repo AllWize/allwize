@@ -1,12 +1,10 @@
 /*
 
-Allwize - Memory Dump Example
+Allwize - Production Test suite
 
-This example uses a wrapping class around Allwize class to
-expose the getMemory method and dump the radio module memory
-byte by byte.
-This is possible since all methods in the AllWize class are either
-public or protected.
+This test suite tests the hardware by running a series of commands over a RC1701XX module.
+This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
+
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -24,6 +22,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+#include "Allwize.h"
+
+#include "AUnit.h"
+using namespace aunit;
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -52,66 +55,61 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
-// Allwize class wrapper
+// Config & globals
 // -----------------------------------------------------------------------------
+
+#define COLUMN_PAD  20
 
 #include "Allwize.h"
-
-class AllwizeWrap : public Allwize {
-    public:
-        AllwizeWrap(Stream& stream, uint8_t reset_gpio = 0xFF): Allwize(stream, reset_gpio) {};
-        uint8_t getMemory(uint8_t address) { return _getMemory(address); }
-
-};
-
-AllwizeWrap * allwize;
+Allwize * allwize;
 
 // -----------------------------------------------------------------------------
-// Code
+// Tests
 // -----------------------------------------------------------------------------
 
-void dump() {
+test(full) {
 
-    char buffer[10];
+    // get original channel
+    uint8_t channel1 = allwize->getChannel();
+    assertNotEqual(0, channel1);
 
-    Serial.println();
-    Serial.print("      ");
-    for (uint16_t address = 0; address <= 0x0F; address++) {
-        snprintf(buffer, sizeof(buffer), " %02X", address);
-        Serial.print(buffer);
-    }
-    Serial.println();
-    Serial.print("------------------------------------------------------");
+    // set new channel
+    uint8_t channel2 = channel1 + 1;
+    allwize->setChannel(channel2, true);
 
-    for (uint16_t address = 0; address <= 0xFF; address++) {
-        if ((address % 16) == 0) {
-            snprintf(buffer, sizeof(buffer), "\n0x%02X: ", address);
-            Serial.print(buffer);
-        }
-        snprintf(buffer, sizeof(buffer), " %02X", allwize->getMemory(address));
-        Serial.print(buffer);
-    }
+    // get channel again
+    uint8_t channel3 = allwize->getChannel();
+    assertEqual(channel2, channel3);
 
-    Serial.println();
-    Serial.println();
+    // factory reset
+    allwize->factoryReset();
+
+    // We must reset the serial connection after a reset or factoryReset
+    module.end();
+    module.begin(19200);
+
+    // get channel once more (factory channel is 3)
+    uint8_t channel4 = allwize->getChannel();
+    assertEqual(3, channel4);
 
 }
+
+// -----------------------------------------------------------------------------
+// Main
+// -----------------------------------------------------------------------------
 
 void setup() {
 
     Serial.begin(115200);
-    delay(5000);
+    while (!Serial);
 
     module.begin(19200);
-    allwize = new AllwizeWrap(module);
+    allwize = new Allwize(module);
 
-    Serial.println();
-    Serial.println("Allwize - Module Memory Dump");
-
-    dump();
-
-    Serial.println("Done");
+    TestRunner::setVerbosity(Verbosity::kAll);
 
 }
 
-void loop() {}
+void loop() {
+    TestRunner::run();
+}

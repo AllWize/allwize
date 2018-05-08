@@ -1,6 +1,6 @@
 /*
 
-Allwize - Test suite
+Allwize - Mockup Test suite
 
 This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
 and RC1701XX_Mockup class that mocks up the RC1701XX radio module

@@ -47,6 +47,9 @@ void Allwize::begin() {
 
 /**
  * @brief Resets the radio module.
+ * You must reset the serial connection after the reset:
+ *     Serial1.end();
+ *     Serial1.begin(19200);
  */
 void Allwize::reset() {
     if (0xFF == _reset_gpio) {
@@ -66,6 +69,9 @@ void Allwize::reset() {
 
 /**
  * @brief Resets the module to factory settings
+ * You must reset the serial connection after the factoryReset:
+ *     Serial1.end();
+ *     Serial1.begin(19200);
  */
 void Allwize::factoryReset() {
     _setMemory(MEM_CONFIG_INTERFACE, 1);
@@ -73,8 +79,9 @@ void Allwize::factoryReset() {
         _send('@');
         _send('R');
         _send('C');
+        delay(100);
+	_config = false;
     }
-    _config = false;
 }
 
 /**
