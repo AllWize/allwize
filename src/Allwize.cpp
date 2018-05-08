@@ -596,14 +596,16 @@ uint8_t Allwize::_getMemory(uint8_t address) {
  * @brief Returns the contents of the memory from a certain address as an HEX String
  * @param {uint8_t} address     Address to start from
  * @param {uint8_t} len         Number of bytes to read
- * @return {String}             Result
+ * @return {String}             Result (empty string if error)
  * @protected
  */
 String Allwize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
-    uint8_t bin[len] = {0};
-    char hex[2*len+1] = {0};
-    _getMemory(address, bin, len);
-    _bin2hex(bin, hex, len);
+    uint8_t bin[len];
+    char hex[2*len+1];
+    hex[0] = 0;
+    if (len == _getMemory(address, bin, len)) {
+        _bin2hex(bin, hex, len);
+    }
     return String(hex);
 }
 

@@ -170,6 +170,24 @@ testF(CustomTest, get_rssi) {
     compare(sizeof(expected), expected);
 }
 
+testF(CustomTest, get_serial_number) {
+    String sn = allwize->getSerialNumber();
+    assertEqual(16, (int) sn.length());
+    uint8_t expected[] = {
+        0x00,
+        'Y', MEM_SERIAL_NUMBER + 0,
+        'Y', MEM_SERIAL_NUMBER + 1,
+        'Y', MEM_SERIAL_NUMBER + 2,
+        'Y', MEM_SERIAL_NUMBER + 3,
+        'Y', MEM_SERIAL_NUMBER + 4,
+        'Y', MEM_SERIAL_NUMBER + 5,
+        'Y', MEM_SERIAL_NUMBER + 6,
+        'Y', MEM_SERIAL_NUMBER + 7,
+        0x58
+    };
+    compare(sizeof(expected), expected);
+}
+
 // -----------------------------------------------------------------------------
 // Main
 // -----------------------------------------------------------------------------
