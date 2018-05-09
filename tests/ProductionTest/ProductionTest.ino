@@ -32,6 +32,12 @@ using namespace aunit;
 // Board definitions
 // -----------------------------------------------------------------------------
 
+#if defined(ARDUINO_ARCH_SAMD)
+    #define debug   SerialUSB
+#else
+    #define debug   Serial
+#endif
+
 #if defined(ARDUINO_AVR_UNO)
     #define RX_PIN      8
     #define TX_PIN      9
@@ -100,12 +106,13 @@ test(full) {
 
 void setup() {
 
-    Serial.begin(115200);
-    while (!Serial);
+    debug.begin(115200);
+    while (!debug);
 
     module.begin(19200);
     allwize = new Allwize(module);
 
+    Printer::setPrinter(&debug);
     TestRunner::setVerbosity(Verbosity::kAll);
 
 }

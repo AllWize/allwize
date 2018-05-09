@@ -29,6 +29,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
+#if defined(ARDUINO_ARCH_SAMD)
+    #define debug   SerialUSB
+#else
+    #define debug   Serial
+#endif
+
 #if defined(ARDUINO_AVR_UNO)
     #define RX_PIN      8
     #define TX_PIN      9
@@ -74,43 +80,43 @@ void dump() {
 
     char buffer[10];
 
-    Serial.println();
-    Serial.print("      ");
+    debug.println();
+    debug.print("      ");
     for (uint16_t address = 0; address <= 0x0F; address++) {
         snprintf(buffer, sizeof(buffer), " %02X", address);
-        Serial.print(buffer);
+        debug.print(buffer);
     }
-    Serial.println();
-    Serial.print("------------------------------------------------------");
+    debug.println();
+    debug.print("------------------------------------------------------");
 
     for (uint16_t address = 0; address <= 0xFF; address++) {
         if ((address % 16) == 0) {
             snprintf(buffer, sizeof(buffer), "\n0x%02X: ", address);
-            Serial.print(buffer);
+            debug.print(buffer);
         }
         snprintf(buffer, sizeof(buffer), " %02X", allwize->getMemory(address));
-        Serial.print(buffer);
+        debug.print(buffer);
     }
 
-    Serial.println();
-    Serial.println();
+    debug.println();
+    debug.println();
 
 }
 
 void setup() {
 
-    Serial.begin(115200);
-    delay(5000);
+    debug.begin(115200);
+    while (!debug);
 
     module.begin(19200);
     allwize = new AllwizeWrap(module);
 
-    Serial.println();
-    Serial.println("Allwize - Module Memory Dump");
+    debug.println();
+    debug.println("Allwize - Module Memory Dump");
 
     dump();
 
-    Serial.println("Done");
+    debug.println("Done");
 
 }
 

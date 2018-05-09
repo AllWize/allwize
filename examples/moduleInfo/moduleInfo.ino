@@ -26,6 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
+#if defined(ARDUINO_ARCH_SAMD)
+    #define debug   SerialUSB
+#else
+    #define debug   Serial
+#endif
+
 #if defined(ARDUINO_AVR_UNO)
     #define RX_PIN      8
     #define TX_PIN      9
@@ -62,15 +68,15 @@ Allwize * allwize;
 // -----------------------------------------------------------------------------
 
 void format(const char * name, const char * value) {
-    Serial.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) Serial.print(" ");
-    Serial.println(value);
+    debug.print(name);
+    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
+    debug.println(value);
 }
 
 void format(const char * name, String value) {
-    Serial.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) Serial.print(" ");
-    Serial.println(value);
+    debug.print(name);
+    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
+    debug.println(value);
 }
 
 void format(const char * name, int value) {
@@ -85,18 +91,18 @@ void format(const char * name, int value) {
 
 void setup() {
 
-    Serial.begin(115200);
-    delay(5000);
+    debug.begin(115200);
+    while (!debug);
 
     module.begin(19200);
     allwize = new Allwize(module);
 
-    Serial.println();
-    Serial.println("Allwize - Module Info");
-    Serial.println();
+    debug.println();
+    debug.println("Allwize - Module Info");
+    debug.println();
 
     format("Property", "Value");
-    Serial.println("------------------------------");
+    debug.println("------------------------------");
 
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());

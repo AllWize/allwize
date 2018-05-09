@@ -28,6 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AUnit.h"
 using namespace aunit;
 
+#if defined(ARDUINO_ARCH_SAMD)
+    #define debug   SerialUSB
+#else
+    #define debug   Serial
+#endif
+
 // -----------------------------------------------------------------------------
 // Test class
 // -----------------------------------------------------------------------------
@@ -194,9 +200,10 @@ testF(CustomTest, get_serial_number) {
 
 void setup() {
 
-    Serial.begin(115200);
-    while (!Serial);
+    debug.begin(115200);
+    while (!debug);
 
+    Printer::setPrinter(&debug);
     //TestRunner::setVerbosity(Verbosity::kAll);
 
 }
