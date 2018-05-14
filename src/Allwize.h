@@ -59,6 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Memory addresses
 #define MEM_CHANNEL                     0x00
 #define MEM_RF_POWER                    0x01
+#define MEM_DATA_RATE                   0x02
 #define MEM_MBUS_MODE                   0x03
 #define MEM_SLEEP_MODE                  0x04
 #define MEM_RSSI_MODE                   0x05
@@ -133,6 +134,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCRYPT_ENABLED                 0x01
 #define ENCRYPT_ENABLED_CRC             0x03
 
+// Preamble Length
+#define PREAMBLE_FORMAT_A               0x00
+#define PREAMBLE_FORMAT_B               0x02
+
 // -----------------------------------------------------------------------------
 // Class prototype
 // -----------------------------------------------------------------------------
@@ -156,9 +161,11 @@ class Allwize {
 
         void setChannel(uint8_t channel, bool persist = false);
         void setPower(uint8_t power, bool persist = false);
+        void setDataRate(uint8_t dr);
         void setMBusMode(uint8_t mode, bool persist = false);
         void setSleepMode(uint8_t mode);
         void setAppendRSSI(bool value);
+        void setPreamble(uint8_t preamble);
         void setTimeout(uint8_t timeout);
         void setNetworkRole(uint8_t role);
         void setLEDControl(uint8_t value);
@@ -170,8 +177,10 @@ class Allwize {
 
         uint8_t getChannel();
         uint8_t getPower();
+        uint8_t getDataRate();
         uint8_t getMBusMode();
         uint8_t getSleepMode();
+        uint8_t getPreamble();
         uint8_t getControlField();
         bool getAppendRSSI();
         uint8_t getTimeout();

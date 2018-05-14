@@ -129,6 +129,8 @@ bool Allwize::ready() {
     return response;
 }
 
+
+
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
@@ -175,6 +177,24 @@ void Allwize::setPower(uint8_t power, bool persist) {
  */
 uint8_t Allwize::getPower() {
     return _getMemory(MEM_RF_POWER);
+}
+
+/**
+ * @brief Sets the data rate
+ * @param {uint8_t} dr          Value in [1, 2, 4, 5]
+ */
+void Allwize::setDataRate(uint8_t dr) {
+    if (0 < dr && dr < 6 && dr != 3) {
+        _setMemory(MEM_DATA_RATE, dr);
+    }
+}
+
+/**
+ * @brief Gets the data rate stored in non-volatile memory
+ * @return {uint8_t} data rate (1 byte)
+ */
+uint8_t Allwize::getDataRate() {
+    return _getMemory(MEM_DATA_RATE);
 }
 
 /**
@@ -228,6 +248,24 @@ void Allwize::setAppendRSSI(bool value) {
  */
 bool Allwize::getAppendRSSI() {
     return (_getMemory(MEM_RSSI_MODE) == 0x01);
+}
+
+/**
+ * @brief Sets the preamble length frame format
+ * @param {uint8_t} preamble          0 or 2
+ */
+void Allwize::setPreamble(uint8_t preamble) {
+    if (PREAMBLE_FORMAT_A == preamble || PREAMBLE_FORMAT_B == preamble) {
+        _setMemory(MEM_PREAMBLE_LENGTH, preamble);
+    }
+}
+
+/**
+ * @brief Gets the preamble length frame format
+ * @return {uint8_t} preamble length format (1 byte)
+ */
+uint8_t Allwize::getPreamble() {
+    return _getMemory(MEM_PREAMBLE_LENGTH);
 }
 
 /**

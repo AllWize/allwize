@@ -108,6 +108,9 @@ void setup() {
     format("Power", allwize->getPower());
     format("MBUS Mode", allwize->getMBusMode());
     format("Sleep Mode", allwize->getSleepMode());
+    format("Data Rate", allwize->getDataRate());
+    format("Preamble Length", allwize->getPreamble());
+    format("Sleep Mode", allwize->getSleepMode());
     format("Control Field", allwize->getControlField());
 
     format("Manufacturer ID", allwize->getMID());
