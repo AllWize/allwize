@@ -60,6 +60,12 @@ using namespace aunit;
     SoftwareSerial module(RX_PIN, TX_PIN);
 #endif // ARDUINO_ARCH_ESP8266
 
+#if defined(ARDUINO_ARCH_ESP32)
+    #define RX_PIN      12
+    #define TX_PIN      13
+    HardwareSerial module(1);
+#endif // ARDUINO_ARCH_ESP8266
+
 // -----------------------------------------------------------------------------
 // Config & globals
 // -----------------------------------------------------------------------------
@@ -77,7 +83,7 @@ test(full) {
 
     // get original channel
     uint8_t channel1 = allwize->getChannel();
-    assertNotEqual(0, channel1);
+    assertNotEqual((uint8_t) 0, channel1);
 
     // set new channel
     uint8_t channel2 = channel1 + 1;
@@ -92,11 +98,15 @@ test(full) {
 
     // We must reset the serial connection after a reset or factoryReset
     module.end();
-    module.begin(19200);
+    #if defined(ARDUINO_ARCH_ESP32)
+        module.begin(19200, SERIAL_8N1, RX_PIN, TX_PIN);
+    #else
+        module.begin(19200);
+    #endif
 
     // get channel once more (factory channel is 3)
     uint8_t channel4 = allwize->getChannel();
-    assertEqual(3, channel4);
+    assertEqual((uint8_t) 3, channel4);
 
 }
 
@@ -109,7 +119,13 @@ void setup() {
     debug.begin(115200);
     while (!debug);
 
-    module.begin(19200);
+    #if defined(ARDUINO_ARCH_ESP32)
+        pinMode (RX_PIN, FUNCTION_4);
+        pinMode (TX_PIN, FUNCTION_4);
+        module.begin(19200, SERIAL_8N1, RX_PIN, TX_PIN);
+    #else
+        module.begin(19200);
+    #endif
     allwize = new Allwize(module);
 
     Printer::setPrinter(&debug);
