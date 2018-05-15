@@ -35,11 +35,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // General
 #define MODEM_BAUDRATE                  19200
+#define CONTROL_INFORMATION             0x7A
 #define END_OF_RESPONSE                 '>'
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58
 #define CMD_EXIT_MEMORY                 (char) 0xFF
-#define RX_BUFFER_SIZE                  128
+#define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
 
 // Command keys
@@ -83,10 +84,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_ENCRYPT_FLAG                0x3E
 #define MEM_DECRYPT_FLAG                0x3F
 #define MEM_DEFAULT_KEY                 0x40
-#define MEM_PART_NUMBER                 0x61
-#define MEM_HW_REV_NUMBER               0x6E
-#define MEM_FW_REV_NUMBER               0x73
-#define MEM_SERIAL_NUMBER               0x78
+#define MEM_PART_NUMBER_OLD             0x61
+#define MEM_SERIAL_NUMBER_OLD           0x71
+#define MEM_PART_NUMBER_NEW             0x89
+#define MEM_SERIAL_NUMBER_NEW           0xA9
 
 // MBus modes
 #define MBUS_MODE_S2                    0x00
@@ -113,9 +114,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SLEEP_MODE_AFTER_TX_RX_TIMEOUT  0x07
 
 // Network roles
-#define NETWORK_ROLE_SLAVE              0x01
-#define NETWORK_ROLE_MASTER             0x02
-#define NETWORK_ROLE_REPEATER           0x03
+#define NETWORK_ROLE_SLAVE              0x00
+#define NETWORK_ROLE_MASTER             0x01
+#define NETWORK_ROLE_REPEATER           0x02
 
 // Timeouts
 #define TIMEOUT_32MS                    0x01
@@ -134,9 +135,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCRYPT_ENABLED                 0x01
 #define ENCRYPT_ENABLED_CRC             0x03
 
+// Data interface
+#define DATA_INTERFACE_ID_ADDR          0x00
+#define DATA_INTERFACE_APP_ONLY         0x01
+#define DATA_INTERFACE_APP_ACK          0x03
+#define DATA_INTERFACE_START_STOP       0x04
+#define DATA_INTERFACE_CRC              0x08
+#define DATA_INTERFACE_CRC_START_STOP   0x0C
+
+
 // Preamble Length
 #define PREAMBLE_FORMAT_A               0x00
 #define PREAMBLE_FORMAT_B               0x02
+
+typedef struct {
+    uint8_t c;
+    uint8_t ci;
+    uint8_t len;
+    uint8_t * data;
+    uint8_t rssi;
+} allwize_message_t;
 
 // -----------------------------------------------------------------------------
 // Class prototype
@@ -146,7 +164,7 @@ class Allwize {
 
     public:
 
-        Allwize(Stream& stream, uint8_t reset_gpio = 0xFF);
+        Allwize(Stream & stream, uint8_t reset_gpio = 0xFF);
 
         void begin();
         void reset();
@@ -154,6 +172,15 @@ class Allwize {
         void sleep();
         void wakeup();
         bool ready();
+        void dump(Stream & debug);
+
+        bool send(uint8_t * buffer, uint8_t len);
+        bool send(const char * buffer);
+        bool available();
+        allwize_message_t read();
+
+        void setControlInformation(uint8_t ci);
+        uint8_t getControlInformation();
 
         void master();
         void slave();
@@ -164,11 +191,12 @@ class Allwize {
         void setDataRate(uint8_t dr);
         void setMBusMode(uint8_t mode, bool persist = false);
         void setSleepMode(uint8_t mode);
-        void setAppendRSSI(bool value);
+        //void setAppendRSSI(bool value);
         void setPreamble(uint8_t preamble);
         void setTimeout(uint8_t timeout);
         void setNetworkRole(uint8_t role);
         void setLEDControl(uint8_t value);
+        //void setDataInterface(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
         void setInstallMode(uint8_t mode, bool persist = false);
         void setEncryptFlag(uint8_t flag);
@@ -181,8 +209,9 @@ class Allwize {
         uint8_t getMBusMode();
         uint8_t getSleepMode();
         uint8_t getPreamble();
+        //uint8_t getDataInterface();
         uint8_t getControlField();
-        bool getAppendRSSI();
+        //bool getAppendRSSI();
         uint8_t getTimeout();
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
@@ -191,7 +220,7 @@ class Allwize {
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
 
-        float getRSSI();
+        //float getRSSI();
         uint8_t getTemperature();
         uint16_t getVoltage();
         String getMID();
@@ -214,6 +243,10 @@ class Allwize {
         uint8_t _getMemory(uint8_t address, uint8_t * buffer, uint8_t len);
         uint8_t _getMemory(uint8_t address);
         String _getMemoryAsHexString(uint8_t address, uint8_t len);
+        String _getMemoryAsString(uint8_t address, uint8_t len);
+        void _readModel();
+
+        bool _decode();
 
         void _flush();
         uint8_t _send(uint8_t * buffer, uint8_t len);
@@ -223,7 +256,7 @@ class Allwize {
         int8_t _sendAndReceive(uint8_t ch);
 
         int _timedRead();
-        int _readBytesUntil(char terminator, char * buffer, uint8_t len);
+        int _readBytesUntil(char terminator, char * buffer, uint16_t len);
         void _hex2bin(char * hex, uint8_t * bin, uint8_t len);
         void _bin2hex(uint8_t * bin, char * hex, uint8_t len);
 
@@ -233,12 +266,21 @@ class Allwize {
 
     protected:
 
-        Stream& _stream;
+        Stream & _stream;
+
         uint8_t _reset_gpio = 0xFF;
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
+        uint8_t _ci = CONTROL_INFORMATION;
+
+        String _model;
+        String _fw;
+        String _hw;
+
+        allwize_message_t _message;
 
         uint8_t _buffer[RX_BUFFER_SIZE];
+        uint8_t _pointer;
 
 };
 

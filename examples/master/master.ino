@@ -1,12 +1,9 @@
 /*
 
-Allwize - Memory Dump Example
+Allwize - Master example
 
-This example uses a wrapping class around Allwize class to
-expose the getMemory method and dump the radio module memory
-byte by byte.
-This is possible since all methods in the AllWize class are either
-public or protected.
+This example prints out the configuration settings stored
+in the module non-volatile memory.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -58,14 +55,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
-// Globals
+// Config & globals
 // -----------------------------------------------------------------------------
 
 #include "Allwize.h"
 Allwize * allwize;
 
 // -----------------------------------------------------------------------------
-// Code
+// Main
 // -----------------------------------------------------------------------------
 
 void setup() {
@@ -78,14 +75,45 @@ void setup() {
     allwize->begin();
     while (!allwize->ready());
 
+    allwize->master();
+    allwize->setChannel(4);
+    allwize->setPower(5);
+    allwize->setDataRate(1);
+    allwize->setControlField(0x46);
+
     debug.println();
-    debug.println("Allwize - Module Memory Dump");
+    debug.println("[Allwize] Master example");
     debug.println();
 
     allwize->dump(debug);
 
-    debug.println("Done");
-
 }
 
-void loop() {}
+void loop() {
+
+    if (allwize->available()) {
+
+        allwize_message_t message = allwize->read();
+
+        // Code to pretty-print the message
+
+        char buffer[64];
+        char ascii[message.len+1];
+
+        snprintf(buffer, sizeof(buffer), "[Allwize] C: %02X, CI: %02X, RSSI: %02X, DATA: { ", message.c, message.ci, message.rssi);
+        debug.print(buffer);
+
+        for (uint8_t i=0; i<message.len; i++) {
+            char ch = message.data[i];
+            snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
+            debug.print(buffer);
+            ascii[i] = (31 < ch && ch < 127) ? ch : ' ';
+        }
+        ascii[message.len] = 0;
+        debug.print("}, STR: \"");
+        debug.print(ascii);
+        debug.println("\"");
+
+    }
+
+}

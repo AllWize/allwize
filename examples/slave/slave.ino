@@ -1,6 +1,6 @@
 /*
 
-Allwize - Module Info Example
+Allwize - Master example
 
 This example prints out the configuration settings stored
 in the module non-volatile memory.
@@ -33,32 +33,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #if defined(ARDUINO_AVR_UNO)
-    #define RX_PIN      8
-    #define TX_PIN      9
+    #define ANALOG_DEPTH        10
+    #define ANALOG_REFERENCE    5000
+    #define RX_PIN              8
+    #define TX_PIN              9
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define module      Serial1
+    #define ANALOG_DEPTH        10
+    #define ANALOG_REFERENCE    5000
+    #define module              Serial1
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define module      Serial1
+    #define ANALOG_DEPTH        12
+    #define ANALOG_REFERENCE    3300
+    #define module              Serial1
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
-    #define RX_PIN      12
-    #define TX_PIN      13
+    #define ANALOG_DEPTH        10
+    #define ANALOG_REFERENCE    3300
+    #define RX_PIN              12
+    #define TX_PIN              13
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
 #endif // ARDUINO_ARCH_ESP8266
 
+#define TEMPERATURE_PIN         A2
+#define TEMPERATURE_SAMPLES     10
+#define ANALOG_COUNT            (1 << ANALOG_DEPTH)
+
 // -----------------------------------------------------------------------------
 // Config & globals
 // -----------------------------------------------------------------------------
-
-#define COLUMN_PAD  20
 
 #include "Allwize.h"
 Allwize * allwize;
@@ -67,22 +77,23 @@ Allwize * allwize;
 // Utils
 // -----------------------------------------------------------------------------
 
-void format(const char * name, const char * value) {
-    debug.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
-    debug.println(value);
-}
+// Get the temperature from the MCP9701 sensor on board attached to A2
+// As per datasheet (page 8):
+// The change in  voltage  is  scaled  to  a  temperature  coefficient  of
+// 10.0 mV/°C   (typical)   for   the   MCP9700/9700A   and
+// 19.5 mV/°C  (typical)  for  the  MCP9701/9701A.  The
+// output voltage at 0°C is also scaled to 500 mV (typical)
+// and  400 mV  (typical)  for  the  MCP9700/9700A  and
+// MCP9701/9701A,  respectively.
 
-void format(const char * name, String value) {
-    debug.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
-    debug.println(value);
-}
-
-void format(const char * name, int value) {
-    char buffer[10];
-    snprintf(buffer, sizeof(buffer), "%d", value);
-    format(name, buffer);
+float getTemperature() {
+    uint16_t sum = 0;
+    for (uint8_t i=0; i<TEMPERATURE_SAMPLES; i++) {
+        sum += analogRead(TEMPERATURE_PIN);
+    }
+    uint16_t mV = sum * ANALOG_REFERENCE / ANALOG_COUNT / TEMPERATURE_SAMPLES;
+    float t = (float) (mV - 400) / 19.5;
+    return t;
 }
 
 // -----------------------------------------------------------------------------
@@ -91,43 +102,49 @@ void format(const char * name, int value) {
 
 void setup() {
 
+    // Init temperature pin
+    pinMode(TEMPERATURE_PIN, INPUT);
+    #ifdef ARDUINO_ARCH_SAMD
+        analogReadResolution(ANALOG_DEPTH);
+    #endif
+
     debug.begin(115200);
+    while (!debug && millis() < 5000);
 
     module.begin(19200);
     allwize = new Allwize(module);
     allwize->begin();
-    delay(5000);
+    while (!allwize->ready());
+    
+    allwize->slave();
+    allwize->setChannel(4);
+    allwize->setPower(5);
+    allwize->setDataRate(1);
+    allwize->setControlField(0x46);
+    allwize->setControlInformation(0x08);
 
     debug.println();
-    debug.println("Allwize - Module Info");
+    debug.println("[Allwize] Slave example");
     debug.println();
 
-    format("Property", "Value");
-    debug.println("------------------------------");
-
-    format("Channel", allwize->getChannel());
-    format("Power", allwize->getPower());
-    format("MBUS Mode", allwize->getMBusMode());
-    format("Sleep Mode", allwize->getSleepMode());
-    format("Data Rate", allwize->getDataRate());
-    format("Preamble Length", allwize->getPreamble());
-    format("Sleep Mode", allwize->getSleepMode());
-    format("Control Field", allwize->getControlField());
-    format("Network Role", allwize->getNetworkRole());
-    format("Install Mode", allwize->getInstallMode());
-
-    format("Manufacturer ID", allwize->getMID());
-    format("Unique ID", allwize->getUID());
-    format("Version", allwize->getVersion());
-    format("Device", allwize->getDevice());
-    format("Part Number", allwize->getPartNumber());
-    format("Hardware Version", allwize->getHardwareVersion());
-    format("Firmware Version", allwize->getFirmwareVersion());
-    format("Serial Number", allwize->getSerialNumber());
-
-    format("Temperature (C)", allwize->getTemperature());
-    format("Voltage (mV)", allwize->getVoltage());
+    allwize->dump(debug);
 
 }
 
-void loop() {}
+void loop() {
+
+    float t = getTemperature();
+    debug.print("[Allwize] Temperature: ");
+    debug.println(t);
+
+    uint8_t payload[2];
+    payload[0] = int(t) + 40;
+    payload[1] = int((t - int(t)) * 100);
+
+    if (!allwize->send(payload, 2)) {
+        debug.println("[Allwize] Error sending message");
+    }
+
+    delay(5000);
+
+}
