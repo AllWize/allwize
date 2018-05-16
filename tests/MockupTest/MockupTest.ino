@@ -85,7 +85,7 @@ testF(CustomTest, set_channel) {
 testF(CustomTest, set_channel_persist) {
     uint8_t channel = 3;
     allwize->setChannel(channel, true);
-    uint8_t expected[] = {0x00, 'M', 0x00, channel, 0xFF, 0x58};
+    uint8_t expected[] = {0x00, 'M', 0x00, channel, 0xFF, 0x58, 0x00, 'C', channel, 0x58};
     compare(sizeof(expected), expected);
 }
 
@@ -105,7 +105,7 @@ testF(CustomTest, set_mbus_mode) {
 testF(CustomTest, set_mbus_mode_persist) {
     uint8_t mode = MBUS_MODE_OSP;
     allwize->setMBusMode(mode, true);
-    uint8_t expected[] = {0x00, 'M', 0x03, mode, 0xFF, 0x58};
+    uint8_t expected[] = {0x00, 'M', 0x03, mode, 0xFF, 0x58, 0x00, 'G', mode, 0x58};
     compare(sizeof(expected), expected);
 }
 
@@ -132,7 +132,7 @@ testF(CustomTest, set_control_field) {
 testF(CustomTest, set_control_field_persist) {
     uint8_t value = 0x06;
     allwize->setControlField(value, true);
-    uint8_t expected[] = {0x00, 'M', 0x3B, value, 0xFF, 0x58};
+    uint8_t expected[] = {0x00, 'M', 0x3B, value, 0xFF, 0x58, 0x00, 'F', value, 0x58};
     compare(sizeof(expected), expected);
 }
 
@@ -170,25 +170,19 @@ testF(CustomTest, get_voltage) {
     compare(sizeof(expected), expected);
 }
 
-testF(CustomTest, get_rssi) {
-    assertEqual(-80, (int) allwize->getRSSI());
-    uint8_t expected[] = {0x00, 'S', 0x58};
-    compare(sizeof(expected), expected);
-}
-
 testF(CustomTest, get_serial_number) {
     String sn = allwize->getSerialNumber();
     assertEqual(16, (int) sn.length());
     uint8_t expected[] = {
         0x00,
-        'Y', MEM_SERIAL_NUMBER + 0,
-        'Y', MEM_SERIAL_NUMBER + 1,
-        'Y', MEM_SERIAL_NUMBER + 2,
-        'Y', MEM_SERIAL_NUMBER + 3,
-        'Y', MEM_SERIAL_NUMBER + 4,
-        'Y', MEM_SERIAL_NUMBER + 5,
-        'Y', MEM_SERIAL_NUMBER + 6,
-        'Y', MEM_SERIAL_NUMBER + 7,
+        'Y', MEM_SERIAL_NUMBER_NEW + 0,
+        'Y', MEM_SERIAL_NUMBER_NEW + 1,
+        'Y', MEM_SERIAL_NUMBER_NEW + 2,
+        'Y', MEM_SERIAL_NUMBER_NEW + 3,
+        'Y', MEM_SERIAL_NUMBER_NEW + 4,
+        'Y', MEM_SERIAL_NUMBER_NEW + 5,
+        'Y', MEM_SERIAL_NUMBER_NEW + 6,
+        'Y', MEM_SERIAL_NUMBER_NEW + 7,
         0x58
     };
     compare(sizeof(expected), expected);

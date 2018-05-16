@@ -256,6 +256,7 @@ class Allwize {
         int8_t _sendAndReceive(uint8_t ch);
 
         int _timedRead();
+        int _readBytes(char * buffer, uint16_t len);
         int _readBytesUntil(char terminator, char * buffer, uint16_t len);
         void _hex2bin(char * hex, uint8_t * bin, uint8_t len);
         void _bin2hex(uint8_t * bin, char * hex, uint8_t len);

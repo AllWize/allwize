@@ -1,6 +1,6 @@
 /*
 
-Allwize - Module Info Example
+Allwize - Returns the module to factory settings
 
 This example prints out the configuration settings stored
 in the module non-volatile memory.
@@ -58,38 +58,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Config & globals
 // -----------------------------------------------------------------------------
 
-#define COLUMN_PAD  20
-
 #include "Allwize.h"
 Allwize * allwize;
-
-#define USE_SNIFFER 0
-#if USE_SNIFFER
-    #include "SerialSniffer.h"
-    SerialSniffer * sniffer;
-#endif
-
-// -----------------------------------------------------------------------------
-// Utils
-// -----------------------------------------------------------------------------
-
-void format(const char * name, const char * value) {
-    debug.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
-    debug.println(value);
-}
-
-void format(const char * name, String value) {
-    debug.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
-    debug.println(value);
-}
-
-void format(const char * name, int value) {
-    char buffer[10];
-    snprintf(buffer, sizeof(buffer), "%d", value);
-    format(name, buffer);
-}
 
 // -----------------------------------------------------------------------------
 // Main
@@ -100,45 +70,21 @@ void setup() {
     debug.begin(115200);
     while (!debug && millis() < 5000);
     debug.println();
-    debug.println("Allwize - Module Info");
+    debug.println("Allwize - Factory reset");
     debug.println();
 
     module.begin(19200);
-    #if USE_SNIFFER
-        sniffer = new SerialSniffer(module, debug);
-        allwize = new Allwize(*sniffer);
-    #else
-        allwize = new Allwize(module);
-    #endif
+    allwize = new Allwize(module);
 
     allwize->begin();
     while (!allwize->ready());
 
-    format("Property", "Value");
-    debug.println("------------------------------");
+    allwize->factoryReset();
+    module.end();
+    module.begin(19200);
+    delay(100);
 
-    format("Channel", allwize->getChannel());
-    format("Power", allwize->getPower());
-    format("MBUS Mode", allwize->getMBusMode());
-    format("Sleep Mode", allwize->getSleepMode());
-    format("Data Rate", allwize->getDataRate());
-    format("Preamble Length", allwize->getPreamble());
-    format("Sleep Mode", allwize->getSleepMode());
-    format("Control Field", allwize->getControlField());
-    format("Network Role", allwize->getNetworkRole());
-    format("Install Mode", allwize->getInstallMode());
-
-    format("Manufacturer ID", allwize->getMID());
-    format("Unique ID", allwize->getUID());
-    format("Version", allwize->getVersion());
-    format("Device", allwize->getDevice());
-    format("Part Number", allwize->getPartNumber());
-    format("Hardware Version", allwize->getHardwareVersion());
-    format("Firmware Version", allwize->getFirmwareVersion());
-    format("Serial Number", allwize->getSerialNumber());
-
-    format("Temperature (C)", allwize->getTemperature());
-    format("Voltage (mV)", allwize->getVoltage());
+    allwize->dump(debug);
 
 }
 

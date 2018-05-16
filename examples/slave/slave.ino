@@ -86,13 +86,13 @@ Allwize * allwize;
 // and  400 mV  (typical)  for  the  MCP9700/9700A  and
 // MCP9701/9701A,  respectively.
 
-float getTemperature() {
-    uint16_t sum = 0;
+double getTemperature() {
+    double sum = 0;
     for (uint8_t i=0; i<TEMPERATURE_SAMPLES; i++) {
         sum += analogRead(TEMPERATURE_PIN);
     }
-    uint16_t mV = sum * ANALOG_REFERENCE / ANALOG_COUNT / TEMPERATURE_SAMPLES;
-    float t = (float) (mV - 400) / 19.5;
+    double mV = sum * ANALOG_REFERENCE / ANALOG_COUNT / TEMPERATURE_SAMPLES;
+    double t = (mV - 400.0) / 19.5;
     return t;
 }
 
@@ -115,9 +115,9 @@ void setup() {
     allwize = new Allwize(module);
     allwize->begin();
     while (!allwize->ready());
-    
+
     allwize->slave();
-    allwize->setChannel(4);
+    allwize->setChannel(4, true);
     allwize->setPower(5);
     allwize->setDataRate(1);
     allwize->setControlField(0x46);
@@ -125,7 +125,6 @@ void setup() {
 
     debug.println();
     debug.println("[Allwize] Slave example");
-    debug.println();
 
     allwize->dump(debug);
 
@@ -134,14 +133,16 @@ void setup() {
 void loop() {
 
     float t = getTemperature();
-    debug.print("[Allwize] Temperature: ");
-    debug.println(t);
 
-    uint8_t payload[2];
-    payload[0] = int(t) + 40;
-    payload[1] = int((t - int(t)) * 100);
+    char payload[7];
+    bool under_zero = t < 0;
+    if (under_zero)  t = -t;
+    snprintf(payload, sizeof(payload), "%s%d.%02d", under_zero ? "-" : "", int(t), int(100 * (t - int(t))));
 
-    if (!allwize->send(payload, 2)) {
+    debug.print("[Allwize] Payload: ");
+    debug.println(payload);
+
+    if (!allwize->send(payload)) {
         debug.println("[Allwize] Error sending message");
     }
 

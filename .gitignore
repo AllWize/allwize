@@ -5,3 +5,6 @@
 # PlatformIO folders
 .pio*
 docs
+
+# Project files
+credentials.h

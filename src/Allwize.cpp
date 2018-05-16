@@ -59,13 +59,16 @@ void Allwize::reset() {
             _send('@');
             _send('R');
             _send('R');
+            delay(10);
+            _config = false;
         }
     } else {
         digitalWrite(_reset_gpio, LOW);
         delay(1);
         digitalWrite(_reset_gpio, HIGH);
+        delay(10);
+        _config = false;
     }
-    _config = false;
 }
 
 /**
@@ -81,8 +84,8 @@ void Allwize::factoryReset() {
         _send('@');
         _send('R');
         _send('C');
-        delay(100);
-	_config = false;
+        delay(10);
+        _config = false;
     }
 }
 
@@ -132,6 +135,8 @@ void Allwize::wakeup() {
  * @brief Test whether the radio module is ready or not
  */
 bool Allwize::ready() {
+    //uint8_t channel = getChannel();
+    //return (0 < channel && channel < 42);
     bool response = _setConfig(true);
     if (response) _setConfig(false);
     return response;
@@ -143,13 +148,11 @@ bool Allwize::ready() {
  */
 void Allwize::dump(Stream & debug) {
 
-    _send(CMD_ENTER_CONFIG);
-    _receive();
+    _setConfig(true);
     _send('0');
 
-    char buffer[258];
-
-    if (256 == _readBytesUntil(END_OF_RESPONSE, buffer, 256)) {
+    char buffer[256];
+    if (256 == _readBytes(buffer, 256)) {
 
         char ch[10];
         char ascii[17] = {0};
@@ -164,7 +167,7 @@ void Allwize::dump(Stream & debug) {
         debug.println();
         debug.print("------------------------------------------------------");
 
-        for (uint16_t address = 0; address <= 0xFF; address++) {
+        for (uint16_t address = 0; address <= 255; address++) {
             if ((address % 16) == 0) {
                 if (address > 0) debug.print(ascii);
                 snprintf(ch, sizeof(ch), "\n0x%02X:  ", address);
@@ -175,7 +178,7 @@ void Allwize::dump(Stream & debug) {
             } else {
                 ascii[address % 16] = ' ';
             }
-            snprintf(ch, sizeof(ch), "%02X ", buffer[address]);
+            snprintf(ch, sizeof(ch), "%02X ", (uint8_t) buffer[address]);
             debug.print(ch);
         }
 
@@ -186,7 +189,7 @@ void Allwize::dump(Stream & debug) {
         debug.println("Error doing memory dump...");
     }
 
-    _send(CMD_EXIT_CONFIG);
+    _setConfig(false);
 
 }
 
@@ -663,13 +666,16 @@ String Allwize::getSerialNumber() {
 */
 bool Allwize::_setConfig(bool value) {
     if (value != _config) {
+        _flush();
         if (value) {
             if (_sendAndReceive(CMD_ENTER_CONFIG) == 0) {
                 _config = true;
+                delay(2);
             }
         } else {
             _send(CMD_EXIT_CONFIG);
             _config = false;
+            delay(10);
         }
     }
     return _config;
@@ -988,6 +994,25 @@ int Allwize::_timedRead() {
 }
 
 /**
+ * @brief Reads the stream buffer up to a number of bytes
+ * @param {char *} buffer       Buffer to store the values to
+ * @param {uint16_t} len        Max number of bytes to read
+ * @returns {int}               Number of bytes read or -1 if timed out
+ * @protected
+ */
+int Allwize::_readBytes(char * buffer, uint16_t len) {
+    if (len < 1) return 0;
+    uint16_t index = 0;
+    while (index < len) {
+        int ch = _timedRead();
+        if (ch < 0) break;
+        *buffer++ = (char) ch;
+        index++;
+    }
+    return index;
+}
+
+/**
  * @brief Reads the stream buffer up to a certain char or times out
  * @param {char} terminator     Terminating char
  * @param {char *} buffer       Buffer to store the values to
@@ -1000,7 +1025,7 @@ int Allwize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
     uint16_t index = 0;
     while (index < len) {
         int ch = _timedRead();
-        if (ch < 0) return ch;
+        if (ch < 0) break;
         if (ch == terminator) break;
         *buffer++ = (char) ch;
         index++;
