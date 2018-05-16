@@ -51,24 +51,29 @@ void Allwize::begin() {
  *     Serial1.end();
  *     Serial1.begin(19200);
  *     delay(200);
+ * @returns {bool}      Reset successfully issued
  */
-void Allwize::reset() {
+bool Allwize::reset() {
     if (0xFF == _reset_gpio) {
         _setMemory(MEM_CONFIG_INTERFACE, 1);
         if (_setConfig(true)) {
             _send('@');
             _send('R');
             _send('R');
-            delay(10);
+            _flush();
+            delay(100);
             _config = false;
+            return true;
         }
     } else {
         digitalWrite(_reset_gpio, LOW);
         delay(1);
         digitalWrite(_reset_gpio, HIGH);
-        delay(10);
+        delay(100);
         _config = false;
+        return true;
     }
+    return false;
 }
 
 /**
@@ -77,16 +82,20 @@ void Allwize::reset() {
  *     Serial1.end();
  *     Serial1.begin(19200);
  *     delay(200);
+ * @returns {bool}      Factory reset successfully issued
  */
-void Allwize::factoryReset() {
+bool Allwize::factoryReset() {
     _setMemory(MEM_CONFIG_INTERFACE, 1);
     if (_setConfig(true)) {
         _send('@');
         _send('R');
         _send('C');
-        delay(10);
+        _flush();
+        delay(100);
         _config = false;
+        return true;
     }
+    return false;
 }
 
 /**

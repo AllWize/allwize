@@ -167,8 +167,8 @@ class Allwize {
         Allwize(Stream & stream, uint8_t reset_gpio = 0xFF);
 
         void begin();
-        void reset();
-        void factoryReset();
+        bool reset();
+        bool factoryReset();
         void sleep();
         void wakeup();
         bool ready();

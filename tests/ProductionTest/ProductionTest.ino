@@ -133,7 +133,7 @@ test(full) {
     assertEqual(channel2, channel3);
 
     // factory reset
-    allwize->factoryReset();
+    assertTrue(allwize->factoryReset());
 
     // We must reset the serial connection after a reset or factoryReset
     module.end();
@@ -142,7 +142,6 @@ test(full) {
     #else
         module.begin(19200);
     #endif
-    module.flush();
     delay(200);
 
     // get channel once more (factory channel is 3)
