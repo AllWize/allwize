@@ -86,6 +86,9 @@ void mqttSetup() {
     mqtt.onConnect(mqttOnConnect);
     mqtt.onDisconnect(mqttOnDisonnect);
     mqtt.setServer(MQTT_HOST, MQTT_PORT);
+    if (strlen(MQTT_USER) > 0 && strlen(MQTT_PASS) > 0) {
+        mqtt.setCredentials(MQTT_USER, MQTT_PASS);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -167,9 +170,9 @@ void wizeLoop() {
 
         // Sending message via MQTT
         if (mqtt.connected()) {
-            char topic[32];
-            snprintf(topic, sizeof(topic), "wize/field/%d", message.ci);
-            mqtt.publish(topic, MQTT_QOS, MQTT_RETAIN, (char *) message.data);
+            char payload[32];
+            snprintf(payload, sizeof(payload), MQTT_PAYLOAD, (char *) message.data);
+            mqtt.publish(MQTT_TOPIC, MQTT_QOS, MQTT_RETAIN, payload);
         }
 
     }
