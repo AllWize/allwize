@@ -40,21 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define module      Serial1
 #endif // ARDUINO_ARCH_SAMD
 
-#if defined(ARDUINO_ARCH_SAMD)
-
-#include <stdio.h>
-
-char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
-  asm(".global _printf_float");
-
-  char fmt[20];
-  sprintf(fmt, "%%%d.%df", width, prec);
-  sprintf(sout, fmt, val);
-  return sout;
-}
-
-#endif
-
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
@@ -76,16 +61,22 @@ Adafruit_BME280 sensor;
 // I2C utils
 // -----------------------------------------------------------------------------
 
-bool i2cCheck(unsigned char address) {
+#include <Wire.h>
+
+bool i2cCheck(uint8_t address) {
     Wire.beginTransmission(address);
     return Wire.endTransmission();
 }
 
 void i2cScan() {
-    unsigned char nDevices = 0;
+
+    Wire.begin();
+
     char buffer[64];
-    for (unsigned char address = 1; address < 127; address++) {
-        unsigned char error = i2cCheck(address);
+    uint8_t count = 0;
+
+    for (uint8_t address = 1; address < 127; address++) {
+        uint8_t error = i2cCheck(address);
         if (error == 0) {
             snprintf(
                 buffer, sizeof(buffer),
@@ -93,10 +84,36 @@ void i2cScan() {
                 address
             );
             debug.println(buffer);
-            nDevices++;
+            count++;
         }
     }
-    if (nDevices == 0) debug.println("[I2C] No devices found\n");
+
+    snprintf(buffer, sizeof(buffer), "[I2C] %u device found", count);
+    debug.println(buffer);
+
+}
+
+// -----------------------------------------------------------------------------
+// Utils format
+// -----------------------------------------------------------------------------
+
+char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+
+    bool negative = value < 0;
+
+    uint32_t mul = 1;
+    for (uint8_t i=0; i<decimals; i++) mul *= 10;
+
+    value = abs(value);
+    uint32_t value_int = int(value);
+    uint32_t value_dec = int((value - value_int) * mul);
+
+    char format[20];
+    snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
+    snprintf(buffer, len, format, value_int, value_dec);
+
+    return buffer;
+
 }
 
 // -----------------------------------------------------------------------------
@@ -145,8 +162,11 @@ void setup() {
     debug.println();
     debug.println("[Allwize] BME280 sensor example");
 
+    // I2C
+    i2cScan();
+
     // Init BME280 sensor
-    if (!sensor.begin(0x40)) {
+    if (!sensor.begin(0x76)) {
         debug.println("[Allwize] Could not find a valid BME280 sensor, check wiring!");
         while (1);
     }
@@ -161,13 +181,13 @@ void loop() {
 
     double t_n = sensor.readTemperature();
     uint8_t h_n = sensor.readHumidity();
-    double p_n = sensor.readPressure();
+    uint32_t p_n = sensor.readPressure();
 
-    char t_s[7]; dtostrf(t_n, sizeof(t_s), 2, t_s);
-    char p_s[8]; dtostrf(p_n, sizeof(p_s), 2, p_s);
+    char t_s[7];
+    snfloat(t_s, sizeof(t_s), 1, t_n);
 
     char payload[20];
-    snprintf(payload, sizeof(payload), "%s,%u,%s", t_s, h_n, p_s);
+    snprintf(payload, sizeof(payload), "%s,%u,%lu", t_s, h_n, p_n);
 
     radioSend(payload);
 
