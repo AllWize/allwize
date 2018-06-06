@@ -86,9 +86,11 @@ void mqttSetup() {
     mqtt.onConnect(mqttOnConnect);
     mqtt.onDisconnect(mqttOnDisonnect);
     mqtt.setServer(MQTT_HOST, MQTT_PORT);
-    if (strlen(MQTT_USER) > 0 && strlen(MQTT_PASS) > 0) {
-        mqtt.setCredentials(MQTT_USER, MQTT_PASS);
-    }
+    #if defined(MQTT_USER) & defined(MQTT_PASS)
+        if (strlen(MQTT_USER) > 0 && strlen(MQTT_PASS) > 0) {
+            mqtt.setCredentials(MQTT_USER, MQTT_PASS);
+        }
+    #endif
 }
 
 // -----------------------------------------------------------------------------
@@ -154,7 +156,7 @@ void wizeLoop() {
         char buffer[64];
         char ascii[message.len+1];
 
-        snprintf(buffer, sizeof(buffer), "[WIZE] C: %02X, CI: %02X, RSSI: %02X, DATA: { ", message.c, message.ci, message.rssi);
+        snprintf(buffer, sizeof(buffer), "[WIZE] C: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ", message.c, message.ci, message.rssi);
         debug.print(buffer);
 
         for (uint8_t i=0; i<message.len; i++) {
@@ -170,9 +172,32 @@ void wizeLoop() {
 
         // Sending message via MQTT
         if (mqtt.connected()) {
-            char payload[32];
-            snprintf(payload, sizeof(payload), MQTT_PAYLOAD, (char *) message.data);
-            mqtt.publish(MQTT_TOPIC, MQTT_QOS, MQTT_RETAIN, payload);
+
+            // Init field counter
+            uint8_t field = 1;
+
+            // Parse a comma-separated payload
+            char * payload;
+            payload = strtok((char *) message.data, ",");
+
+            // While there is a field
+            while (NULL != payload) {
+
+                // Build topic string with CI and field number
+                char topic[32];
+                snprintf(topic, sizeof(topic), MQTT_TOPIC, message.ci, field);
+
+                // Publish message
+                snprintf(buffer, sizeof(buffer), "[WIZE] MQTT message: %s => %s\n", topic, payload);
+                debug.print(buffer);
+                mqtt.publish(topic, MQTT_QOS, MQTT_RETAIN, payload);
+
+                // Get new token and update field counter
+                payload = strtok (NULL, ",");
+                field++;
+
+            }
+
         }
 
     }

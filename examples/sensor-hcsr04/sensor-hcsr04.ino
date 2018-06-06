@@ -1,6 +1,6 @@
 /*
 
-Allwize - Master example
+Allwize - Sensor example
 
 This example prints out the configuration settings stored
 in the module non-volatile memory.
@@ -32,35 +32,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define debug   Serial
 #endif
 
-#if defined(ARDUINO_AVR_UNO)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    5000
-    #define RX_PIN              8
-    #define TX_PIN              9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-#endif // ARDUINO_AVR_UNO
-
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    5000
-    #define module              Serial1
+    #define module      Serial1
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define ANALOG_DEPTH        12
-    #define ANALOG_REFERENCE    3300
-    #define module              Serial1
+    #define module      Serial1
 #endif // ARDUINO_ARCH_SAMD
-
-#if defined(ARDUINO_ARCH_ESP8266)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    3300
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-#endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -68,11 +46,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define CHANNEL                 0x04
 #define NETWORK_ID              0x46
-#define NODE_ID                 0x08
+#define NODE_ID                 0x10
 
-#define TEMPERATURE_PIN         A2
-#define TEMPERATURE_SAMPLES     10
-#define ANALOG_COUNT            (1 << ANALOG_DEPTH)
+#define TRIGGER_PIN             5
+#define ECHO_PIN                6
 
 // -----------------------------------------------------------------------------
 // Allwize
@@ -109,26 +86,20 @@ void radioSend(const char * payload) {
 }
 
 // -----------------------------------------------------------------------------
-// Utils
+// Sensor
 // -----------------------------------------------------------------------------
 
-// Get the temperature from the MCP9701 sensor on board attached to A2
-// As per datasheet (page 8):
-// The change in  voltage  is  scaled  to  a  temperature  coefficient  of
-// 10.0 mV/°C   (typical)   for   the   MCP9700/9700A   and
-// 19.5 mV/°C  (typical)  for  the  MCP9701/9701A.  The
-// output voltage at 0°C is also scaled to 500 mV (typical)
-// and  400 mV  (typical)  for  the  MCP9700/9700A  and
-// MCP9701/9701A,  respectively.
+uint16_t getDistance() {
 
-double getTemperature() {
-    double sum = 0;
-    for (uint8_t i=0; i<TEMPERATURE_SAMPLES; i++) {
-        sum += analogRead(TEMPERATURE_PIN);
-    }
-    double mV = sum * ANALOG_REFERENCE / ANALOG_COUNT / TEMPERATURE_SAMPLES;
-    double t = (mV - 400.0) / 19.5;
-    return t;
+    digitalWrite(TRIGGER_PIN, LOW);
+    delayMicroseconds(2);
+    digitalWrite(TRIGGER_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIGGER_PIN, LOW);
+
+    uint32_t duration = pulseIn(ECHO_PIN, HIGH);
+    return (duration / 2) * 0.34; // in millimeters
+
 }
 
 // -----------------------------------------------------------------------------
@@ -137,17 +108,15 @@ double getTemperature() {
 
 void setup() {
 
-    // Init serial debug
+    // Init debug
     debug.begin(115200);
     while (!debug && millis() < 5000);
     debug.println();
-    debug.println("[Allwize] MCP9701 sensor example");
+    debug.println("[Allwize] HC-SR04 sensor example");
 
-    // Init temperature pin
-    pinMode(TEMPERATURE_PIN, INPUT);
-    #ifdef ARDUINO_ARCH_SAMD
-        analogReadResolution(ANALOG_DEPTH);
-    #endif
+    // Init HC-SR04
+    pinMode(TRIGGER_PIN, OUTPUT);
+    pinMode(ECHO_PIN, INPUT);
 
     // Init radio
     radioSetup();
@@ -156,11 +125,13 @@ void setup() {
 
 void loop() {
 
-    float t = getTemperature();
-    char payload[7];
-    dtostrf(t, -sizeof(payload), 2, payload);
+    uint32_t distance = getDistance();
 
-    radioSend(payload);
+    if (distance < 2000) {
+        char payload[20];
+        snprintf(payload, sizeof(payload), "%lu", distance);
+        radioSend(payload);
+    }
 
     delay(5000);
 

@@ -1,6 +1,6 @@
 /*
 
-Allwize - Master example
+Allwize - Sensor example
 
 This example prints out the configuration settings stored
 in the module non-volatile memory.
@@ -32,35 +32,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define debug   Serial
 #endif
 
-#if defined(ARDUINO_AVR_UNO)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    5000
-    #define RX_PIN              8
-    #define TX_PIN              9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-#endif // ARDUINO_AVR_UNO
-
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    5000
-    #define module              Serial1
+    #define module      Serial1
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define ANALOG_DEPTH        12
-    #define ANALOG_REFERENCE    3300
-    #define module              Serial1
+    #define module      Serial1
 #endif // ARDUINO_ARCH_SAMD
 
-#if defined(ARDUINO_ARCH_ESP8266)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    3300
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-#endif // ARDUINO_ARCH_ESP8266
+#if defined(ARDUINO_ARCH_SAMD)
+
+#include <stdio.h>
+
+char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
+  asm(".global _printf_float");
+
+  char fmt[20];
+  sprintf(fmt, "%%%d.%df", width, prec);
+  sprintf(sout, fmt, val);
+  return sout;
+}
+
+#endif
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -68,11 +61,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define CHANNEL                 0x04
 #define NETWORK_ID              0x46
-#define NODE_ID                 0x08
+#define NODE_ID                 0x09
 
-#define TEMPERATURE_PIN         A2
-#define TEMPERATURE_SAMPLES     10
-#define ANALOG_COUNT            (1 << ANALOG_DEPTH)
+// -----------------------------------------------------------------------------
+// Globals
+// -----------------------------------------------------------------------------
+
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+#include <Wire.h>
+Adafruit_BME280 sensor;
+
+// -----------------------------------------------------------------------------
+// I2C utils
+// -----------------------------------------------------------------------------
+
+bool i2cCheck(unsigned char address) {
+    Wire.beginTransmission(address);
+    return Wire.endTransmission();
+}
+
+void i2cScan() {
+    unsigned char nDevices = 0;
+    char buffer[64];
+    for (unsigned char address = 1; address < 127; address++) {
+        unsigned char error = i2cCheck(address);
+        if (error == 0) {
+            snprintf(
+                buffer, sizeof(buffer),
+                "[I2C] Device found at address 0x%02X",
+                address
+            );
+            debug.println(buffer);
+            nDevices++;
+        }
+    }
+    if (nDevices == 0) debug.println("[I2C] No devices found\n");
+}
 
 // -----------------------------------------------------------------------------
 // Allwize
@@ -109,45 +134,23 @@ void radioSend(const char * payload) {
 }
 
 // -----------------------------------------------------------------------------
-// Utils
-// -----------------------------------------------------------------------------
-
-// Get the temperature from the MCP9701 sensor on board attached to A2
-// As per datasheet (page 8):
-// The change in  voltage  is  scaled  to  a  temperature  coefficient  of
-// 10.0 mV/°C   (typical)   for   the   MCP9700/9700A   and
-// 19.5 mV/°C  (typical)  for  the  MCP9701/9701A.  The
-// output voltage at 0°C is also scaled to 500 mV (typical)
-// and  400 mV  (typical)  for  the  MCP9700/9700A  and
-// MCP9701/9701A,  respectively.
-
-double getTemperature() {
-    double sum = 0;
-    for (uint8_t i=0; i<TEMPERATURE_SAMPLES; i++) {
-        sum += analogRead(TEMPERATURE_PIN);
-    }
-    double mV = sum * ANALOG_REFERENCE / ANALOG_COUNT / TEMPERATURE_SAMPLES;
-    double t = (mV - 400.0) / 19.5;
-    return t;
-}
-
-// -----------------------------------------------------------------------------
 // Main
 // -----------------------------------------------------------------------------
 
 void setup() {
 
-    // Init serial debug
+    // Init debug
     debug.begin(115200);
     while (!debug && millis() < 5000);
     debug.println();
-    debug.println("[Allwize] MCP9701 sensor example");
+    debug.println("[Allwize] BME280 sensor example");
 
-    // Init temperature pin
-    pinMode(TEMPERATURE_PIN, INPUT);
-    #ifdef ARDUINO_ARCH_SAMD
-        analogReadResolution(ANALOG_DEPTH);
-    #endif
+    // Init BME280 sensor
+    if (!sensor.begin(0x40)) {
+        debug.println("[Allwize] Could not find a valid BME280 sensor, check wiring!");
+        while (1);
+    }
+    debug.println("[Allwize] Sensor ready!");
 
     // Init radio
     radioSetup();
@@ -156,9 +159,15 @@ void setup() {
 
 void loop() {
 
-    float t = getTemperature();
-    char payload[7];
-    dtostrf(t, -sizeof(payload), 2, payload);
+    double t_n = sensor.readTemperature();
+    uint8_t h_n = sensor.readHumidity();
+    double p_n = sensor.readPressure();
+
+    char t_s[7]; dtostrf(t_n, sizeof(t_s), 2, t_s);
+    char p_s[8]; dtostrf(p_n, sizeof(p_s), 2, p_s);
+
+    char payload[20];
+    snprintf(payload, sizeof(payload), "%s,%u,%s", t_s, h_n, p_s);
 
     radioSend(payload);
 
