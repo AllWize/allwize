@@ -2,7 +2,7 @@
 
 Allwize - MCP9701 Thermistor Slave Example
 
-This example sends the data for the built-in MCP9701 thermistor.
+This example sends the data for the built-in MCP9701 thermistor in the AllWize K1.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
