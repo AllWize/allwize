@@ -1,9 +1,9 @@
 /*
 
-Allwize - Master example
+Allwize - Simple MASTER example
 
-This example prints out the configuration settings stored
-in the module non-volatile memory.
+Listents to messages on the same channel and CF and
+prints them out via the serial monitor
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -26,25 +26,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_ARCH_SAMD)
-    #define debug   SerialUSB
-#else
-    #define debug   Serial
-#endif
-
 #if defined(ARDUINO_AVR_UNO)
     #define RX_PIN      8
     #define TX_PIN      9
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define module      Serial1
+    #define debug       Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define module      Serial1
+    #define debug       SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
@@ -52,55 +49,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define TX_PIN      13
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
 #endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
-// Config & globals
+// Configuration
+// -----------------------------------------------------------------------------
+
+#define WIZE_CHANNEL        0x04
+#define WIZE_DATARATE       0x01
+#define WIZE_NETWORK_ID     0x46
+
+// -----------------------------------------------------------------------------
+// Wize
 // -----------------------------------------------------------------------------
 
 #include "Allwize.h"
 Allwize * allwize;
 
-// -----------------------------------------------------------------------------
-// Main
-// -----------------------------------------------------------------------------
-
-void setup() {
-
-    debug.begin(115200);
-    while (!debug && millis() < 5000);
+void wizeSetup() {
 
     module.begin(19200);
-    allwize = new Allwize(module);
+    #if USE_SNIFFER
+        sniffer = new SerialSniffer(module, debug);
+        allwize = new Allwize(*sniffer);
+    #else
+        allwize = new Allwize(module);
+    #endif
     allwize->begin();
     while (!allwize->ready());
 
     allwize->master();
-    allwize->setChannel(4);
+    allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(5);
-    allwize->setDataRate(1);
-    allwize->setControlField(0x46);
-
-    debug.println();
-    debug.println("[Allwize] Master example");
-    debug.println();
+    allwize->setDataRate(WIZE_DATARATE);
+    allwize->setControlField(WIZE_NETWORK_ID);
 
     allwize->dump(debug);
 
+    debug.println("[WIZE] Listening...");
+
 }
 
-void loop() {
+void wizeLoop() {
 
     if (allwize->available()) {
 
         allwize_message_t message = allwize->read();
 
         // Code to pretty-print the message
-
         char buffer[64];
         char ascii[message.len+1];
 
-        snprintf(buffer, sizeof(buffer), "[Allwize] C: %02X, CI: %02X, RSSI: %02X, DATA: { ", message.c, message.ci, message.rssi);
+        snprintf(buffer, sizeof(buffer), "[WIZE] C: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ", message.c, message.ci, message.rssi);
         debug.print(buffer);
 
         for (uint8_t i=0; i<message.len; i++) {
@@ -115,5 +116,30 @@ void loop() {
         debug.println("\"");
 
     }
+
+}
+
+// -----------------------------------------------------------------------------
+// Main
+// -----------------------------------------------------------------------------
+
+void setup() {
+
+    // Setup serial debug
+    debug.begin(115200);
+    while (!debug && millis() < 5000);
+    debug.println();
+    debug.println("[MAIN] Wize Master Example");
+    debug.println();
+
+    // Init radio
+    wizeSetup();
+
+}
+
+void loop() {
+
+    // Listen to messages
+    wizeLoop();
 
 }

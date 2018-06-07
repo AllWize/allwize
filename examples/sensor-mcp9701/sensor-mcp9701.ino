@@ -1,9 +1,8 @@
 /*
 
-Allwize - Master example
+Allwize - MCP9701 Thermistor Slave Example
 
-This example prints out the configuration settings stored
-in the module non-volatile memory.
+This example sends the data for the built-in MCP9701 thermistor.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -26,53 +25,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_ARCH_SAMD)
-    #define debug   SerialUSB
-#else
-    #define debug   Serial
-#endif
-
 #if defined(ARDUINO_AVR_UNO)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    5000
-    #define RX_PIN              8
-    #define TX_PIN              9
+    #define RX_PIN      8
+    #define TX_PIN      9
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    5000
-    #define module              Serial1
+    #define module      Serial1
+    #define debug       Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define ANALOG_DEPTH        12
-    #define ANALOG_REFERENCE    3300
-    #define module              Serial1
+    #define module      Serial1
+    #define debug       SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
-    #define ANALOG_DEPTH        10
-    #define ANALOG_REFERENCE    3300
-    #define RX_PIN              12
-    #define TX_PIN              13
+    #define RX_PIN      12
+    #define TX_PIN      13
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
 #endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
 
-#define CHANNEL                 0x04
-#define NETWORK_ID              0x46
-#define NODE_ID                 0x08
+#define WIZE_CHANNEL            0x04
+#define WIZE_DATARATE           0x01
+#define WIZE_NETWORK_ID         0x46
+#define WIZE_NODE_ID            0x08
 
 #define TEMPERATURE_PIN         A2
 #define TEMPERATURE_SAMPLES     10
-#define ANALOG_COUNT            (1 << ANALOG_DEPTH)
+
+// -----------------------------------------------------------------------------
+// Formatting
+// -----------------------------------------------------------------------------
+
+char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+
+    bool negative = value < 0;
+
+    uint32_t mul = 1;
+    for (uint8_t i=0; i<decimals; i++) mul *= 10;
+
+    value = abs(value);
+    uint32_t value_int = int(value);
+    uint32_t value_dec = int((value - value_int) * mul);
+
+    char format[20];
+    snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
+    snprintf(buffer, len, format, value_int, value_dec);
+
+    return buffer;
+
+}
 
 // -----------------------------------------------------------------------------
 // Allwize
@@ -81,7 +93,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Allwize.h"
 Allwize * allwize;
 
-void radioSetup() {
+void wizeSetup() {
 
     module.begin(19200);
     allwize = new Allwize(module);
@@ -89,15 +101,15 @@ void radioSetup() {
     while (!allwize->ready());
 
     allwize->slave();
-    allwize->setChannel(CHANNEL, true);
+    allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(5);
-    allwize->setDataRate(1);
-    allwize->setControlField(NETWORK_ID);
-    allwize->setControlInformation(NODE_ID);
+    allwize->setDataRate(WIZE_DATARATE);
+    allwize->setControlField(WIZE_NETWORK_ID);
+    allwize->setControlInformation(WIZE_NODE_ID);
 
 }
 
-void radioSend(const char * payload) {
+void wizeSend(const char * payload) {
 
     debug.print("[Allwize] Payload: ");
     debug.println(payload);
@@ -109,8 +121,30 @@ void radioSend(const char * payload) {
 }
 
 // -----------------------------------------------------------------------------
-// Utils
+// Sensor reading
 // -----------------------------------------------------------------------------
+
+#if defined(ARDUINO_AVR_UNO)
+    #define ANALOG_DEPTH        10
+    #define ANALOG_REFERENCE    5000
+#endif // ARDUINO_AVR_UNO
+
+#if defined(ARDUINO_AVR_LEONARDO)
+    #define ANALOG_DEPTH        10
+    #define ANALOG_REFERENCE    5000
+#endif // ARDUINO_AVR_LEONARDO
+
+#if defined(ARDUINO_ARCH_SAMD)
+    #define ANALOG_DEPTH        12
+    #define ANALOG_REFERENCE    3300
+#endif // ARDUINO_ARCH_SAMD
+
+#if defined(ARDUINO_ARCH_ESP8266)
+    #define ANALOG_DEPTH        10
+    #define ANALOG_REFERENCE    3300
+#endif // ARDUINO_ARCH_ESP8266
+
+#define ANALOG_COUNT            (1 << ANALOG_DEPTH)
 
 // Get the temperature from the MCP9701 sensor on board attached to A2
 // As per datasheet (page 8):
@@ -150,7 +184,7 @@ void setup() {
     #endif
 
     // Init radio
-    radioSetup();
+    wizeSetup();
 
 }
 
@@ -158,9 +192,9 @@ void loop() {
 
     float t = getTemperature();
     char payload[7];
-    dtostrf(t, -sizeof(payload), 2, payload);
+    snfloat(payload, sizeof(payload), 2, t);
 
-    radioSend(payload);
+    wizeSend(payload);
 
     delay(5000);
 

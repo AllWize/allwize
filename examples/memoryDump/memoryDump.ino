@@ -2,11 +2,7 @@
 
 Allwize - Memory Dump Example
 
-This example uses a wrapping class around Allwize class to
-expose the getMemory method and dump the radio module memory
-byte by byte.
-This is possible since all methods in the AllWize class are either
-public or protected.
+This example dumps the radio module memory byte by byte.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -29,25 +25,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_ARCH_SAMD)
-    #define debug   SerialUSB
-#else
-    #define debug   Serial
-#endif
-
 #if defined(ARDUINO_AVR_UNO)
     #define RX_PIN      8
     #define TX_PIN      9
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define module      Serial1
+    #define debug       Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define module      Serial1
+    #define debug       SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
@@ -55,6 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define TX_PIN      13
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
 #endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------

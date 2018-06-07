@@ -1,9 +1,9 @@
 /*
 
-Allwize - Sensor example
+Allwize - Ultrasonic HC-SR04 Slave Example
 
-This example prints out the configuration settings stored
-in the module non-volatile memory.
+This example shows the use of an ultrasonic HC-SR04 to send
+data about distance to a target.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -26,30 +26,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_ARCH_SAMD)
-    #define debug   SerialUSB
-#else
-    #define debug   Serial
-#endif
+#if defined(ARDUINO_AVR_UNO)
+    #define RX_PIN      8
+    #define TX_PIN      9
+    #include <SoftwareSerial.h>
+    SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
+#endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define module      Serial1
+    #define debug       Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define module      Serial1
+    #define debug       SerialUSB
 #endif // ARDUINO_ARCH_SAMD
+
+#if defined(ARDUINO_ARCH_ESP8266)
+    #define RX_PIN      12
+    #define TX_PIN      13
+    #include <SoftwareSerial.h>
+    SoftwareSerial module(RX_PIN, TX_PIN);
+    #define debug       Serial
+#endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
 
-#define CHANNEL                 0x04
-#define NETWORK_ID              0x46
-#define NODE_ID                 0x10
+#define WIZE_CHANNEL        0x04
+#define WIZE_DATARATE       0x01
+#define WIZE_NETWORK_ID     0x46
+#define WIZE_NODE_ID        0x10
 
-#define TRIGGER_PIN             5
-#define ECHO_PIN                6
+#define TRIGGER_PIN         5
+#define ECHO_PIN            6
 
 // -----------------------------------------------------------------------------
 // Allwize
@@ -58,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Allwize.h"
 Allwize * allwize;
 
-void radioSetup() {
+void wizeSetup() {
 
     module.begin(19200);
     allwize = new Allwize(module);
@@ -66,15 +79,15 @@ void radioSetup() {
     while (!allwize->ready());
 
     allwize->slave();
-    allwize->setChannel(CHANNEL, true);
+    allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(5);
-    allwize->setDataRate(1);
-    allwize->setControlField(NETWORK_ID);
-    allwize->setControlInformation(NODE_ID);
+    allwize->setDataRate(WIZE_DATARATE);
+    allwize->setControlField(WIZE_NETWORK_ID);
+    allwize->setControlInformation(WIZE_NODE_ID);
 
 }
 
-void radioSend(const char * payload) {
+void wizeSend(const char * payload) {
 
     debug.print("[Allwize] Payload: ");
     debug.println(payload);
@@ -119,7 +132,7 @@ void setup() {
     pinMode(ECHO_PIN, INPUT);
 
     // Init radio
-    radioSetup();
+    wizeSetup();
 
 }
 
@@ -130,7 +143,7 @@ void loop() {
     if (distance < 2000) {
         char payload[20];
         snprintf(payload, sizeof(payload), "%lu", distance);
-        radioSend(payload);
+        wizeSend(payload);
     }
 
     delay(5000);
