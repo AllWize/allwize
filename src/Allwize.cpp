@@ -26,9 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Allwize object constructor
- * @param {Stream&} stream      Serial stream to communicate with the module
- * @param {uint8_t} _reset_gpio GPIO connected to the module RESET pin
+ * @brief               Allwize object constructor
+ * @param stream        Serial stream to communicate with the module
+ * @param _reset_gpio   GPIO connected to the module RESET pin
  */
 Allwize::Allwize(Stream& stream, uint8_t reset_gpio) : _stream(stream), _reset_gpio(reset_gpio) {
     if (0xFF != _reset_gpio) {
@@ -38,7 +38,7 @@ Allwize::Allwize(Stream& stream, uint8_t reset_gpio) : _stream(stream), _reset_g
 }
 
 /**
- * @brief Inits the module communications
+ * @brief               Inits the module communications
  */
 void Allwize::begin() {
     _stream.flush();
@@ -46,12 +46,14 @@ void Allwize::begin() {
 }
 
 /**
- * @brief Resets the radio module.
- * You must reset the serial connection after the reset:
- *     Serial1.end();
- *     Serial1.begin(19200);
- *     delay(200);
- * @returns {bool}      Reset successfully issued
+ * @brief               Resets the radio module.
+ *                      You must reset the serial connection after the reset:
+ *
+ *                          Serial1.end();
+ *                          Serial1.begin(19200);
+ *                          delay(200);
+ *
+ * @return              Reset successfully issued
  */
 bool Allwize::reset() {
     if (0xFF == _reset_gpio) {
@@ -77,12 +79,12 @@ bool Allwize::reset() {
 }
 
 /**
- * @brief Resets the module to factory settings
- * You must reset the serial connection after the factoryReset:
- *     Serial1.end();
- *     Serial1.begin(19200);
- *     delay(200);
- * @returns {bool}      Factory reset successfully issued
+ * @brief               Resets the module to factory settings
+ *                      You must reset the serial connection after the factoryReset:
+ *                          Serial1.end();
+ *                          Serial1.begin(19200);
+ *                          delay(200);
+ * @return              Factory reset successfully issued
  */
 bool Allwize::factoryReset() {
     _setMemory(MEM_CONFIG_INTERFACE, 1);
@@ -99,7 +101,7 @@ bool Allwize::factoryReset() {
 }
 
 /**
- * @brief Sets the module in master mode
+ * @brief               Sets the module in master mode
  */
 void Allwize::master() {
     setMBusMode(MBUS_MODE_OSP, true);
@@ -111,7 +113,7 @@ void Allwize::master() {
 }
 
 /**
- * @brief Sets the module in slave mode
+ * @brief               Sets the module in slave mode
  */
 void Allwize::slave() {
     setMBusMode(MBUS_MODE_OSP, true);
@@ -119,7 +121,7 @@ void Allwize::slave() {
 }
 
 /**
- * @brief Sets the module in repeater mode
+ * @brief               Sets the module in repeater mode
  */
 void Allwize::repeater() {
     setMBusMode(MBUS_MODE_OSP, true);
@@ -127,21 +129,21 @@ void Allwize::repeater() {
 }
 
 /**
- * @brief Sets the radio module in sleep mode
+ * @brief               Sets the radio module in sleep mode
  */
 void Allwize::sleep() {
     _sendCommand(CMD_SLEEP);
 }
 
 /**
- * @brief Wakes up the radio from sleep mode
+ * @brief               Wakes up the radio from sleep mode
  */
 void Allwize::wakeup() {
     _sendAndReceive(CMD_EXIT_CONFIG);
 }
 
 /**
- * @brief Test whether the radio module is ready or not
+ * @brief               Test whether the radio module is ready or not
  */
 bool Allwize::ready() {
     //uint8_t channel = getChannel();
@@ -152,8 +154,8 @@ bool Allwize::ready() {
 }
 
 /**
- * @brief Dumps the current memory configuration to the given stream
- * @type {Stream&}          Data stream to dump the data to
+ * @brief               Dumps the current memory configuration to the given stream
+ * @param debug         Data stream to dump the data to
  */
 void Allwize::dump(Stream & debug) {
 
@@ -203,10 +205,10 @@ void Allwize::dump(Stream & debug) {
 }
 
 /**
- * @brief Sends a byte array
- * @param {uint8_t *} buffer    Byte array with the application payload
- * @param {uint8_t} len         Length of the payload
- * @returns {bool}              Returns true if message has been correctly sent
+ * @brief               Sends a byte array
+ * @param buffer        Byte array with the application payload
+ * @param len           Length of the payload
+ * @return              Returns true if message has been correctly sent
  */
 bool Allwize::send(uint8_t * buffer, uint8_t len) {
     if (_config) return false;
@@ -218,18 +220,18 @@ bool Allwize::send(uint8_t * buffer, uint8_t len) {
 }
 
 /**
- * @brief Sends c-string
- * @param {const char *} buffer C-string with the application payload
- * @returns {bool}              Returns true if message has been correctly sent
+ * @brief               Sends c-string
+ * @param buffer        C-string with the application payload
+ * @return              Returns true if message has been correctly sent
  */
 bool Allwize::send(const char * buffer) {
     return send((uint8_t *) buffer, strlen(buffer));
 }
 
 /**
- * {brief} Returns true if a new message has been received and decoded
- * This method has to be called in the main loop to monitor for incomming messages
- * @returns {bool}          Whether a new message is available
+ * @brief               Returns true if a new message has been received and decoded
+ *                      This method has to be called in the main loop to monitor for incomming messages
+ * @return              Whether a new message is available
  */
 bool Allwize::available() {
 
@@ -261,8 +263,8 @@ bool Allwize::available() {
 }
 
 /**
- * {brief} Returns latest received message
- * @returns {allwize_message_t}     New message
+ * @brief               Returns latest received message
+ * @return              New message
  */
 allwize_message_t Allwize::read() {
     return _message;
@@ -273,25 +275,25 @@ allwize_message_t Allwize::read() {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Sets the control information byte
- * @param {uint8_t} ci      CI byte value
+ * @brief               Sets the control information byte
+ * @param  ci           CI byte value
  */
 void Allwize::setControlInformation(uint8_t ci) {
     _ci = ci;
 }
 
 /**
- * @brief Gets the control information byte
- * @returns {uint8_t}       CI byte value
+ * @brief               Gets the control information byte
+ * @return              CI byte value
  */
 uint8_t Allwize::getControlInformation() {
     return _ci;
 }
 
 /**
- * @brief Sets the communications channel (for MBUS_MODE_R2 only)
- * @param {uint8_t} channel     Channel number
- * @param {bool} persist        Persist the changes in non-volatile memory
+ * @brief               Sets the communications channel (for MBUS_MODE_R2 only)
+ * @param channel       Channel number
+ * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setChannel(uint8_t channel, bool persist) {
     if (persist) _setMemory(MEM_CHANNEL, channel);
@@ -299,17 +301,17 @@ void Allwize::setChannel(uint8_t channel, bool persist) {
 }
 
 /**
- * @brief Gets the channel stored in non-volatile memory
- * @return {uint8_t} Channel (1 byte)
+ * @brief               Gets the channel stored in non-volatile memory
+ * @return              Channel (1 byte)
  */
 uint8_t Allwize::getChannel() {
     return _getMemory(MEM_CHANNEL);
 }
 
 /**
- * @brief Sets the RF power
- * @param {uint8_t} power       Value from 1 to 5
- * @param {bool} persist        Persist the changes in non-volatile memory
+ * @brief               Sets the RF power
+ * @param power         Value from 1 to 5
+ * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setPower(uint8_t power, bool persist) {
     if (0 < power && power < 6) {
@@ -319,16 +321,16 @@ void Allwize::setPower(uint8_t power, bool persist) {
 }
 
 /**
- * @brief Gets the RF power stored in non-volatile memory
- * @return {uint8_t} RF power (1 byte)
+ * @brief               Gets the RF power stored in non-volatile memory
+ * @return              RF power (1 byte)
  */
 uint8_t Allwize::getPower() {
     return _getMemory(MEM_RF_POWER);
 }
 
 /**
- * @brief Sets the data rate
- * @param {uint8_t} dr          Value in [1, 2, 4, 5]
+ * @brief               Sets the data rate
+ * @param dr            Value in [1, 2, 4, 5]
  */
 void Allwize::setDataRate(uint8_t dr) {
     if (0 < dr && dr < 6 && dr != 3) {
@@ -337,17 +339,17 @@ void Allwize::setDataRate(uint8_t dr) {
 }
 
 /**
- * @brief Gets the data rate stored in non-volatile memory
- * @return {uint8_t} data rate (1 byte)
+ * @brief               Gets the data rate stored in non-volatile memory
+ * @return              Current data rate (1 byte)
  */
 uint8_t Allwize::getDataRate() {
     return _getMemory(MEM_DATA_RATE);
 }
 
 /**
- * @brief Sets the module in one of the available MBus modes
- * @param {uint8_t} mode        MBus mode
- * @param {bool} persist        Persist the changes in non-volatile memory
+ * @brief               Sets the module in one of the available MBus modes
+ * @param mode          MBus mode (MBUS_MODE_*)
+ * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setMBusMode(uint8_t mode, bool persist) {
     if (persist) _setMemory(MEM_MBUS_MODE, mode);
@@ -355,48 +357,48 @@ void Allwize::setMBusMode(uint8_t mode, bool persist) {
 }
 
 /**
- * @brief Gets the MBus mode stored in non-volatile memory
- * @return {uint8_t} MBus mode (1 byte)
+ * @brief               Gets the MBus mode stored in non-volatile memory
+ * @return              MBus mode (1 byte)
  */
 uint8_t Allwize::getMBusMode() {
     return _getMemory(MEM_MBUS_MODE);
 }
 
 /**
- * @brief Sets the sleep mode
- * @param {uint8_t} mode        One of SLEEP_MODE_*
+ * @brief               Sets the sleep mode
+ * @param mode          One of SLEEP_MODE_*
  */
 void Allwize::setSleepMode(uint8_t mode) {
     _setMemory(MEM_SLEEP_MODE, mode);
 }
 
 /**
- * @brief Gets the sleep mode stored in non-volatile memory
- * @return {uint8_t} Sleep mode (1 byte)
+ * @brief               Gets the sleep mode stored in non-volatile memory
+ * @return              Sleep mode (1 byte)
  */
 uint8_t Allwize::getSleepMode() {
     return _getMemory(MEM_SLEEP_MODE);
 }
 
 /**
- * @brief Sets the RSSI mode value
- * @param {bool} value          Set to true to append RSSI value to received data
+ * @brief               Sets the RSSI mode value
+ * @param value         Set to true to append RSSI value to received data
  */
 //void Allwize::setAppendRSSI(bool value) {
 //    _setMemory(MEM_RSSI_MODE, value ? 1 : 0);
 //}
 
 /**
- * @brief Gets the current RSSI mode value
- * @return {bool} True if RSSI value will be appended to received data
+ * @brief               Gets the current RSSI mode value
+ * @return              True if RSSI value will be appended to received data
  */
 //bool Allwize::getAppendRSSI() {
 //    return (_getMemory(MEM_RSSI_MODE) == 0x01);
 //}
 
 /**
- * @brief Sets the preamble length frame format
- * @param {uint8_t} preamble          0 or 2
+ * @brief               Sets the preamble length frame format
+ * @param preamble      0 or 2
  */
 void Allwize::setPreamble(uint8_t preamble) {
     if (PREAMBLE_FORMAT_A == preamble || PREAMBLE_FORMAT_B == preamble) {
@@ -405,64 +407,64 @@ void Allwize::setPreamble(uint8_t preamble) {
 }
 
 /**
- * @brief Gets the preamble length frame format
- * @return {uint8_t} preamble length format (1 byte)
+ * @brief               Gets the preamble length frame format
+ * @return              Preamble length format (1 byte)
  */
 uint8_t Allwize::getPreamble() {
     return _getMemory(MEM_PREAMBLE_LENGTH);
 }
 
 /**
- * @brief Sets the timeout for auto sleep modes
- * @param {uint8_t} timeout     Timeout value
+ * @brief               Sets the timeout for auto sleep modes
+ * @param timeout       Timeout value (defaults to 1s)
  */
 void Allwize::setTimeout(uint8_t timeout) {
     _setMemory(MEM_TIMEOUT, timeout);
 }
 
 /**
- * @brief Gets the current timeout for auto sleep modes
- * @return {uint8_t}            Timeout setting
+ * @brief               Gets the current timeout for auto sleep modes
+ * @return              Timeout setting
  */
 uint8_t Allwize::getTimeout() {
     return _getMemory(MEM_TIMEOUT);
 }
 
 /**
- * @brief Sets the network role
- * @param {uint8_t} role        Network role
+ * @brief               Sets the network role
+ * @param role          Network role (NETWORK_ROLE_*)
  */
 void Allwize::setNetworkRole(uint8_t role) {
     _setMemory(MEM_NETWORK_ROLE, role);
 }
 
 /**
- * @brief Gets the current network role
- * @return {uint8_t}            Network role
+ * @brief               Gets the current network role
+ * @return              Network role
  */
 uint8_t Allwize::getNetworkRole() {
     return _getMemory(MEM_NETWORK_ROLE);
 }
 
 /**
- * @brief Sets the LED control
- * @param {uint8_t} value       LED control value
+ * @brief               Sets the LED control
+ * @param value         LED control value
  */
 void Allwize::setLEDControl(uint8_t value) {
     _setMemory(MEM_LED_CONTROL, value);
 }
 
 /**
- * @brief Gets the current LED control
- * @return {uint8_t}            LED control value
+ * @brief               Gets the current LED control
+ * @return              LED control value
  */
 uint8_t Allwize::getLEDControl() {
     return _getMemory(MEM_LED_CONTROL);
 }
 
 /**
- * @brief Sets the data interface for receiving packets
- * @param {uint8_t} value      Value from 0x00 to 0x0C
+ * @brief               Sets the data interface for receiving packets
+ * @param               Value from 0x00 to 0x0C
  */
 //void Allwize::setDataInterface(uint8_t value) {
 //    if (0 <= value && value <= 0x0C) {
@@ -471,17 +473,17 @@ uint8_t Allwize::getLEDControl() {
 //}
 
 /**
- * @brief Gets the data interface for receiving packets
- * @return {uint8_t} value (1 byte)
+ * @brief               Gets the data interface for receiving packets
+ * @return              Value (1 byte)
  */
 //uint8_t Allwize::getDataInterface() {
 //    return _getMemory(MEM_DATA_INTERFACE);
 //}
 
 /**
- * @brief Sets the control field value
- * @param {uint8_t} value       Control field
- * @param {bool} persist        Persist the changes in non-volatile memory
+ * @brief               Sets the control field value
+ * @param value         Control field
+ * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setControlField(uint8_t value, bool persist) {
     if (persist) _setMemory(MEM_CONTROL_FIELD, value);
@@ -489,16 +491,17 @@ void Allwize::setControlField(uint8_t value, bool persist) {
 }
 
 /**
- * @brief Gets the control field value stored in non-volatile memory
- * @return {uint8_t} Control field value (1 byte)
+ * @brief               Gets the control field value stored in non-volatile memory
+ * @return              Control field value (1 byte)
  */
 uint8_t Allwize::getControlField() {
     return _getMemory(MEM_CONTROL_FIELD);
 }
 
 /**
- * @brief Sets the module in one of the available operations modes
- * @param {allwize_install_mode_t} mode Operation mode
+ * @brief               Sets the module in one of the available operations modes
+ * @param mode          Operation mode
+ * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setInstallMode(uint8_t mode, bool persist) {
     if (persist) _setMemory(MEM_INSTALL_MODE, mode);
@@ -506,56 +509,56 @@ void Allwize::setInstallMode(uint8_t mode, bool persist) {
 }
 
 /**
- * @brief Gets the install modevalue stored in non-volatile memory
- * @return {uint8_t} Install mode value (1 byte)
+ * @brief               Gets the install modevalue stored in non-volatile memory
+ * @return              Install mode value (1 byte)
  */
 uint8_t Allwize::getInstallMode() {
     return _getMemory(MEM_INSTALL_MODE);
 }
 
 /**
- * @brief Sets the encrypt flag setting
- * @param {uint8_t} flag        Encrypt flag
+ * @brief               Sets the encrypt flag setting
+ * @param flag          Encrypt flag
  */
 void Allwize::setEncryptFlag(uint8_t flag) {
     _setMemory(MEM_ENCRYPT_FLAG, flag);
 }
 
 /**
- * @brief Gets the encrypt flag setting
- * @return {uint8_t}            Encrypt flag
+ * @brief               Gets the encrypt flag setting
+ * @return              Encrypt flag
  */
 uint8_t Allwize::getEncryptFlag() {
     return _getMemory(MEM_ENCRYPT_FLAG);
 }
 
 /**
- * @brief Sets the decrypt flag setting
- * @param {uint8_t} flag        Decrypt flag
+ * @brief               Sets the decrypt flag setting
+ * @param flag          Decrypt flag
  */
 void Allwize::setDecryptFlag(uint8_t flag) {
     _setMemory(MEM_DECRYPT_FLAG, flag);
 }
 
 /**
- * @brief Gets the decrypt flag setting
- * @return {uint8_t}            Decrypt flag
+ * @brief               Gets the decrypt flag setting
+ * @return              Decrypt flag
  */
 uint8_t Allwize::getDecryptFlag() {
     return _getMemory(MEM_DECRYPT_FLAG);
 }
 
 /**
- * @brief Sets the default encryption key
- * @param {uint8_t *} key      A 16-byte encryption key as binary array
+ * @brief               Sets the default encryption key
+ * @param key           A 16-byte encryption key as binary array
  */
 void Allwize::setDefaultKey(uint8_t * key) {
     _setMemory(MEM_DEFAULT_KEY, key, 16);
 }
 
 /**
- * @brief Gets the default encryption key
- * @param {uint8_t *} key      A binary buffer to store the key (16 bytes)
+ * @brief               Gets the default encryption key
+ * @param key           A binary buffer to store the key (16 bytes)
  */
 void Allwize::getDefaultKey(uint8_t * key) {
     _getMemory(MEM_DEFAULT_KEY, key, 16);
@@ -564,9 +567,9 @@ void Allwize::getDefaultKey(uint8_t * key) {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Returns the RSSI of the last valid packet received
- * TODO: values do not seem right and are not the same as in the packet
- * @return {float} RSSI in dBm
+ * @brief               Returns the RSSI of the last valid packet received
+ *                      TODO: values do not seem right and are not the same as in the packet
+ * @return              RSSI in dBm
  */
 /*
 float Allwize::getRSSI() {
@@ -577,8 +580,8 @@ float Allwize::getRSSI() {
 */
 
 /**
- * @brief Returns the internal temperature of the module
- * @return {uint8_t} Temperature in Celsius
+ * @brief               Returns the internal temperature of the module
+ * @return              Temperature in Celsius
  */
 uint8_t Allwize::getTemperature() {
     uint8_t response = _sendCommand(CMD_TEMPERATURE);
@@ -587,8 +590,8 @@ uint8_t Allwize::getTemperature() {
 }
 
 /**
- * @brief Returns the internal voltage of the module
- * @return {uint16_t} Voltage in mV
+ * @brief               Returns the internal voltage of the module
+ * @return              Voltage in mV
  */
 uint16_t Allwize::getVoltage() {
     uint8_t response = _sendCommand(CMD_VOLTAGE);
@@ -597,40 +600,40 @@ uint16_t Allwize::getVoltage() {
 }
 
 /**
- * @brief Returns the Manufacturer ID string
- * @return {String} 2-byte hex string with the manufacturer ID
+ * @brief               Returns the Manufacturer ID string
+ * @return              2-byte hex string with the manufacturer ID
  */
 String Allwize::getMID() {
     return _getMemoryAsHexString(MEM_MANUFACTURER_ID, 2);
 }
 
 /**
- * @brief Returns the Unique ID string
- * @return {String} 4-byte hex string with the unique ID
+ * @brief               Returns the Unique ID string
+ * @return              4-byte hex string with the unique ID
  */
 String Allwize::getUID() {
     return _getMemoryAsHexString(MEM_UNIQUE_ID, 4);
 }
 
 /**
- * @brief Returns the module version from non-volatile memory
- * @return {uint8_t} Version
+ * @brief               Returns the module version from non-volatile memory
+ * @return              Version
  */
 uint8_t Allwize::getVersion() {
     return _getMemory(MEM_VERSION);
 }
 
 /**
- * @brief Returns the device version from non-volatile memory
- * @return {uint8_t} Device
+ * @brief               Returns the device version from non-volatile memory
+ * @return              Device
  */
 uint8_t Allwize::getDevice() {
     return _getMemory(MEM_DEVICE);
 }
 
 /**
- * @brief Returns the module part number
- * @return {String} 12-byte hex string with the part number
+ * @brief               Returns the module part number
+ * @return              12-byte hex string with the part number
  */
 String Allwize::getPartNumber() {
     _readModel();
@@ -638,8 +641,8 @@ String Allwize::getPartNumber() {
 }
 
 /**
- * @brief Returns the module hardware revision
- * @return {String} 4-byte hex string with the HW version
+ * @brief               Returns the module hardware revision
+ * @return              4-byte hex string with the HW version
  */
 String Allwize::getHardwareVersion() {
     _readModel();
@@ -647,8 +650,8 @@ String Allwize::getHardwareVersion() {
 }
 
 /**
- * @brief Returns the module firmware revision
- * @return {String} 4-byte hex string with the FW version
+ * @brief               Returns the module firmware revision
+ * @return              4-byte hex string with the FW version
  */
 String Allwize::getFirmwareVersion() {
     _readModel();
@@ -656,8 +659,8 @@ String Allwize::getFirmwareVersion() {
 }
 
 /**
- * @brief Returns the module serial number
- * @return {String} 8-byte hex string with the serial number
+ * @brief               Returns the module serial number
+ * @return              8-byte hex string with the serial number
  */
 String Allwize::getSerialNumber() {
     return _getMemoryAsHexString(MEM_SERIAL_NUMBER_NEW, 8);
@@ -668,9 +671,9 @@ String Allwize::getSerialNumber() {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Sets or unsets config mode
- * @param {bool} value      True to enter config mode
- * @return {bool}           True if in config mode
+ * @brief               Sets or unsets config mode
+ * @param value         True to enter config mode
+ * @return              True if in config mode
  * @protected
 */
 bool Allwize::_setConfig(bool value) {
@@ -691,10 +694,10 @@ bool Allwize::_setConfig(bool value) {
 }
 
 /**
- * @brief Sends a command with the given data
- * @param {uint8_t} command     Command key
- * @param {uint8_t *} data      Binary data to send
- * @param {uint8_t} len         Length of the binary data
+ * @brief               Sends a command with the given data
+ * @param command       Command key
+ * @param data          Binary data to send
+ * @param len           Length of the binary data
  * @protected
  */
 int8_t Allwize::_sendCommand(uint8_t command, uint8_t * data, uint8_t len) {
@@ -708,10 +711,10 @@ int8_t Allwize::_sendCommand(uint8_t command, uint8_t * data, uint8_t len) {
 }
 
 /**
- * @brief Sends a command with the given data
- * @param {uint8_t} command     Command key
- * @param {uint8_t} data        Single byte
- * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
+ * @brief               Sends a command with the given data
+ * @param command       Command key
+ * @param data          Single byte
+ * @return              Number of bytes received, -1 if timed out or error sending
  * @protected
  */
 int8_t Allwize::_sendCommand(uint8_t command, uint8_t data) {
@@ -725,9 +728,9 @@ int8_t Allwize::_sendCommand(uint8_t command, uint8_t data) {
 }
 
 /**
- * @brief Sends a command with no data
- * @param {uint8_t} command     Command key
- * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
+ * @brief               Sends a command with no data
+ * @param  command      Command key
+ * @return              Number of bytes received, -1 if timed out or error sending
  * @protected
  */
 int8_t Allwize::_sendCommand(uint8_t command) {
@@ -739,11 +742,11 @@ int8_t Allwize::_sendCommand(uint8_t command) {
 }
 
 /**
- * @brief Sets non-volatile memory contents starting from given address
- * @param {uint8_t} address     Command key
- * @param {uint8_t *} data      Binary data to store
- * @param {uint8_t} len         Length of the binary data
- * @return {bool}               True if the data was successfully saved
+ * @brief               Sets non-volatile memory contents starting from given address
+ * @param  address      Command key
+ * @param data          Binary data to store
+ * @param len           Length of the binary data
+ * @return              True if the data was successfully saved
  * @protected
  */
 bool Allwize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
@@ -757,10 +760,10 @@ bool Allwize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
 }
 
 /**
- * @brief Sets non-volatile memory contents starting from given address
- * @param {uint8_t} address     Command key
- * @param {uint8_t} data        Single byte to store at given address
- * @return {bool}               True if the data was successfully saved
+ * @brief               Sets non-volatile memory contents starting from given address
+ * @param address       Command key
+ * @param data          Single byte to store at given address
+ * @return              True if the data was successfully saved
  * @protected
  */
 bool Allwize::_setMemory(uint8_t address, uint8_t value) {
@@ -769,11 +772,11 @@ bool Allwize::_setMemory(uint8_t address, uint8_t value) {
 }
 
 /**
- * @brief Returns the contents of consecutive memory addresses
- * @param {uint8_t} address     Address to start from
- * @param {uint8_t *} buffer    Buffer with at least 'len' position to store data to
- * @param {uint8_t} len         Number of positions to read
- * @return {uint8_t}            Number of positions actually read
+ * @brief               Returns the contents of consecutive memory addresses
+ * @param address       Address to start from
+ * @param buffer        Buffer with at least 'len' position to store data to
+ * @param len           Number of positions to read
+ * @return              Number of positions actually read
  * @protected
  */
 uint8_t Allwize::_getMemory(uint8_t address, uint8_t * buffer, uint8_t len) {
@@ -791,9 +794,9 @@ uint8_t Allwize::_getMemory(uint8_t address, uint8_t * buffer, uint8_t len) {
 }
 
 /**
- * @brief Returns the contents of single memory addresses
- * @param {uint8_t} address     Address to start from
- * @return {uint8_t}            Contents of the address, 0 if error
+ * @brief               Returns the contents of single memory addresses
+ * @param address       Address to start from
+ * @return              Contents of the address, 0 if error
  * @protected
  */
 uint8_t Allwize::_getMemory(uint8_t address) {
@@ -803,10 +806,10 @@ uint8_t Allwize::_getMemory(uint8_t address) {
 }
 
 /**
- * @brief Returns the contents of the memory from a certain address as an HEX String
- * @param {uint8_t} address     Address to start from
- * @param {uint8_t} len         Number of bytes to read
- * @return {String}             Result (empty string if error)
+ * @brief               Returns the contents of the memory from a certain address as an HEX String
+ * @param address       Address to start from
+ * @param len           Number of bytes to read
+ * @return              Result (empty string if error)
  * @protected
  */
 String Allwize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
@@ -820,10 +823,10 @@ String Allwize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
 }
 
 /**
- * @brief Returns the contents of the memory from a certain address as a String object
- * @param {uint8_t} address     Address to start from
- * @param {uint8_t} len         Number of bytes to read
- * @return {String}             Result (empty string if error)
+ * @brief               Returns the contents of the memory from a certain address as a String object
+ * @param address       Address to start from
+ * @param len           Number of bytes to read
+ * @return              Result (empty string if error)
  * @protected
  */
 String Allwize::_getMemoryAsString(uint8_t address, uint8_t len) {
@@ -838,7 +841,7 @@ String Allwize::_getMemoryAsString(uint8_t address, uint8_t len) {
 }
 
 /**
- * @brief Reads and caches the module model & version
+ * @brief               Reads and caches the module model & version
  */
 void Allwize::_readModel() {
 
@@ -869,8 +872,8 @@ void Allwize::_readModel() {
 }
 
 /**
- * {brief} Decodes the current RX buffer contents
- * @returns {bool}          Whether the contents are a valid packet
+ * @brief               Decodes the current RX buffer contents
+ * @return              Whether the contents are a valid packet
  *
  * Message format depending current configuration
  *
@@ -917,7 +920,7 @@ bool Allwize::_decode() {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Flushes the serial line to the module
+ * @brief               Flushes the serial line to the module
  * @protected
  */
 void Allwize::_flush() {
@@ -925,9 +928,9 @@ void Allwize::_flush() {
 }
 
 /**
- * @brief Sends a single byte to the module UART. Returns the number of bytes actually sent.
- * @param {uint8_t} ch          Byte to send
- * @return {uint8_t}            Number of bytes actually sent
+ * @brief               Sends a single byte to the module UART. Returns the number of bytes actually sent.
+ * @param ch            Byte to send
+ * @return              Number of bytes actually sent
  * @protected
  */
 uint8_t Allwize::_send(uint8_t ch) {
@@ -935,10 +938,10 @@ uint8_t Allwize::_send(uint8_t ch) {
 }
 
 /**
- * @brief Sends a binary buffer to the module UART. Returns the number of bytes actually sent.
- * @param {uint8_t *} buffer    Binary data to send
- * @param {uint8_t} len         Length of the binary data
- * @return {uint8_t}            Number of bytes actually sent
+ * @brief               Sends a binary buffer to the module UART. Returns the number of bytes actually sent.
+ * @param buffer        Binary data to send
+ * @param len           Length of the binary data
+ * @return              Number of bytes actually sent
  * @protected
  */
 uint8_t Allwize::_send(uint8_t * buffer, uint8_t len) {
@@ -950,8 +953,8 @@ uint8_t Allwize::_send(uint8_t * buffer, uint8_t len) {
 }
 
 /**
- * @brief Listens to incomming data from the module until timeout or END_OF_RESPONSE. Returns the number of bytes received and stored in the internal _buffer.
- * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
+ * @brief               Listens to incomming data from the module until timeout or END_OF_RESPONSE.
+ * @return              Number of bytes received and stored in the internal _buffer.
  * @protected
  */
 int8_t Allwize::_receive() {
@@ -959,10 +962,10 @@ int8_t Allwize::_receive() {
 }
 
 /**
- * @brief Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the internal _buffer.
- * @param {uint8_t *} buffer    Binary data to send
- * @param {uint8_t} len         Length of the binary data
- * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
+ * @brief               Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the internal _buffer.
+ * @param buffer        Binary data to send
+ * @param len           Length of the binary data
+ * @return              Number of bytes received, -1 if timed out or error sending
  * @protected
  */
 int8_t Allwize::_sendAndReceive(uint8_t * buffer, uint8_t len) {
@@ -971,9 +974,9 @@ int8_t Allwize::_sendAndReceive(uint8_t * buffer, uint8_t len) {
 }
 
 /**
- * @brief Sends a byte and waits for response. Returns the number of bytes received and stored in the internal _buffer.
- * @param {uint8_t} ch          Byte to send (-1 if timed out)
- * @return {int8_t}             Number of bytes received, -1 if timed out or error sending
+ * @brief               Sends a byte and waits for response. Returns the number of bytes received and stored in the internal _buffer.
+ * @param ch            Byte to send (-1 if timed out)
+ * @return              Number of bytes received, -1 if timed out or error sending
  * @protected
  */
 int8_t Allwize::_sendAndReceive(uint8_t ch) {
@@ -986,8 +989,8 @@ int8_t Allwize::_sendAndReceive(uint8_t ch) {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief Reads a byte from the stream with a timeout
- * @returns {int}               Read char or -1 if timed out
+ * @brief               Reads a byte from the stream with a timeout
+ * @return              Read char or -1 if timed out
  * @protected
  */
 int Allwize::_timedRead() {
@@ -1003,10 +1006,10 @@ int Allwize::_timedRead() {
 }
 
 /**
- * @brief Reads the stream buffer up to a number of bytes
- * @param {char *} buffer       Buffer to store the values to
- * @param {uint16_t} len        Max number of bytes to read
- * @returns {int}               Number of bytes read or -1 if timed out
+ * @brief               Reads the stream buffer up to a number of bytes
+ * @param buffer        Buffer to store the values to
+ * @param len           Max number of bytes to read
+ * @return              Number of bytes read or -1 if timed out
  * @protected
  */
 int Allwize::_readBytes(char * buffer, uint16_t len) {
@@ -1022,11 +1025,11 @@ int Allwize::_readBytes(char * buffer, uint16_t len) {
 }
 
 /**
- * @brief Reads the stream buffer up to a certain char or times out
- * @param {char} terminator     Terminating char
- * @param {char *} buffer       Buffer to store the values to
- * @param {uint16_t} len        Max number of bytes to read
- * @returns {int}               Number of bytes read or -1 if timed out
+ * @brief               Reads the stream buffer up to a certain char or times out
+ * @param terminator    Terminating char
+ * @param buffer        Buffer to store the values to
+ * @param len           Max number of bytes to read
+ * @return              Number of bytes read or -1 if timed out
  * @protected
  */
 int Allwize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
@@ -1043,10 +1046,10 @@ int Allwize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
 }
 
 /**
- * @brief Converts a hex c-string to a binary buffer.
- * @param {char *} hex          C-string with the hex values
- * @param {uint8_t *} bin       Buffer to store the converted values in
- * @param {uint8_t} len         Length of the hex c-string
+ * @brief               Converts a hex c-string to a binary buffer.
+ * @param hex           C-string with the hex values
+ * @param bin           Buffer to store the converted values in
+ * @param len           Length of the hex c-string
  * @protected
  */
 void Allwize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
@@ -1056,10 +1059,10 @@ void Allwize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
 }
 
 /**
- * @brief Converts a binary buffer to an hex c-string.
- * @param {uint8_t *} bin       Buffer to read the values from
- * @param {char *} hex          C-string to store the hex values
- * @param {uint8_t} len         Length of the input buffer
+ * @brief               Converts a binary buffer to an hex c-string.
+ * @param bin           Buffer to read the values from
+ * @param hex           C-string to store the hex values
+ * @param len           Length of the input buffer
  * @protected
  */
 void Allwize::_bin2hex(uint8_t * bin, char * hex, uint8_t len) {
