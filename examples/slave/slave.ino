@@ -1,8 +1,8 @@
 /*
 
-Allwize - Simple SLAVE EXample
+Allwize - Simple Slave Example
 
-This example sends an auto-increment number.
+Simple slave that sends an auto-increment number every 5 seconds.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

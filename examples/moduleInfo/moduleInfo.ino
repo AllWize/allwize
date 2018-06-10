@@ -2,8 +2,7 @@
 
 Allwize - Module Info Example
 
-This example prints out the configuration settings stored
-in the module non-volatile memory.
+Pretty-prints out the configuration settings stored in the module non-volatile memory.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

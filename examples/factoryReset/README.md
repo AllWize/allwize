@@ -1,20 +1,8 @@
-# AllWize
+# AllWize - Factory Reset Example
 
-Library to interface a Wize radio module
+Resets the module non-volatile memory to factory settings.
 
-[![version](https://img.shields.io/badge/version-0.0.1-brightgreen.svg)](CHANGELOG.md)
-[![license](https://img.shields.io/github/license/Allwize/allwize.svg)](LICENSE)
-
-Compatible radios:
-
-* RadioCrafts RC1701HP-OSP (Ondeo version)
-* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
-
-Compatible platforms:
-
-* AVR (Arduino Uno, Arduino Leonardo)
-* SAMD21 (Arduino Zero, Arduino MKR family)
-* ESP8266
+Always remember to connect the antenna before powering the board!
 
 ## License
 

@@ -1,20 +1,14 @@
-# AllWize
+# AllWize - Ultrasonic HC-SR04 Slave Example
 
-Library to interface a Wize radio module
+Shows how to use an ultrasonic HC-SR04 to send data about distance to a target.
 
-[![version](https://img.shields.io/badge/version-0.0.1-brightgreen.svg)](CHANGELOG.md)
-[![license](https://img.shields.io/github/license/Allwize/allwize.svg)](LICENSE)
+The HC-SR04 is a 5V digital sensor.
+If you are using the Allwize K1 you must set the sensor power jumper to 5V and
+connect your sensor to the digital grove connector (the one closer to the USB connector).
+The connect the white cable to the ECHO pin and the yellow one to the TRIG pin
+in the HC-SR04.
 
-Compatible radios:
-
-* RadioCrafts RC1701HP-OSP (Ondeo version)
-* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
-
-Compatible platforms:
-
-* AVR (Arduino Uno, Arduino Leonardo)
-* SAMD21 (Arduino Zero, Arduino MKR family)
-* ESP8266
+Always remember to connect the antenna before powering the board!
 
 ## License
 

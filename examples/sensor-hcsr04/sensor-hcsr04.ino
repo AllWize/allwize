@@ -2,8 +2,7 @@
 
 Allwize - Ultrasonic HC-SR04 Slave Example
 
-This example shows the use of an ultrasonic HC-SR04 to send
-data about distance to a target.
+Shows how to use an ultrasonic HC-SR04 to send data about distance to a target.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

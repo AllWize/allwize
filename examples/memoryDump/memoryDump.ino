@@ -2,7 +2,7 @@
 
 Allwize - Memory Dump Example
 
-This example dumps the radio module memory byte by byte.
+Dumps the radio module non-volatile memory byte by byte.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

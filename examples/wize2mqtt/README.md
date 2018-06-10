@@ -1,20 +1,10 @@
-# AllWize
+# Allwize - WIZE 2 MQTT Bridge
 
-Library to interface a Wize radio module
+Listens to messages on the same channel, data rate and CF and
+forwards them to an MQTT broker.
+This example is meant to run on a Wemos D1 board (ESP8266).
 
-[![version](https://img.shields.io/badge/version-0.0.1-brightgreen.svg)](CHANGELOG.md)
-[![license](https://img.shields.io/github/license/Allwize/allwize.svg)](LICENSE)
-
-Compatible radios:
-
-* RadioCrafts RC1701HP-OSP (Ondeo version)
-* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
-
-Compatible platforms:
-
-* AVR (Arduino Uno, Arduino Leonardo)
-* SAMD21 (Arduino Zero, Arduino MKR family)
-* ESP8266
+Always remember to connect the antenna before powering the board!
 
 ## License
 

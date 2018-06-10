@@ -1,20 +1,18 @@
-# AllWize
+# AllWize - BME280 Slave Example
 
-Library to interface a Wize radio module
+Shows how to use a BME280 sensor (temperature, humidity & pressure) to send environmental data.
 
-[![version](https://img.shields.io/badge/version-0.0.1-brightgreen.svg)](CHANGELOG.md)
-[![license](https://img.shields.io/github/license/Allwize/allwize.svg)](LICENSE)
+The BME280 is a I2C sensor that must be powered with 3V3.
+If you are using the Allwize K1 you must set the sensor power jumper to 3V3 and
+connect your sensor to the I2C grove connector (the one closer to the barrel jack).
+Remember that Grove I2C sensor use the following color convention:
 
-Compatible radios:
+* Black - Negative / Ground
+* Red - Positive / Power / 3V3 / 5V
+* White - SDA / DA
+* Yellow - SCL / CL
 
-* RadioCrafts RC1701HP-OSP (Ondeo version)
-* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
-
-Compatible platforms:
-
-* AVR (Arduino Uno, Arduino Leonardo)
-* SAMD21 (Arduino Zero, Arduino MKR family)
-* ESP8266
+Always remember to connect the antenna before powering the board!
 
 ## License
 

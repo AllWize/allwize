@@ -1,9 +1,9 @@
 /*
 
-Allwize - Simple MASTER example
+Allwize - Simple Master example
 
-Listents to messages on the same channel and CF and
-prints them out via the serial monitor
+Listens to messages on the same channel, data rate and CF and
+prints them out via the serial monitor.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

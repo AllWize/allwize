@@ -1,20 +1,8 @@
-# AllWize
+# AllWize - MCP9701 Thermistor Slave Example
 
-Library to interface a Wize radio module
+Sends the data for the built-in MCP9701 thermistor in the AllWize K1.
 
-[![version](https://img.shields.io/badge/version-0.0.1-brightgreen.svg)](CHANGELOG.md)
-[![license](https://img.shields.io/github/license/Allwize/allwize.svg)](LICENSE)
-
-Compatible radios:
-
-* RadioCrafts RC1701HP-OSP (Ondeo version)
-* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
-
-Compatible platforms:
-
-* AVR (Arduino Uno, Arduino Leonardo)
-* SAMD21 (Arduino Zero, Arduino MKR family)
-* ESP8266
+Always remember to connect the antenna before powering the board!
 
 ## License
 

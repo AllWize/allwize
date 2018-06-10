@@ -2,8 +2,9 @@
 
 Allwize - WIZE 2 MQTT Bridge
 
-This example is meant to run on a Wemos D1 board (ESP8266) and it
-forwards any message received to an MQTT topic
+Listens to messages on the same channel, data rate and CF and
+forwards them to an MQTT broker.
+This example is meant to run on a Wemos D1 board (ESP8266).
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

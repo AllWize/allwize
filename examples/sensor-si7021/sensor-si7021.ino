@@ -2,9 +2,8 @@
 
 Allwize - SI7021/HTU21C Slave Example
 
-This example shows the use of an SI7021 or HTU21C sensor (temperature & humidity)
+Shows how to use an SI7021 or HTU21C sensor (temperature & humidity)
 to send environmental data.
-
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 

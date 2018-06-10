@@ -2,8 +2,7 @@
 
 Allwize - Returns the module to factory settings
 
-This example prints out the configuration settings stored
-in the module non-volatile memory.
+Resets the module non-volatile memory to factory settings.
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
