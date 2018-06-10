@@ -89,6 +89,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MEM_PART_NUMBER_NEW             0x89
 #define MEM_SERIAL_NUMBER_NEW           0xA9
 
+// Channels
+#define CHANNEL_01                      0x01
+#define CHANNEL_02                      0x02
+#define CHANNEL_03                      0x03
+#define CHANNEL_04                      0x04
+#define CHANNEL_05                      0x05
+#define CHANNEL_06                      0x06
+#define CHANNEL_07                      0x07
+#define CHANNEL_08                      0x08
+#define CHANNEL_09                      0x09
+#define CHANNEL_10                      0x10
+#define CHANNEL_11                      0x11
+#define CHANNEL_12                      0x12
+#define CHANNEL_13                      0x13
+#define CHANNEL_14                      0x14
+#define CHANNEL_15                      0x15
+#define CHANNEL_16                      0x16
+#define CHANNEL_17                      0x17
+#define CHANNEL_18                      0x18
+#define CHANNEL_19                      0x19
+#define CHANNEL_20                      0x20
+#define CHANNEL_21                      0x21
+#define CHANNEL_22                      0x22
+#define CHANNEL_23                      0x23
+#define CHANNEL_24                      0x24
+#define CHANNEL_25                      0x25
+#define CHANNEL_26                      0x26
+#define CHANNEL_27                      0x27
+#define CHANNEL_28                      0x28
+#define CHANNEL_29                      0x29
+#define CHANNEL_30                      0x30
+#define CHANNEL_31                      0x31
+#define CHANNEL_32                      0x32
+#define CHANNEL_33                      0x33
+#define CHANNEL_34                      0x34
+#define CHANNEL_35                      0x35
+#define CHANNEL_36                      0x36
+#define CHANNEL_37                      0x37
+#define CHANNEL_38                      0x38
+#define CHANNEL_39                      0x39
+#define CHANNEL_40                      0x40
+#define CHANNEL_41                      0x41
+
+// Data rates
+#define DATARATE_2400bps                0x01
+#define DATARATE_4800bps                0x02
+#define DATARATE_19200bps               0x04
+#define DATARATE_6400bps                0x05
+
+// Power modes
+#define POWER_10dBm                     0x01
+#define POWER_14dBm                     0x02
+#define POWER_17dBm                     0x03
+#define POWER_20dBm                     0x04
+#define POWER_24dBm                     0x05
+
 // MBus modes
 #define MBUS_MODE_S2                    0x00
 #define MBUS_MODE_T1                    0x01

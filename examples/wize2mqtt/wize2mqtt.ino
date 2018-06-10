@@ -23,21 +23,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // -----------------------------------------------------------------------------
-// Board definitions
+// Configuration
 // -----------------------------------------------------------------------------
 
 #if not defined(ARDUINO_ARCH_ESP8266)
     #error "This example is meant to run on an ESP8266 board!"
 #endif
 
+#define RESET_PIN   14
 #define RX_PIN      12
 #define TX_PIN      13
 #include            <SoftwareSerial.h>
 SoftwareSerial      module(RX_PIN, TX_PIN);
 #define debug       Serial
 
+#define WIZE_CHANNEL            CHANNEL_04
+#define WIZE_POWER              POWER_20dBm
+#define WIZE_DATARATE           DATARATE_2400bps
+#define WIZE_NETWORK_ID         0x46
+
 // -----------------------------------------------------------------------------
-// Config & globals
+// Globals
 // -----------------------------------------------------------------------------
 
 #include "credentials.h"
@@ -124,21 +130,23 @@ void wifiSetup() {
 
 void wizeSetup() {
 
-    module.begin(19200);
     #if USE_SNIFFER
         sniffer = new SerialSniffer(module, debug);
-        allwize = new Allwize(*sniffer);
+        allwize = new Allwize(*sniffer, RESET_PIN);
     #else
-        allwize = new Allwize(module);
+        allwize = new Allwize(module, RESET_PIN);
     #endif
-    allwize->begin();
+
+    allwize->reset();
+    module.begin(19200);
     while (!allwize->ready());
+    allwize->begin();
 
     allwize->master();
-    allwize->setChannel(4, true);
-    allwize->setPower(5);
-    allwize->setDataRate(1);
-    allwize->setControlField(0x46);
+    allwize->setChannel(WIZE_CHANNEL, true);
+    allwize->setPower(WIZE_POWER);
+    allwize->setDataRate(WIZE_DATARATE);
+    allwize->setControlField(WIZE_NETWORK_ID);
 
     allwize->dump(debug);
 

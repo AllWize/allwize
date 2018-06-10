@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 #if defined(ARDUINO_AVR_UNO)
+    #define RESET_PIN   7
     #define RX_PIN      8
     #define TX_PIN      9
     #include <SoftwareSerial.h>
@@ -34,16 +35,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
+    #define RESET_PIN   7
     #define module      Serial1
     #define debug       Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
+    #define RESET_PIN   7
     #define module      Serial1
     #define debug       SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
+    #define RESET_PIN   14
     #define RX_PIN      12
     #define TX_PIN      13
     #include <SoftwareSerial.h>
@@ -55,13 +59,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Configuration
 // -----------------------------------------------------------------------------
 
-#define WIZE_CHANNEL            0x04
-#define WIZE_DATARATE           0x01
-#define WIZE_NETWORK_ID         0x46
-#define WIZE_NODE_ID            0x08
+#define WIZE_CHANNEL        CHANNEL_04
+#define WIZE_POWER          POWER_20dBm
+#define WIZE_DATARATE       DATARATE_2400bps
+#define WIZE_NETWORK_ID     0x46
+#define WIZE_NODE_ID        0x08
 
-#define TEMPERATURE_PIN         A2
-#define TEMPERATURE_SAMPLES     10
+#define TEMPERATURE_PIN     A2
+#define TEMPERATURE_SAMPLES 10
 
 // -----------------------------------------------------------------------------
 // Formatting
@@ -95,14 +100,15 @@ Allwize * allwize;
 
 void wizeSetup() {
 
+    allwize = new Allwize(module, RESET_PIN);
+    allwize->reset();
     module.begin(19200);
-    allwize = new Allwize(module);
-    allwize->begin();
     while (!allwize->ready());
+    allwize->begin();
 
     allwize->slave();
     allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(5);
+    allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setControlField(WIZE_NETWORK_ID);
     allwize->setControlInformation(WIZE_NODE_ID);

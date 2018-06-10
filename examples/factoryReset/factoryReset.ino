@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 #if defined(ARDUINO_AVR_UNO)
+    #define RESET_PIN   7
     #define RX_PIN      8
     #define TX_PIN      9
     #include <SoftwareSerial.h>
@@ -35,22 +36,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
+    #define RESET_PIN   7
     #define module      Serial1
     #define debug       Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
+    #define RESET_PIN   7
     #define module      Serial1
     #define debug       SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
+    #define RESET_PIN   14
     #define RX_PIN      12
     #define TX_PIN      13
     #include <SoftwareSerial.h>
     SoftwareSerial module(RX_PIN, TX_PIN);
     #define debug       Serial
 #endif // ARDUINO_ARCH_ESP8266
+
 
 // -----------------------------------------------------------------------------
 // Config & globals
@@ -71,11 +76,11 @@ void setup() {
     debug.println("Allwize - Factory reset");
     debug.println();
 
+    allwize = new Allwize(module, RESET_PIN);
+    allwize->reset();
     module.begin(19200);
-    allwize = new Allwize(module);
-
-    allwize->begin();
     while (!allwize->ready());
+    allwize->begin();
 
     allwize->factoryReset();
     module.end();
