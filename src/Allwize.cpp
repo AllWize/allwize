@@ -905,8 +905,6 @@ bool Allwize::_decode() {
 
     // Application data
     _message.len = len - 2;
-    if (_message.data) delete[] _message.data;
-    _message.data = new uint8_t[_message.len + 1];
     memcpy(_message.data, &_buffer[3], _message.len);
     _message.data[_message.len] = 0;
 

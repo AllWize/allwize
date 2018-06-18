@@ -65,6 +65,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_DATARATE           DATARATE_2400bps
 #define WIZE_NETWORK_ID         0x46
 
+#define USE_SNIFFER 0
+#if USE_SNIFFER
+    #include "SerialSniffer.h"
+    SerialSniffer * sniffer;
+#endif
+
 // -----------------------------------------------------------------------------
 // Wize
 // -----------------------------------------------------------------------------

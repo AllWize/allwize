@@ -199,7 +199,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DATA_INTERFACE_CRC              0x08
 #define DATA_INTERFACE_CRC_START_STOP   0x0C
 
-
 // Preamble Length
 #define PREAMBLE_FORMAT_A               0x00
 #define PREAMBLE_FORMAT_B               0x02
@@ -208,7 +207,7 @@ typedef struct {
     uint8_t c;
     uint8_t ci;
     uint8_t len;
-    uint8_t * data;
+    uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
 } allwize_message_t;
 
