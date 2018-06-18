@@ -767,7 +767,7 @@ bool Allwize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
  * @protected
  */
 bool Allwize::_setMemory(uint8_t address, uint8_t value) {
-    uint8_t buffer[3] = {address, value, CMD_EXIT_MEMORY};
+    uint8_t buffer[3] = {address, value, (uint8_t) CMD_EXIT_MEMORY};
     return (_sendCommand(CMD_WRITE_MEMORY, buffer, 3) != -1);
 }
 
