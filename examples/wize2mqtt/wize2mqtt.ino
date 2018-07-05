@@ -31,12 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #error "This example is meant to run on an ESP8266 board!"
 #endif
 
-#define RESET_PIN   14
-#define RX_PIN      12
-#define TX_PIN      13
-#include            <SoftwareSerial.h>
-SoftwareSerial      module(RX_PIN, TX_PIN);
-#define debug       Serial
+#define RESET_PIN               14
+#define RX_PIN                  12
+#define TX_PIN                  13
+#define DEBUG_SERIAL            Serial
 
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_POWER              POWER_20dBm
@@ -62,27 +60,21 @@ Ticker mqttTimer;
 
 Allwize * allwize;
 
-#define USE_SNIFFER 0
-#if USE_SNIFFER
-    #include "SerialSniffer.h"
-    SerialSniffer * sniffer;
-#endif
-
 // -----------------------------------------------------------------------------
 // MQTT
 // -----------------------------------------------------------------------------
 
 void mqttConnect() {
-    debug.println("[MQTT] Connecting...");
+    DEBUG_SERIAL.println("[MQTT] Connecting...");
     mqtt.connect();
 }
 
 void mqttOnConnect(bool sessionPresent) {
-    debug.println("[MQTT] Connected!");
+    DEBUG_SERIAL.println("[MQTT] Connected!");
 }
 
 void mqttOnDisonnect(AsyncMqttClientDisconnectReason reason) {
-    debug.println("[MQTT] Disconnected!");
+    DEBUG_SERIAL.println("[MQTT] Disconnected!");
     if (WiFi.isConnected()) {
         mqttTimer.detach();
         mqttTimer.once(2, mqttConnect);
@@ -93,7 +85,7 @@ void mqttSetup() {
     mqtt.onConnect(mqttOnConnect);
     mqtt.onDisconnect(mqttOnDisonnect);
     mqtt.setServer(MQTT_HOST, MQTT_PORT);
-    #if defined(MQTT_USER) & defined(MQTT_PASS)
+    #if defined(MQTT_USER) && defined(MQTT_PASS)
         if (strlen(MQTT_USER) > 0 && strlen(MQTT_PASS) > 0) {
             mqtt.setCredentials(MQTT_USER, MQTT_PASS);
         }
@@ -105,17 +97,17 @@ void mqttSetup() {
 // -----------------------------------------------------------------------------
 
 void wifiConnect() {
-    debug.println("[WIFI] Connecting...");
+    DEBUG_SERIAL.println("[WIFI] Connecting...");
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
 
 void wifiOnConnect(const WiFiEventStationModeGotIP& event) {
-    debug.println("[WIFI] Connected!");
+    DEBUG_SERIAL.println("[WIFI] Connected!");
     mqttConnect();
 }
 
 void wifiOnDisconnect(const WiFiEventStationModeDisconnected& event) {
-    debug.println("[WIFI] Disconnected!");
+    DEBUG_SERIAL.println("[WIFI] Disconnected!");
     wifiTimer.detach();
     wifiTimer.once(2, wifiConnect);
 }
@@ -131,17 +123,12 @@ void wifiSetup() {
 
 void wizeSetup() {
 
-    #if USE_SNIFFER
-        sniffer = new SerialSniffer(module, debug);
-        allwize = new Allwize(*sniffer, RESET_PIN);
-    #else
-        allwize = new Allwize(module, RESET_PIN);
-    #endif
-
-    allwize->reset();
-    module.begin(19200);
-    while (!allwize->ready());
+    allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
     allwize->begin();
+    if (!allwize->waitForReady()) {
+        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        while (true);
+    }
 
     allwize->master();
     allwize->setChannel(WIZE_CHANNEL, true);
@@ -149,9 +136,9 @@ void wizeSetup() {
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setControlField(WIZE_NETWORK_ID);
 
-    allwize->dump(debug);
+    allwize->dump(DEBUG_SERIAL);
 
-    debug.println("[WIZE] Listening...");
+    DEBUG_SERIAL.println("[WIZE] Listening...");
 
 }
 
@@ -166,18 +153,18 @@ void wizeLoop() {
         char ascii[message.len+1];
 
         snprintf(buffer, sizeof(buffer), "[WIZE] C: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ", message.c, message.ci, message.rssi);
-        debug.print(buffer);
+        DEBUG_SERIAL.print(buffer);
 
         for (uint8_t i=0; i<message.len; i++) {
             char ch = message.data[i];
             snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
-            debug.print(buffer);
+            DEBUG_SERIAL.print(buffer);
             ascii[i] = (31 < ch && ch < 127) ? ch : ' ';
         }
         ascii[message.len] = 0;
-        debug.print("}, STR: \"");
-        debug.print(ascii);
-        debug.println("\"");
+        DEBUG_SERIAL.print("}, STR: \"");
+        DEBUG_SERIAL.print(ascii);
+        DEBUG_SERIAL.println("\"");
 
         // Sending message via MQTT
         if (mqtt.connected()) {
@@ -198,7 +185,7 @@ void wizeLoop() {
 
                 // Publish message
                 snprintf(buffer, sizeof(buffer), "[WIZE] MQTT message: %s => %s\n", topic, payload);
-                debug.print(buffer);
+                DEBUG_SERIAL.print(buffer);
                 mqtt.publish(topic, MQTT_QOS, MQTT_RETAIN, payload);
 
                 // Get new token and update field counter
@@ -219,12 +206,12 @@ void wizeLoop() {
 
 void setup() {
 
-    // Setup serial debug
-    debug.begin(115200);
-    while (!debug && millis() < 5000);
-    debug.println();
-    debug.println("[MAIN] Wize 2 MQTT bridge");
-    debug.println();
+    // Setup serial DEBUG_SERIAL
+    DEBUG_SERIAL.begin(115200);
+    while (!DEBUG_SERIAL && millis() < 5000);
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println("[MAIN] Wize 2 MQTT bridge");
+    DEBUG_SERIAL.println();
 
     mqttSetup();
     wifiSetup();

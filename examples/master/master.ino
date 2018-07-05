@@ -27,34 +27,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 #if defined(ARDUINO_AVR_UNO)
-    #define RESET_PIN   7
-    #define RX_PIN      8
-    #define TX_PIN      9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-    #define debug       Serial
+    #define RESET_PIN           7
+    #define RX_PIN              8
+    #define TX_PIN              9
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define RESET_PIN   7
-    #define module      Serial1
-    #define debug       Serial
+    #define RESET_PIN           7
+    #define HARDWARE_SERIAL     Serial1
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN   7
-    #define module      Serial1
-    #define debug       SerialUSB
+    #define RESET_PIN           7
+    #define HARDWARE_SERIAL     Serial1
+    #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
-    #define RESET_PIN   14
-    #define RX_PIN      12
-    #define TX_PIN      13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-    #define debug       Serial
+    #define RESET_PIN           14
+    #define RX_PIN              12
+    #define TX_PIN              13
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP8266
+
+#if defined(ARDUINO_ARCH_ESP32)
+    #define RESET_PIN           14
+    #define RX_PIN              12
+    #define TX_PIN              13
+    #define DEBUG_SERIAL        Serial
+#endif // ARDUINO_ARCH_ESP32
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -65,12 +68,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_DATARATE           DATARATE_2400bps
 #define WIZE_NETWORK_ID         0x46
 
-#define USE_SNIFFER 0
-#if USE_SNIFFER
-    #include "SerialSniffer.h"
-    SerialSniffer * sniffer;
-#endif
-
 // -----------------------------------------------------------------------------
 // Wize
 // -----------------------------------------------------------------------------
@@ -80,17 +77,17 @@ Allwize * allwize;
 
 void wizeSetup() {
 
-    #if USE_SNIFFER
-        sniffer = new SerialSniffer(module, debug);
-        allwize = new Allwize(*sniffer, RESET_PIN);
+    // Create and init AllWize object
+    #if defined(HARDWARE_SERIAL)
+        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(module, RESET_PIN);
+        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
-
-    allwize->reset();
-    module.begin(19200);
-    while (!allwize->ready());
     allwize->begin();
+    if (!allwize->waitForReady()) {
+        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        while (true);
+    }
 
     allwize->master();
     allwize->setChannel(WIZE_CHANNEL, true);
@@ -98,9 +95,9 @@ void wizeSetup() {
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setControlField(WIZE_NETWORK_ID);
 
-    allwize->dump(debug);
+    allwize->dump(DEBUG_SERIAL);
 
-    debug.println("[WIZE] Listening...");
+    DEBUG_SERIAL.println("[WIZE] Listening...");
 
 }
 
@@ -115,18 +112,18 @@ void wizeLoop() {
         char ascii[message.len+1];
 
         snprintf(buffer, sizeof(buffer), "[WIZE] C: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ", message.c, message.ci, message.rssi);
-        debug.print(buffer);
+        DEBUG_SERIAL.print(buffer);
 
         for (uint8_t i=0; i<message.len; i++) {
             char ch = message.data[i];
             snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
-            debug.print(buffer);
+            DEBUG_SERIAL.print(buffer);
             ascii[i] = (31 < ch && ch < 127) ? ch : ' ';
         }
         ascii[message.len] = 0;
-        debug.print("}, STR: \"");
-        debug.print(ascii);
-        debug.println("\"");
+        DEBUG_SERIAL.print("}, STR: \"");
+        DEBUG_SERIAL.print(ascii);
+        DEBUG_SERIAL.println("\"");
 
     }
 
@@ -138,12 +135,12 @@ void wizeLoop() {
 
 void setup() {
 
-    // Setup serial debug
-    debug.begin(115200);
-    while (!debug && millis() < 5000);
-    debug.println();
-    debug.println("[MAIN] Wize Master Example");
-    debug.println();
+    // Setup serial DEBUG_SERIAL
+    DEBUG_SERIAL.begin(115200);
+    while (!DEBUG_SERIAL && millis() < 5000);
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println("[MAIN] Wize Master Example");
+    DEBUG_SERIAL.println();
 
     // Init radio
     wizeSetup();

@@ -26,34 +26,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 #if defined(ARDUINO_AVR_UNO)
-    #define RESET_PIN   7
-    #define RX_PIN      8
-    #define TX_PIN      9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-    #define debug       Serial
+    #define RESET_PIN           7
+    #define RX_PIN              8
+    #define TX_PIN              9
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define RESET_PIN   7
-    #define module      Serial1
-    #define debug       Serial
+    #define RESET_PIN           7
+    #define HARDWARE_SERIAL     Serial1
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN   7
-    #define module      Serial1
-    #define debug       SerialUSB
+    #define RESET_PIN           7
+    #define HARDWARE_SERIAL     Serial1
+    #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
-
-#if defined(ARDUINO_ARCH_ESP8266)
-    #define RESET_PIN   14
-    #define RX_PIN      12
-    #define TX_PIN      13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-    #define debug       Serial
-#endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -100,11 +89,17 @@ Allwize * allwize;
 
 void wizeSetup() {
 
-    allwize = new Allwize(module, RESET_PIN);
-    allwize->reset();
-    module.begin(19200);
-    while (!allwize->ready());
+    // Create and init AllWize object
+    #if defined(HARDWARE_SERIAL)
+        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+    #else
+        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+    #endif
     allwize->begin();
+    if (!allwize->waitForReady()) {
+        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        while (true);
+    }
 
     allwize->slave();
     allwize->setChannel(WIZE_CHANNEL, true);
@@ -117,11 +112,11 @@ void wizeSetup() {
 
 void wizeSend(const char * payload) {
 
-    debug.print("[Allwize] Payload: ");
-    debug.println(payload);
+    DEBUG_SERIAL.print("[Allwize] Payload: ");
+    DEBUG_SERIAL.println(payload);
 
     if (!allwize->send(payload)) {
-        debug.println("[Allwize] Error sending message");
+        DEBUG_SERIAL.println("[Allwize] Error sending message");
     }
 
 }
@@ -177,11 +172,11 @@ double getTemperature() {
 
 void setup() {
 
-    // Init serial debug
-    debug.begin(115200);
-    while (!debug && millis() < 5000);
-    debug.println();
-    debug.println("[Allwize] MCP9701 sensor example");
+    // Init serial DEBUG_SERIAL
+    DEBUG_SERIAL.begin(115200);
+    while (!DEBUG_SERIAL && millis() < 5000);
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println("[Allwize] MCP9701 sensor example");
 
     // Init temperature pin
     pinMode(TEMPERATURE_PIN, INPUT);
