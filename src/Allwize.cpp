@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Allwize.h"
 #include <assert.h>
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include "wiring_private.h"
+#endif
+
 // -----------------------------------------------------------------------------
 // Init
 // -----------------------------------------------------------------------------
@@ -47,8 +51,13 @@ Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  */
 Allwize::Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx), _reset_gpio(reset_gpio) {
     #if defined(ARDUINO_ARCH_SAMD)
+
+        //_stream = _sw_serial = new Uart(&sercom3, _rx, _tx, SERCOM_RX_PAD_3, UART_TX_PAD_2);
+        //void SERCOM3_Handler() { _sw_serial.IrqHandler(); }
+
         // Software serial not implemented for SAMD
         assert(false);
+
     #elif defined(ARDUINO_ARCH_ESP32)
         _stream = _hw_serial = new HardwareSerial(HARDWARE_SERIAL_PORT);
     #else
@@ -75,14 +84,16 @@ void Allwize::_reset_serial() {
     if (_hw_serial) {
         _hw_serial->end();
         #if defined(ARDUINO_ARCH_ESP32)
+            pinMode(_rx, FUNCTION_4);
+            pinMode(_tx, FUNCTION_4);
             _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
         #else
             _hw_serial->begin(MODEM_BAUDRATE);
         #endif
     } else {
         #if defined(ARDUINO_ARCH_SAMD)
-            // Software serial not implemented for SAMD
-            assert(false);
+            pinPeripheral(_rx, PIO_SERCOM);
+            pinPeripheral(_tx, PIO_SERCOM);
         #elif defined(ARDUINO_ARCH_ESP32)
             // It should never hit this block
             assert(false);

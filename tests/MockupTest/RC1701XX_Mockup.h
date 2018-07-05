@@ -110,8 +110,8 @@ class RC1701XX_Mockup : public Stream {
         virtual size_t write(uint8_t ch) {
 
             #if MOCKUP_DEBUG
-                Serial.print("Received: 0x");
-                Serial.println((uint8_t) ch, HEX);
+                SerialUSB.print("Received: 0x");
+                SerialUSB.println((uint8_t) ch, HEX);
             #endif
 
             _process(ch);
@@ -142,8 +142,8 @@ class RC1701XX_Mockup : public Stream {
         virtual size_t rx_write(uint8_t ch) {
 
             #if MOCKUP_DEBUG
-                Serial.print("Sending : 0x");
-                Serial.println((uint8_t) ch, HEX);
+                SerialUSB.print("Sending : 0x");
+                SerialUSB.println((uint8_t) ch, HEX);
             #endif
 
             return _tx->write(ch);

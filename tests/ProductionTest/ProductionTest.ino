@@ -37,7 +37,7 @@ using namespace aunit;
 // Some boards will only allow to use 8/9 if we want to have
 // USB serial with the computer
 #ifndef USE_SOFTWARE_SERIAL
-#define USE_SOFTWARE_SERIAL        0
+#define USE_SOFTWARE_SERIAL             0
 #endif
 
 // -----------------------------------------------------------------------------
@@ -46,63 +46,62 @@ using namespace aunit;
 
 // USB serial will depend on the board platform
 #if defined(ARDUINO_SAMD_ZERO)
-    #define debug   SerialUSB
+    #define DEBUG_SERIAL                SerialUSB
 #else
-    #define debug   Serial
+    #define DEBUG_SERIAL                Serial
 #endif
 
 // The Arduino UNO has just one hardware serial, so communication
 // with the module will always be using SoftwareSerial library
 #if defined(ARDUINO_AVR_UNO)
-    #define RX_PIN              8
-    #define TX_PIN              9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
+    #define RESET_PIN                   7
+    #define RX_PIN                      8
+    #define TX_PIN                      9
 #endif // ARDUINO_AVR_UNO
 
 // The Arduino Leonardo has a dedicated serial for USB (Serial)
 // We can use the other hradware serial (Serial1) to communicate with
 // the radio module or use SoftwareSerial library
-#if defined(ARDUINO_AVR_LEONARDO) || defined(ARDUINO_AVR_YUN)
+#if defined(ARDUINO_AVR_LEONARDO)
+    #define RESET_PIN                   7
     #if USE_SOFTWARE_SERIAL
-        #define RX_PIN          8
-        #define TX_PIN          9
-        #include <SoftwareSerial.h>
-        SoftwareSerial module(RX_PIN, TX_PIN);
+        #define RX_PIN                  8
+        #define TX_PIN                  9
     #else
-        #define module          Serial1
+        #define HARDWARE_SERIAL         Serial1
     #endif
 #endif // ARDUINO_AVR_LEONARDO
 
 // The SAMD has 3 configurable hardware UART, so we can use both options too
 #if defined(ARDUINO_SAMD_ZERO)
+    #define RESET_PIN                   7
     #if USE_SOFTWARE_SERIAL
-        #define RX_PIN          8
-        #define TX_PIN          9
+        #define RX_PIN                  8
+        #define TX_PIN                  9
         #include "wiring_private.h"
-        Uart module(&sercom3, RX_PIN, TX_PIN, SERCOM_RX_PAD_3, UART_TX_PAD_2);
-        void SERCOM3_Handler() { module.IrqHandler(); }
+        Uart Serial3(&sercom3, RX_PIN, TX_PIN, SERCOM_RX_PAD_3, UART_TX_PAD_2);
+        void SERCOM3_Handler() { Serial3.IrqHandler(); }
+        #define HARDWARE_SERIAL         Serial3
     #else
-        #define module          Serial1
+        #define HARDWARE_SERIAL         Serial1
     #endif
 #endif // ARDUINO_ARCH_SAMD
 
 // The ESP8266 Wemos D1 has just one hardware serial, so communication
 // with the module will always be using SoftwareSerial library
 #if defined(ARDUINO_ARCH_ESP8266)
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
+    #define RESET_PIN                   14
+    #define RX_PIN                      12
+    #define TX_PIN                      13
 #endif // ARDUINO_ARCH_ESP8266
 
 // The ESP32 Wemos maps the USB to the first hardware serial in 0/1,
 // so we only have the option to use a secondary hardware serial and
 // configure it to pins 8 and 9 (GPIO12 and 13)
 #if defined(ARDUINO_ARCH_ESP32)
-    #define RX_PIN              12
-    #define TX_PIN              13
-    HardwareSerial module(1);
+    #define RESET_PIN                   14
+    #define RX_PIN                      12
+    #define TX_PIN                      13
 #endif // ARDUINO_ARCH_ESP8266
 
 // -----------------------------------------------------------------------------
@@ -135,15 +134,6 @@ test(full) {
     // factory reset
     assertTrue(allwize->factoryReset());
 
-    // We must reset the serial connection after a reset or factoryReset
-    module.end();
-    #if defined(ARDUINO_ARCH_ESP32)
-        module.begin(19200, SERIAL_8N1, RX_PIN, TX_PIN);
-    #else
-        module.begin(19200);
-    #endif
-    delay(200);
-
     // get channel once more (factory channel is 3)
     uint8_t channel4 = allwize->getChannel();
     assertEqual((uint8_t) 3, channel4);
@@ -156,59 +146,54 @@ test(full) {
 
 void info() {
 
-    debug.println();
+    DEBUG_SERIAL.println();
 
     #ifdef ARDUINO_AVR_UNO
-        debug.println("Board : Arduino UNO R3");
+        DEBUG_SERIAL.println("Board : Arduino UNO R3");
     #endif
     #ifdef ARDUINO_AVR_LEONARDO
-        debug.println("Board : Arduino Leonardo");
-    #endif
-    #ifdef ARDUINO_AVR_YUN
-        debug.println("Board : Arduino Yun");
+        DEBUG_SERIAL.println("Board : Arduino Leonardo");
     #endif
     #ifdef ARDUINO_SAMD_ZERO
-        debug.println("Board : Arduino Zero / M0 / M0 Pro");
+        DEBUG_SERIAL.println("Board : Arduino Zero / M0 / M0 Pro");
     #endif
     #ifdef ARDUINO_ARCH_ESP8266
-        debug.println("Board : ESP8266");
+        DEBUG_SERIAL.println("Board : ESP8266");
     #endif
     #ifdef ARDUINO_ARCH_ESP32
-        debug.println("Board : ESP32");
+        DEBUG_SERIAL.println("Board : ESP32");
     #endif
 
     #if USE_SOFTWARE_SERIAL
-        debug.println("Serial: Pins 8 & 9");
+        DEBUG_SERIAL.println("Serial: Pins 8 & 9");
     #else
-        debug.println("Serial: Pins 0 & 1");
+        DEBUG_SERIAL.println("Serial: Pins 0 & 1");
     #endif
 
-    debug.println();
+    DEBUG_SERIAL.println();
 
 }
 
 void setup() {
 
-    debug.begin(115200);
-    while (!debug);
+    DEBUG_SERIAL.begin(115200);
+    while (!DEBUG_SERIAL);
 
     info();
 
-    #if defined(ARDUINO_ARCH_ESP32)
-        pinMode (RX_PIN, FUNCTION_4);
-        pinMode (TX_PIN, FUNCTION_4);
-        module.begin(19200, SERIAL_8N1, RX_PIN, TX_PIN);
-    #elif defined(ARDUINO_ARCH_SAMD) && USE_SOFTWARE_SERIAL
-        pinPeripheral(RX_PIN, PIO_SERCOM);
-        pinPeripheral(TX_PIN, PIO_SERCOM);
-        module.begin(19200);
+    // Create and init AllWize object
+    #if defined(HARDWARE_SERIAL)
+        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        module.begin(19200);
+        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
+    allwize->begin();
+    if (!allwize->waitForReady()) {
+        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        while (true);
+    }
 
-    allwize = new Allwize(module);
-
-    Printer::setPrinter(&debug);
+    Printer::setPrinter(&DEBUG_SERIAL);
     TestRunner::setVerbosity(Verbosity::kAll);
 
 }

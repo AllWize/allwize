@@ -193,8 +193,12 @@ class Allwize {
 
         Stream * _stream = NULL;
         HardwareSerial * _hw_serial = NULL;
-        #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-        SoftwareSerial * _sw_serial = NULL;
+        #if defined(ARDUINO_ARCH_SAMD)
+            Uart * _sw_serial = NULL;
+        #elif defined(ARDUINO_ARCH_ESP32)
+            // Nothing
+        #else
+            SoftwareSerial * _sw_serial = NULL;
         #endif
 
         uint8_t _reset_gpio = GPIO_NONE;
