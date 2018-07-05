@@ -241,7 +241,7 @@ class Allwize {
     public:
 
         Allwize(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
-        #if not ( defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_ESP32) )
+        #if defined(ARDUINO_ARCH_SAMD)
         Allwize(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
         #endif
 
