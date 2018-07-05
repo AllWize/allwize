@@ -1,6 +1,6 @@
 /*
 
-Allwize 0.0.1
+AllWize Library
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -28,6 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 #include <Stream.h>
+#if not defined(ARDUINO_ARCH_SAMD)
+#include <SoftwareSerial.h>
+#endif
 
 // -----------------------------------------------------------------------------
 // Types & definitions
@@ -35,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // General
 #define MODEM_BAUDRATE                  19200
+#define GPIO_NONE                       0x99
 #define CONTROL_INFORMATION             0x7A
 #define END_OF_RESPONSE                 '>'
 #define CMD_ENTER_CONFIG                (char) 0x00
@@ -212,6 +216,23 @@ typedef struct {
 } allwize_message_t;
 
 // -----------------------------------------------------------------------------
+// DEBUG
+// -----------------------------------------------------------------------------
+
+// Uncomment this to the proper port
+// or define it in your build settings if you want
+// to get low level debug information via serial
+//#define ALLWIZE_DEBUG_PORT Serial
+
+#if defined(ALLWIZE_DEBUG_PORT)
+    #define ALLWIZE_DEBUG_PRINT(...) ALLWIZE_DEBUG_PORT.print(__VA_ARGS__)
+    #define ALLWIZE_DEBUG_PRINTLN(...) ALLWIZE_DEBUG_PORT.println(__VA_ARGS__)
+#else
+    #define ALLWIZE_DEBUG_PRINT(...)
+    #define ALLWIZE_DEBUG_PRINTLN(...)
+#endif
+
+// -----------------------------------------------------------------------------
 // Class prototype
 // -----------------------------------------------------------------------------
 
@@ -219,7 +240,10 @@ class Allwize {
 
     public:
 
-        Allwize(Stream & stream, uint8_t reset_gpio = 0xFF);
+        Allwize(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
+        #if not ( defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_ESP32) )
+        Allwize(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
+        #endif
 
         void begin();
         bool reset();
@@ -227,6 +251,7 @@ class Allwize {
         void sleep();
         void wakeup();
         bool ready();
+        bool waitForReady(uint32_t timeout = DEFAULT_TIMEOUT);
         void dump(Stream & debug);
 
         bool send(uint8_t * buffer, uint8_t len);
@@ -304,6 +329,7 @@ class Allwize {
         bool _decode();
 
         void _flush();
+        void _reset_serial();
         uint8_t _send(uint8_t * buffer, uint8_t len);
         uint8_t _send(uint8_t ch);
         int8_t _receive();
@@ -322,9 +348,13 @@ class Allwize {
 
     protected:
 
-        Stream & _stream;
+        Stream * _stream = NULL;
+        HardwareSerial * _hw_serial = NULL;
+        #if not defined(ARDUINO_ARCH_SAMD)
+        SoftwareSerial * _sw_serial = NULL;
+        #endif
 
-        uint8_t _reset_gpio = 0xFF;
+        uint8_t _reset_gpio = GPIO_NONE;
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
         uint8_t _ci = CONTROL_INFORMATION;

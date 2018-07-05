@@ -1,6 +1,6 @@
 /*
 
-Allwize 0.0.1
+AllWize Library
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -27,36 +27,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @brief               Allwize object constructor
- * @param stream        Serial stream to communicate with the module
+ * @param stream        HardwareSerial object to communicate with the module
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
-Allwize::Allwize(Stream& stream, uint8_t reset_gpio) : _stream(stream), _reset_gpio(reset_gpio) {
-    if (0xFF != _reset_gpio) {
+Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
+    if (GPIO_NONE != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
         digitalWrite(_reset_gpio, HIGH);
     }
 }
 
+#if not defined(ARDUINO_ARCH_SAMD)
+/**
+ * @brief               Allwize object constructor
+ * @param stream        SoftwareSerial object to communicate with the module
+ * @param _reset_gpio   GPIO connected to the module RESET pin
+ */
+Allwize::Allwize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
+    if (GPIO_NONE != _reset_gpio) {
+        pinMode(_reset_gpio, OUTPUT);
+        digitalWrite(_reset_gpio, HIGH);
+    }
+}
+#endif
+
 /**
  * @brief               Inits the module communications
  */
 void Allwize::begin() {
-    _stream.flush();
+    reset();
     delay(200);
 }
 
 /**
+ * @brief               Resets the serial object
+ */
+void Allwize::_reset_serial() {
+    if (_hw_serial) {
+        _hw_serial->end();
+        _hw_serial->begin(MODEM_BAUDRATE);
+    } else {
+        #if not defined(ARDUINO_ARCH_SAMD)
+            _sw_serial->end();
+            _sw_serial->begin(MODEM_BAUDRATE);
+        #endif
+    }
+    _flush();
+}
+
+/**
  * @brief               Resets the radio module.
- *                      You must reset the serial connection after the reset:
- *
- *                          Serial1.end();
- *                          Serial1.begin(19200);
- *                          delay(200);
- *
  * @return              Reset successfully issued
  */
 bool Allwize::reset() {
-    if (0xFF == _reset_gpio) {
+    if (GPIO_NONE == _reset_gpio) {
+        _reset_serial();
+        delay(100);
         _setMemory(MEM_CONFIG_INTERFACE, 1);
         if (_setConfig(true)) {
             _send('@');
@@ -65,6 +91,7 @@ bool Allwize::reset() {
             _flush();
             delay(100);
             _config = false;
+            _reset_serial();
             return true;
         }
     } else {
@@ -73,6 +100,7 @@ bool Allwize::reset() {
         digitalWrite(_reset_gpio, HIGH);
         delay(100);
         _config = false;
+        _reset_serial();
         return true;
     }
     return false;
@@ -80,13 +108,11 @@ bool Allwize::reset() {
 
 /**
  * @brief               Resets the module to factory settings
- *                      You must reset the serial connection after the factoryReset:
- *                          Serial1.end();
- *                          Serial1.begin(19200);
- *                          delay(200);
  * @return              Factory reset successfully issued
  */
 bool Allwize::factoryReset() {
+    _reset_serial();
+    delay(100);
     _setMemory(MEM_CONFIG_INTERFACE, 1);
     if (_setConfig(true)) {
         _send('@');
@@ -95,6 +121,7 @@ bool Allwize::factoryReset() {
         _flush();
         delay(100);
         _config = false;
+        _reset_serial();
         return true;
     }
     return false;
@@ -146,11 +173,21 @@ void Allwize::wakeup() {
  * @brief               Test whether the radio module is ready or not
  */
 bool Allwize::ready() {
-    //uint8_t channel = getChannel();
-    //return (0 < channel && channel < 42);
     bool response = _setConfig(true);
     if (response) _setConfig(false);
     return response;
+}
+
+/**
+ * @brief               Waits for timeout millis for the module to be ready
+ */
+bool Allwize::waitForReady(uint32_t timeout) {
+    uint32_t start = millis();
+    while (millis() - start < timeout) {
+        if (ready()) return true;
+        delay(100);
+    }
+    return false;
 }
 
 /**
@@ -241,8 +278,8 @@ bool Allwize::available() {
 
         static uint32_t when = millis();
 
-        while (_stream.available()) {
-            uint8_t ch = _stream.read();
+        while (_stream->available()) {
+            uint8_t ch = _stream->read();
             _buffer[_pointer++] = ch;
             when = millis();
             #if defined(ARDUINO_ARCH_ESP8266)
@@ -922,7 +959,7 @@ bool Allwize::_decode() {
  * @protected
  */
 void Allwize::_flush() {
-    _stream.flush();
+    _stream->flush();
 }
 
 /**
@@ -932,7 +969,10 @@ void Allwize::_flush() {
  * @protected
  */
 uint8_t Allwize::_send(uint8_t ch) {
-    return _stream.write(ch);
+    ALLWIZE_DEBUG_PRINT("w ");
+    ALLWIZE_DEBUG_PRINT(ch, HEX);
+    ALLWIZE_DEBUG_PRINTLN("");
+    return _stream->write(ch);
 }
 
 /**
@@ -994,7 +1034,7 @@ int8_t Allwize::_sendAndReceive(uint8_t ch) {
 int Allwize::_timedRead() {
     uint32_t _start = millis();
     while (millis() - _start < _timeout) {
-        int ch = _stream.read();
+        int ch = _stream->read();
         if (ch >= 0) return ch;
         #if defined(ARDUINO_ARCH_ESP8266)
             yield();
@@ -1037,6 +1077,9 @@ int Allwize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
         int ch = _timedRead();
         if (ch < 0) break;
         if (ch == terminator) break;
+        ALLWIZE_DEBUG_PRINT("r ");
+        ALLWIZE_DEBUG_PRINT(ch, HEX);
+        ALLWIZE_DEBUG_PRINTLN("");
         *buffer++ = (char) ch;
         index++;
     }

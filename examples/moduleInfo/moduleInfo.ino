@@ -55,25 +55,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define debug       Serial
 #endif // ARDUINO_ARCH_ESP8266
 
-
 // -----------------------------------------------------------------------------
 // Config & globals
 // -----------------------------------------------------------------------------
 
-#define COLUMN_PAD  20
-
 #include "Allwize.h"
 Allwize * allwize;
-
-#define USE_SNIFFER 0
-#if USE_SNIFFER
-    #include "SerialSniffer.h"
-    SerialSniffer * sniffer;
-#endif
 
 // -----------------------------------------------------------------------------
 // Utils
 // -----------------------------------------------------------------------------
+
+#define COLUMN_PAD  20
 
 void format(const char * name, const char * value) {
     debug.print(name);
@@ -105,17 +98,13 @@ void setup() {
     debug.println("Allwize - Module Info");
     debug.println();
 
-    #if USE_SNIFFER
-        sniffer = new SerialSniffer(module, debug);
-        allwize = new Allwize(*sniffer, RESET_PIN);
-    #else
-        allwize = new Allwize(module, RESET_PIN);
-    #endif
-
-    allwize->reset();
-    module.begin(19200);
-    while (!allwize->ready());
+    // Create and init AllWize object
+    allwize = new Allwize(&module, RESET_PIN);
     allwize->begin();
+    if (!allwize->waitForReady()) {
+        debug.println("Error connecting to the module, check your wiring!");
+        while (true);
+    }
 
     format("Property", "Value");
     debug.println("------------------------------");
