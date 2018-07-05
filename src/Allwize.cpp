@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Allwize.h"
+#include <assert.h>
 
 // -----------------------------------------------------------------------------
 // Init
@@ -37,19 +38,27 @@ Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
     }
 }
 
-#if not defined(ARDUINO_ARCH_SAMD)
+
 /**
  * @brief               Allwize object constructor
- * @param stream        SoftwareSerial object to communicate with the module
+ * @param rx            GPIO for RX
+ * @param tx            GPIO for TX
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
-Allwize::Allwize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
+Allwize::Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx), _reset_gpio(reset_gpio) {
+    #if defined(ARDUINO_ARCH_SAMD)
+        // Software serial not implemented for SAMD
+        assert(false);
+    #elif defined(ARDUINO_ARCH_ESP32)
+        _stream = _hw_serial = new HardwareSerial(HARDWARE_SERIAL_PORT);
+    #else
+        _stream = _sw_serial = new SoftwareSerial(_rx, _tx);
+    #endif
     if (GPIO_NONE != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
         digitalWrite(_reset_gpio, HIGH);
     }
 }
-#endif
 
 /**
  * @brief               Inits the module communications
@@ -65,9 +74,19 @@ void Allwize::begin() {
 void Allwize::_reset_serial() {
     if (_hw_serial) {
         _hw_serial->end();
-        _hw_serial->begin(MODEM_BAUDRATE);
+        #if defined(ARDUINO_ARCH_ESP32)
+            _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
+        #else
+            _hw_serial->begin(MODEM_BAUDRATE);
+        #endif
     } else {
-        #if not defined(ARDUINO_ARCH_SAMD)
+        #if defined(ARDUINO_ARCH_SAMD)
+            // Software serial not implemented for SAMD
+            assert(false);
+        #elif defined(ARDUINO_ARCH_ESP32)
+            // It should never hit this block
+            assert(false);
+        #else
             _sw_serial->end();
             _sw_serial->begin(MODEM_BAUDRATE);
         #endif

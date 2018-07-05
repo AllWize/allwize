@@ -26,34 +26,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 #if defined(ARDUINO_AVR_UNO)
-    #define RESET_PIN   7
-    #define RX_PIN      8
-    #define TX_PIN      9
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-    #define debug       Serial
+    #define RESET_PIN           7
+    #define RX_PIN              8
+    #define TX_PIN              9
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define RESET_PIN   7
-    #define module      Serial1
-    #define debug       Serial
+    #define RESET_PIN           7
+    #define HARDWARE_SERIAL     Serial1
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN   7
-    #define module      Serial1
-    #define debug       SerialUSB
+    #define RESET_PIN           7
+    #define HARDWARE_SERIAL     Serial1
+    #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
-    #define RESET_PIN   14
-    #define RX_PIN      12
-    #define TX_PIN      13
-    #include <SoftwareSerial.h>
-    SoftwareSerial module(RX_PIN, TX_PIN);
-    #define debug       Serial
+    #define RESET_PIN           14
+    #define RX_PIN              12
+    #define TX_PIN              13
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP8266
+
+#if defined(ARDUINO_ARCH_ESP32)
+    #define RESET_PIN           14
+    #define RX_PIN              12
+    #define TX_PIN              13
+    #define DEBUG_SERIAL        Serial
+#endif // ARDUINO_ARCH_ESP32
 
 // -----------------------------------------------------------------------------
 // Config & globals
@@ -69,15 +72,15 @@ Allwize * allwize;
 #define COLUMN_PAD  20
 
 void format(const char * name, const char * value) {
-    debug.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
-    debug.println(value);
+    DEBUG_SERIAL.print(name);
+    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) DEBUG_SERIAL.print(" ");
+    DEBUG_SERIAL.println(value);
 }
 
 void format(const char * name, String value) {
-    debug.print(name);
-    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) debug.print(" ");
-    debug.println(value);
+    DEBUG_SERIAL.print(name);
+    for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) DEBUG_SERIAL.print(" ");
+    DEBUG_SERIAL.println(value);
 }
 
 void format(const char * name, int value) {
@@ -92,22 +95,26 @@ void format(const char * name, int value) {
 
 void setup() {
 
-    debug.begin(115200);
-    while (!debug && millis() < 5000);
-    debug.println();
-    debug.println("Allwize - Module Info");
-    debug.println();
+    DEBUG_SERIAL.begin(115200);
+    while (!DEBUG_SERIAL && millis() < 5000);
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println("Allwize - Module Info");
+    DEBUG_SERIAL.println();
 
     // Create and init AllWize object
-    allwize = new Allwize(&module, RESET_PIN);
+    #if defined(HARDWARE_SERIAL)
+        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+    #else
+        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+    #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
-        debug.println("Error connecting to the module, check your wiring!");
+        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true);
     }
 
     format("Property", "Value");
-    debug.println("------------------------------");
+    DEBUG_SERIAL.println("------------------------------");
 
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());
