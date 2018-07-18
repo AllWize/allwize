@@ -74,10 +74,10 @@ using namespace aunit;
 
 // The SAMD has 3 configurable hardware UART, so we can use both options too
 #if defined(ARDUINO_SAMD_ZERO)
-    #define RESET_PIN                   7
+    #define RESET_PIN                   8
     #if USE_SOFTWARE_SERIAL
-        #define RX_PIN                  8
-        #define TX_PIN                  9
+        #define RX_PIN                  7
+        #define TX_PIN                  6
         #include "wiring_private.h"
         Uart Serial3(&sercom3, RX_PIN, TX_PIN, SERCOM_RX_PAD_3, UART_TX_PAD_2);
         void SERCOM3_Handler() { Serial3.IrqHandler(); }

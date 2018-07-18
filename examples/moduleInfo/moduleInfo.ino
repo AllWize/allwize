@@ -22,6 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // -----------------------------------------------------------------------------
+// Config & globals
+// -----------------------------------------------------------------------------
+
+#include "Allwize.h"
+Allwize * allwize;
+
+// -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
 
@@ -44,6 +51,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
+/*
+#if defined(ARDUINO_ARCH_SAMD)
+
+    //Possible combinations:
+    //
+    //SERCOM1:
+    //    RX on 10,11,12,13
+    //    TX on 10,11
+    //    Mode PIO_SERCOM
+    //
+    //SERCOM3:
+    //    RX on 6,7,10,11,12,13
+    //    TX on 6,10,11
+    //    Mode PIO_SERCOM_ALT
+    //    6-10 and 7-12 are not compatible
+    //
+    //Pads:
+    //    6   pad 2
+    //    7   pad 3 (only RX)
+    //    10  pad 2
+    //    11  pad 0
+    //    12  pad 3 (only RX)
+    //    13  pad 1 (only RX)
+
+    #define RESET_PIN           8
+    #define RX_PIN              12
+    #define TX_PIN              11
+    #define SERCOM_PORT         sercom1
+    #define SERCOM_HANDLER      SERCOM1_Handler
+    #define SERCOM_MODE         PIO_SERCOM
+    #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
+    #define SERCOM_TX_PAD       UART_TX_PAD_0
+
+    #include "wiring_private.h" // pinPeripheral() function
+    Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
+    void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+
+    #define HARDWARE_SERIAL     SerialWize
+    #define DEBUG_SERIAL        SerialUSB
+
+#endif // ARDUINO_ARCH_SAMD
+*/
+
 #if defined(ARDUINO_ARCH_ESP8266)
     #define RESET_PIN           14
     #define RX_PIN              12
@@ -57,13 +107,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define TX_PIN              13
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP32
-
-// -----------------------------------------------------------------------------
-// Config & globals
-// -----------------------------------------------------------------------------
-
-#include "Allwize.h"
-Allwize * allwize;
 
 // -----------------------------------------------------------------------------
 // Utils
@@ -108,10 +151,22 @@ void setup() {
         allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
+
+    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
+        pinPeripheral(RX_PIN, SERCOM_MODE);
+        pinPeripheral(TX_PIN, SERCOM_MODE);
+    #endif
+
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true);
     }
+
+    // -------------------------------------------------------------------------
+
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println("Module info:");
+    DEBUG_SERIAL.println();
 
     format("Property", "Value");
     DEBUG_SERIAL.println("------------------------------");
@@ -122,7 +177,6 @@ void setup() {
     format("Sleep Mode", allwize->getSleepMode());
     format("Data Rate", allwize->getDataRate());
     format("Preamble Length", allwize->getPreamble());
-    format("Sleep Mode", allwize->getSleepMode());
     format("Control Field", allwize->getControlField());
     format("Network Role", allwize->getNetworkRole());
     format("Install Mode", allwize->getInstallMode());
@@ -138,6 +192,19 @@ void setup() {
 
     format("Temperature (C)", allwize->getTemperature());
     format("Voltage (mV)", allwize->getVoltage());
+
+    // -------------------------------------------------------------------------
+
+    delay(1000);
+
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.println("Memory dump:");
+
+    allwize->dump(DEBUG_SERIAL);
+
+    DEBUG_SERIAL.println("Done");
+
 
 }
 
