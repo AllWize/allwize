@@ -22,10 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Allwize.h"
 #include <assert.h>
 
-#if defined(ARDUINO_ARCH_SAMD)
-#include "wiring_private.h"
-#endif
-
 // -----------------------------------------------------------------------------
 // Init
 // -----------------------------------------------------------------------------
@@ -47,12 +43,14 @@ Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  * @param stream        SoftwareSerial object to communicate with the module
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
+#if not defined(ARDUINO_ARCH_SAMD)
 Allwize::Allwize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
     if (GPIO_NONE != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
         digitalWrite(_reset_gpio, HIGH);
     }
 }
+#endif
 
 /**
  * @brief               Allwize object constructor

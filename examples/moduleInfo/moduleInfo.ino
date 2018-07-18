@@ -41,13 +41,24 @@ Allwize * allwize;
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
+/*
+#if defined(ARDUINO_AVR_LEONARDO)
+    #define RESET_PIN           7
+    #define RX_PIN              8
+    #define TX_PIN              9
+    SoftwareSerial SerialWize(RX_PIN, TX_PIN);
+    #define MODULE_SERIAL       SerialWize
+    #define DEBUG_SERIAL        Serial
+#endif // ARDUINO_AVR_LEONARDO
+*/
+
 #if defined(ARDUINO_ARCH_SAMD)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
@@ -76,19 +87,19 @@ Allwize * allwize;
     //    13  pad 1 (only RX)
 
     #define RESET_PIN           8
-    #define RX_PIN              12
-    #define TX_PIN              11
-    #define SERCOM_PORT         sercom1
-    #define SERCOM_HANDLER      SERCOM1_Handler
-    #define SERCOM_MODE         PIO_SERCOM
+    #define RX_PIN              7
+    #define TX_PIN              6
+    #define SERCOM_PORT         sercom3
+    #define SERCOM_HANDLER      SERCOM3_Handler
+    #define SERCOM_MODE         PIO_SERCOM_ALT
     #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
-    #define SERCOM_TX_PAD       UART_TX_PAD_0
+    #define SERCOM_TX_PAD       UART_TX_PAD_2
 
     #include "wiring_private.h" // pinPeripheral() function
     Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
     void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
 
-    #define HARDWARE_SERIAL     SerialWize
+    #define MODULE_SERIAL       SerialWize
     #define DEBUG_SERIAL        SerialUSB
 
 #endif // ARDUINO_ARCH_SAMD
@@ -145,11 +156,12 @@ void setup() {
     DEBUG_SERIAL.println();
 
     // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+    #if defined(MODULE_SERIAL)
+        allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
     #else
         allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
+
     allwize->begin();
 
     #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)

@@ -83,7 +83,9 @@ class Allwize {
     public:
 
         Allwize(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
+        #if not defined(ARDUINO_ARCH_SAMD)
         Allwize(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
+        #endif
         Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE);
 
         void begin();
