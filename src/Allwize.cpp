@@ -106,10 +106,10 @@ void Allwize::_reset_serial() {
         #if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD)
             // It should never hit this block
             assert(false);
+        #else
+            _sw_serial->end();
+            _sw_serial->begin(MODEM_BAUDRATE);
         #endif
-
-        _sw_serial->end();
-        _sw_serial->begin(MODEM_BAUDRATE);
 
     }
 

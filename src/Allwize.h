@@ -197,7 +197,7 @@ class Allwize {
         Stream * _stream = NULL;
         HardwareSerial * _hw_serial = NULL;
         #if defined(ARDUINO_ARCH_SAMD)
-            Uart * _sw_serial = NULL;
+            // Uart * _sw_serial = NULL;
         #elif defined(ARDUINO_ARCH_ESP32)
             // Nothing
         #else
