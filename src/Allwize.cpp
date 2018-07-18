@@ -42,6 +42,17 @@ Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
     }
 }
 
+/**
+ * @brief               Allwize object constructor
+ * @param stream        SoftwareSerial object to communicate with the module
+ * @param _reset_gpio   GPIO connected to the module RESET pin
+ */
+Allwize::Allwize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
+    if (GPIO_NONE != _reset_gpio) {
+        pinMode(_reset_gpio, OUTPUT);
+        digitalWrite(_reset_gpio, HIGH);
+    }
+}
 
 /**
  * @brief               Allwize object constructor
@@ -81,9 +92,13 @@ void Allwize::_reset_serial() {
 
         _hw_serial->end();
         #if defined(ARDUINO_ARCH_ESP32)
-            pinMode(_rx, FUNCTION_4);
-            pinMode(_tx, FUNCTION_4);
-            _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
+            if ((_rx != -1) && (_tx != -1)) {
+                pinMode(_rx, FUNCTION_4);
+                pinMode(_tx, FUNCTION_4);
+                _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
+            } else {
+                _hw_serial->begin(MODEM_BAUDRATE);
+            }
         #else
             _hw_serial->begin(MODEM_BAUDRATE);
         #endif
