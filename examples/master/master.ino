@@ -93,7 +93,6 @@ void wizeSetup() {
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
-    allwize->setControlField(WIZE_NETWORK_ID);
 
     allwize->dump(DEBUG_SERIAL);
 
@@ -108,10 +107,18 @@ void wizeLoop() {
         allwize_message_t message = allwize->read();
 
         // Code to pretty-print the message
-        char buffer[64];
+        char buffer[128];
         char ascii[message.len+1];
 
-        snprintf(buffer, sizeof(buffer), "[WIZE] C: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ", message.c, message.ci, message.rssi);
+        snprintf(
+            buffer, sizeof(buffer),
+            "[WIZE] C: 0x%02X, MAN: 0x%02X%02X, ADDR: 0x%02X%02X%02X%02X%02X%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
+            message.c,
+            message.man[0], message.man[1],
+            message.address[0], message.address[1], message.address[2],
+            message.address[3], message.address[4], message.address[5],
+            message.ci, message.rssi
+        );
         DEBUG_SERIAL.print(buffer);
 
         for (uint8_t i=0; i<message.len; i++) {

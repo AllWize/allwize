@@ -3,18 +3,29 @@
 // -----------------------------------------------------------------------------
 
 // Command keys
+#define CMD_AUTO_MESSAGE_FLAGS          'A'
+#define CMD_BIND                        'B'
 #define CMD_CHANNEL                     'C'
+#define CMD_ENCRYPT                     'E'
 #define CMD_CONTROL_FIELD               'F'
 #define CMD_MBUS_MODE                   'G'
 #define CMD_INSTALL_MODE                'I'
+#define CMD_KEY_REGISTER                'K'
+#define CMD_LIST_BINDING                'L'
 #define CMD_WRITE_MEMORY                'M'
+#define CMD_ACCESS_NUMBER               'N'
+#define CMD_READ_AUTO_MESSAGE_FLAGS     'O'
 #define CMD_RF_POWER                    'P'
 #define CMD_QUALITY                     'Q'
+#define CMD_READ_MAILBOX                'R'
 #define CMD_RSSI                        'S'
+#define CMD_DESTINATION                 'T'
 #define CMD_TEMPERATURE                 'U'
 #define CMD_VOLTAGE                     'V'
+#define CMD_WRITE_MAILBOX               'W'
 #define CMD_READ_MEMORY                 'Y'
 #define CMD_SLEEP                       'Z'
+#define CMD_TEST_MODE_0                 '0'
 
 // Memory addresses
 #define MEM_CHANNEL                     0x00

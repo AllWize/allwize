@@ -66,7 +66,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL        CHANNEL_04
 #define WIZE_POWER          POWER_20dBm
 #define WIZE_DATARATE       DATARATE_2400bps
-#define WIZE_NETWORK_ID     0x46
 #define WIZE_NODE_ID        0x09
 
 // -----------------------------------------------------------------------------
@@ -161,7 +160,6 @@ void wizeSetup() {
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
-    allwize->setControlField(WIZE_NETWORK_ID);
     allwize->setControlInformation(WIZE_NODE_ID);
 
 }

@@ -177,8 +177,10 @@ void Allwize::master() {
     setNetworkRole(NETWORK_ROLE_MASTER);
     setInstallMode(INSTALL_MODE_HOST);
     setSleepMode(SLEEP_MODE_DISABLE);
-    _setMemory(MEM_RSSI_MODE, 1);
-    _setMemory(MEM_DATA_INTERFACE, DATA_INTERFACE_START_STOP);
+    setPower(POWER_20dBm);
+    setDataRate(DATARATE_2400bps);
+    setDataInterface(DATA_INTERFACE_START_STOP);
+    setAppendRSSI(true);
 }
 
 /**
@@ -187,6 +189,8 @@ void Allwize::master() {
 void Allwize::slave() {
     setMBusMode(MBUS_MODE_OSP, true);
     setNetworkRole(NETWORK_ROLE_SLAVE);
+    setPower(POWER_20dBm);
+    setDataRate(DATARATE_2400bps);
 }
 
 /**
@@ -239,7 +243,7 @@ bool Allwize::waitForReady(uint32_t timeout) {
 void Allwize::dump(Stream & debug) {
 
     _setConfig(true);
-    _send('0');
+    _send(CMD_TEST_MODE_0);
 
     char buffer[256];
     if (256 == _readBytes(buffer, 256)) {
@@ -292,10 +296,46 @@ void Allwize::dump(Stream & debug) {
 bool Allwize::send(uint8_t * buffer, uint8_t len) {
     if (_config) return false;
     if (0 == len) return (1 == _send(0xFE));
-    if (1 != _send(len+1)) return false;
-    if (1 != _send(_ci)) return false;
-    if (len != _send(buffer, len)) return false;
+    if (_encrypt) {
+
+        // CI
+        if (1 != _send(0x7A)) return false;
+
+        // counter
+        if (1 != _send(_counter)) return false;
+
+        // status
+        if (1 != _send(0x00)) return false;
+
+        // length
+        if (1 != _send(len+2)) return false;
+
+        // signature field
+        if (1 != _send(SIGNATURE_FIELD)) return false;
+
+        // 2F pad
+        if (1 != _send(0x2F)) return false;
+        if (1 != _send(0x2F)) return false;
+
+        // payload
+        if (len != _send(buffer, len)) return false;
+
+    } else {
+
+        // length
+        if (1 != _send(len+1)) return false;
+
+        // CI
+        if (1 != _send(_ci)) return false;
+
+        // payload
+        if (len != _send(buffer, len)) return false;
+
+    }
+
+    _counter++;
     return true;
+
 }
 
 /**
@@ -433,6 +473,7 @@ uint8_t Allwize::getDataRate() {
 void Allwize::setMBusMode(uint8_t mode, bool persist) {
     if (persist) _setMemory(MEM_MBUS_MODE, mode);
     _sendCommand(CMD_MBUS_MODE, mode);
+    _mbus_mode = mode;
 }
 
 /**
@@ -440,7 +481,10 @@ void Allwize::setMBusMode(uint8_t mode, bool persist) {
  * @return              MBus mode (1 byte)
  */
 uint8_t Allwize::getMBusMode() {
-    return _getMemory(MEM_MBUS_MODE);
+    if (0xFF == _mbus_mode) {
+        _mbus_mode = _getMemory(MEM_MBUS_MODE);
+    }
+    return _mbus_mode;
 }
 
 /**
@@ -463,17 +507,17 @@ uint8_t Allwize::getSleepMode() {
  * @brief               Sets the RSSI mode value
  * @param value         Set to true to append RSSI value to received data
  */
-//void Allwize::setAppendRSSI(bool value) {
-//    _setMemory(MEM_RSSI_MODE, value ? 1 : 0);
-//}
+void Allwize::setAppendRSSI(bool value) {
+    _setMemory(MEM_RSSI_MODE, value ? 1 : 0);
+}
 
 /**
  * @brief               Gets the current RSSI mode value
  * @return              True if RSSI value will be appended to received data
  */
-//bool Allwize::getAppendRSSI() {
-//    return (_getMemory(MEM_RSSI_MODE) == 0x01);
-//}
+bool Allwize::getAppendRSSI() {
+    return (_getMemory(MEM_RSSI_MODE) == 0x01);
+}
 
 /**
  * @brief               Sets the preamble length frame format
@@ -545,19 +589,19 @@ uint8_t Allwize::getLEDControl() {
  * @brief               Sets the data interface for receiving packets
  * @param               Value from 0x00 to 0x0C
  */
-//void Allwize::setDataInterface(uint8_t value) {
-//    if (0 <= value && value <= 0x0C) {
-//        _setMemory(MEM_DATA_INTERFACE, value);
-//    }
-//}
+void Allwize::setDataInterface(uint8_t value) {
+    if (0 <= value && value <= 0x0C) {
+        _setMemory(MEM_DATA_INTERFACE, value);
+    }
+}
 
 /**
  * @brief               Gets the data interface for receiving packets
  * @return              Value (1 byte)
  */
-//uint8_t Allwize::getDataInterface() {
-//    return _getMemory(MEM_DATA_INTERFACE);
-//}
+uint8_t Allwize::getDataInterface() {
+    return _getMemory(MEM_DATA_INTERFACE);
+}
 
 /**
  * @brief               Sets the control field value
@@ -600,6 +644,7 @@ uint8_t Allwize::getInstallMode() {
  * @param flag          Encrypt flag
  */
 void Allwize::setEncryptFlag(uint8_t flag) {
+    _encrypt = (flag > 0);
     _setMemory(MEM_ENCRYPT_FLAG, flag);
 }
 
@@ -629,10 +674,24 @@ uint8_t Allwize::getDecryptFlag() {
 
 /**
  * @brief               Sets the default encryption key
+ * @param reg           Register number (1-64)
  * @param key           A 16-byte encryption key as binary array
  */
-void Allwize::setDefaultKey(uint8_t * key) {
-    _setMemory(MEM_DEFAULT_KEY, key, 16);
+void Allwize::setKey(uint8_t reg, const uint8_t * key) {
+    if (0 < reg && reg < 65) {
+        uint8_t data[17];
+        data[0] = reg;
+        memcpy(&data[1], key, 16);
+        _sendCommand(CMD_KEY_REGISTER, data, 17);
+    }
+}
+
+/**
+ * @brief               Sets the default encryption key
+ * @param key           A 16-byte encryption key as binary array
+ */
+void Allwize::setDefaultKey(const uint8_t * key) {
+    _setMemory(MEM_DEFAULT_KEY, (uint8_t *) key, 16);
 }
 
 /**
@@ -959,36 +1018,109 @@ void Allwize::_readModel() {
  *    Data interface           | 0 | 1 | 3 | 4 | 8 | C |
  * -----------------------------------------------------
  * 0. Start byte (0x68)        |   |   |   | * |   | * |
- * 1. Length (1-byte)          | * | * | * | * | * | * |
- * 2. Control field (1-byte)   | * | * | * | * | * | * | NO?
- * 3. Header (8-bytes)         |   |   | * | * | * | * | NO?
+ * 1. Length (1-byte)          | * | * | * | * | * | * | length of sections 2 to 7
+ * 2. Control field (1-byte)   | * |   |   | * | * | * |
+ * 3. Header (8-bytes)         | * |   |   | * | * | * | manID (2 bytes) + address (6 bytes)
  * 4. Control info (1-byte)    | * | * | * | * | * | * |
  * 5. App data (n-bytes)       | * | * | * | * | * | * |
- * 6. RSSI (1-byte)            |   if RSSI_MODE == 1   |
- * 7. CRC (2-bytes)            |   |   |   |   |   | * |
+ * 6. RSSI (1-byte)            | - | - | - | - | - | - |
+ * 7. CRC (2-bytes)            |   |   |   |   | * | * |
  * 8. Stop byte (0x16)         |   |   |   | * |   | * |
  *
- * Data Interface is hardcoded to 0x04 for this version and RSSI enabled
+ * Note:
+ *  - Data Interface defaults to 0x04 for this version and RSSI enabled
+ *  - Modes 0x01 and 0x03 not working in MBUS_MODE_OSP
+ *  - Modes 0x01 and 0x03 should be the same, but 0x03 does ACK
+ *  - Section 6 (RSSI) present always and only if RSSI_MODE == 1
+ *  - Section 2 (C) and 3 (HEADER) not present in MBUS_MODE_OSP
+ *
  */
 bool Allwize::_decode() {
 
-    // Get and check buffer length
-    uint8_t len = _buffer[1];
-    if (_pointer != len+3) return false;
+    #if defined(ALLWIZE_DEBUG_PORT)
+    {
+        char ch[10];
+        for (uint8_t i = 0; i<_pointer; i++) {
+            snprintf(ch, sizeof(ch), "%02X ", _buffer[i]);
+            ALLWIZE_DEBUG_PRINT(ch);
+        }
+        ALLWIZE_DEBUG_PRINTLN();
+    }
+    #endif
 
-    // C-field
-    _message.c = 0xFF;
+    // Local copy of the buffer
+    uint8_t _local[RX_BUFFER_SIZE];
+    memcpy(_local, _buffer, RX_BUFFER_SIZE);
+
+    // Get current values
+    uint8_t mbus_mode = getMBusMode();
+    uint8_t data_interface = getDataInterface();
+    bool has_start = (data_interface & 0x04) == 0x04;
+    bool has_header = (mbus_mode != MBUS_MODE_OSP) & ((data_interface & 0x01) == 0x00);
+    bool has_rssi = getAppendRSSI();
+    bool has_crc = (data_interface & 0x08) == 0x08;
+    uint8_t bytes_not_in_len = has_start ? 3 : 1;
+    uint8_t bytes_not_in_app = (has_header ? 9 : 0) + 1 + (has_rssi ? 1 : 0) + (has_crc ? 2 : 0);
+
+    // This variable will contain the pointer to the current reading position
+    uint8_t in = 0;
+
+    // Start byte
+    if (has_start) {
+        if (START_BYTE != _local[in]) return false;
+        in += 1;
+    };
+
+    // Get and check buffer length
+    uint8_t len = _local[in];
+    if (_pointer != len + bytes_not_in_len) return false;
+    in += 1;
+
+    if (has_header) {
+
+        // C-field
+        _message.c = _local[in];
+        in += 1;
+
+        // Header
+        memcpy(_message.man, &_local[in], 2);
+        in += 2;
+        memcpy(_message.address, &_local[in], 6);
+        in += 6;
+
+    } else {
+        _message.c = 0xFF;
+        memset(_message.man, 0, 2);
+        memset(_message.address, 0, 6);
+    }
 
     // Control information
-    _message.ci = _buffer[2];
+    _message.ci = _buffer[in];
+    in += 1;
 
     // Application data
-    _message.len = len - 2;
-    memcpy(_message.data, &_buffer[3], _message.len);
+    _message.len = len - bytes_not_in_app;
+    memcpy(_message.data, &_local[in], _message.len);
     _message.data[_message.len] = 0;
+    in += _message.len;
 
     // RSSI
-    _message.rssi = _buffer[_pointer-2];
+    if (has_rssi) {
+        _message.rssi = _local[in];
+        in += 1;
+    } else {
+        _message.rssi = 0xFF;
+    }
+
+    // CRC
+    if (has_crc) {
+        in += 2;
+    }
+
+    // Stop byte
+    if (has_start) {
+        if (STOP_BYTE != _local[in]) return false;
+    }
 
     return true;
 

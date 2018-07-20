@@ -48,10 +48,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
 #define HARDWARE_SERIAL_PORT            1
+#define SIGNATURE_FIELD                 0x05            // TODO: should not be here
+#define START_BYTE                      0x68
+#define STOP_BYTE                       0x16
 
 typedef struct {
     uint8_t c;
     uint8_t ci;
+    uint8_t man[2];
+    uint8_t address[6];
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
@@ -114,17 +119,18 @@ class Allwize {
         void setDataRate(uint8_t dr);
         void setMBusMode(uint8_t mode, bool persist = false);
         void setSleepMode(uint8_t mode);
-        //void setAppendRSSI(bool value);
+        void setAppendRSSI(bool value);
         void setPreamble(uint8_t preamble);
         void setTimeout(uint8_t timeout);
         void setNetworkRole(uint8_t role);
         void setLEDControl(uint8_t value);
-        //void setDataInterface(uint8_t value);
+        void setDataInterface(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
         void setInstallMode(uint8_t mode, bool persist = false);
         void setEncryptFlag(uint8_t flag);
         void setDecryptFlag(uint8_t flag);
-        void setDefaultKey(uint8_t * key);
+        void setKey(uint8_t reg, const uint8_t * key);
+        void setDefaultKey(const uint8_t * key);
 
         uint8_t getChannel();
         uint8_t getPower();
@@ -132,9 +138,9 @@ class Allwize {
         uint8_t getMBusMode();
         uint8_t getSleepMode();
         uint8_t getPreamble();
-        //uint8_t getDataInterface();
+        uint8_t getDataInterface();
         uint8_t getControlField();
-        //bool getAppendRSSI();
+        bool getAppendRSSI();
         uint8_t getTimeout();
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
@@ -208,6 +214,9 @@ class Allwize {
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
         uint8_t _ci = CONTROL_INFORMATION;
+        uint8_t _mbus_mode = 0xFF;
+        bool _encrypt = false;
+        unsigned char _counter = 0;
 
         String _model;
         String _fw;

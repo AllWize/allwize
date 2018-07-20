@@ -65,8 +65,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
-#define WIZE_NETWORK_ID         0x46
-#define WIZE_NODE_ID            0x02
+#define WIZE_NODE_ID            0x5A
+#define WIZE_ENCRYPT            0
+
+static const uint8_t WIZE_ENCRYPT_KEY[16] = { 0x0A, 0x90, 0xE5, 0xB7, 0x4D, 0x28, 0x07, 0xA6, 0x51, 0xF6, 0x9A, 0xC0, 0x89, 0x6A, 0x09, 0xF6 };
 
 // -----------------------------------------------------------------------------
 // Allwize
@@ -93,8 +95,11 @@ void wizeSetup() {
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
-    allwize->setControlField(WIZE_NETWORK_ID);
     allwize->setControlInformation(WIZE_NODE_ID);
+    #if WIZE_ENCRYPT
+        allwize->setKey(1, WIZE_ENCRYPT_KEY);
+        allwize->setEncryptFlag(ENCRYPT_ENABLED);
+    #endif
 
 }
 
@@ -119,7 +124,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[Allwize] MCP9701 sensor example");
+    DEBUG_SERIAL.println("[Allwize] Basic slave example");
 
     // Init radio
     wizeSetup();
@@ -128,11 +133,11 @@ void setup() {
 
 void loop() {
 
-    // This static variable will hold the number
+    // This static variables will hold the number as int and char string
     static uint8_t count = 0;
+    static char payload[4];
 
     // Convert the number to a string
-    char payload[4];
     itoa(count, payload, 10);
 
     // Send the string as payload

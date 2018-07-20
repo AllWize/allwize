@@ -145,6 +145,23 @@ testF(CustomTest, get_control_field) {
     compare(sizeof(expected), expected);
 }
 
+testF(CustomTest, set_key) {
+    uint8_t reg = 0x9;
+    uint8_t value = 0x10;
+    uint8_t key[16];
+    for (uint8_t i=0; i<sizeof(key); i++) key[i] = value;
+    allwize->setKey(reg, key);
+    uint8_t expected[] = {
+        0x00, 'K', reg,
+        value, value, value, value,
+        value, value, value, value,
+        value, value, value, value,
+        value, value, value, value,
+        0x58
+    };
+    compare(sizeof(expected), expected);
+}
+
 testF(CustomTest, set_default_key) {
     uint8_t value = 0x10;
     uint8_t key[16];
