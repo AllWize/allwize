@@ -55,7 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef struct {
     uint8_t c;
     uint8_t ci;
-    uint8_t man[2];
+    char man[4];
     uint8_t address[6];
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
@@ -214,7 +214,12 @@ class Allwize {
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
         uint8_t _ci = CONTROL_INFORMATION;
+
         uint8_t _mbus_mode = 0xFF;
+        uint8_t _data_interface = 0xFF;
+        bool _append_rssi = false;
+
+
         bool _encrypt = false;
         unsigned char _counter = 0;
 

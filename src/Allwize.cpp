@@ -79,6 +79,9 @@ Allwize::Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx),
 void Allwize::begin() {
     reset();
     delay(200);
+    _append_rssi = _getMemory(MEM_RSSI_MODE) == 0x01;
+    _mbus_mode = _getMemory(MEM_MBUS_MODE);
+    _data_interface = _getMemory(MEM_DATA_INTERFACE);
 }
 
 /**
@@ -173,7 +176,7 @@ bool Allwize::factoryReset() {
  * @brief               Sets the module in master mode
  */
 void Allwize::master() {
-    setMBusMode(MBUS_MODE_OSP, true);
+    setMBusMode(MBUS_MODE_N1, true);
     setNetworkRole(NETWORK_ROLE_MASTER);
     setInstallMode(INSTALL_MODE_HOST);
     setSleepMode(SLEEP_MODE_DISABLE);
@@ -187,7 +190,7 @@ void Allwize::master() {
  * @brief               Sets the module in slave mode
  */
 void Allwize::slave() {
-    setMBusMode(MBUS_MODE_OSP, true);
+    setMBusMode(MBUS_MODE_N1, true);
     setNetworkRole(NETWORK_ROLE_SLAVE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
@@ -481,9 +484,6 @@ void Allwize::setMBusMode(uint8_t mode, bool persist) {
  * @return              MBus mode (1 byte)
  */
 uint8_t Allwize::getMBusMode() {
-    if (0xFF == _mbus_mode) {
-        _mbus_mode = _getMemory(MEM_MBUS_MODE);
-    }
     return _mbus_mode;
 }
 
@@ -509,6 +509,7 @@ uint8_t Allwize::getSleepMode() {
  */
 void Allwize::setAppendRSSI(bool value) {
     _setMemory(MEM_RSSI_MODE, value ? 1 : 0);
+    _append_rssi = value;
 }
 
 /**
@@ -516,7 +517,7 @@ void Allwize::setAppendRSSI(bool value) {
  * @return              True if RSSI value will be appended to received data
  */
 bool Allwize::getAppendRSSI() {
-    return (_getMemory(MEM_RSSI_MODE) == 0x01);
+    return _append_rssi;
 }
 
 /**
@@ -592,6 +593,7 @@ uint8_t Allwize::getLEDControl() {
 void Allwize::setDataInterface(uint8_t value) {
     if (0 <= value && value <= 0x0C) {
         _setMemory(MEM_DATA_INTERFACE, value);
+        _data_interface = value;
     }
 }
 
@@ -600,7 +602,7 @@ void Allwize::setDataInterface(uint8_t value) {
  * @return              Value (1 byte)
  */
 uint8_t Allwize::getDataInterface() {
-    return _getMemory(MEM_DATA_INTERFACE);
+    return _data_interface;
 }
 
 /**
@@ -1082,15 +1084,21 @@ bool Allwize::_decode() {
         _message.c = _local[in];
         in += 1;
 
-        // Header
-        memcpy(_message.man, &_local[in], 2);
+        // Manufacturer
+        unsigned int man = (_local[in+1] << 8) + _local[in];
+        _message.man[0] = ((man >> 10) & 0x001F) + 64;
+        _message.man[1] = ((man >>  5) & 0x001F) + 64;
+        _message.man[2] = ((man >>  0) & 0x001F) + 64;
+        _message.man[3] = 0;
         in += 2;
+
+        // Address
         memcpy(_message.address, &_local[in], 6);
         in += 6;
 
     } else {
         _message.c = 0xFF;
-        memset(_message.man, 0, 2);
+        _message.man[0] = 0;
         memset(_message.address, 0, 6);
     }
 
