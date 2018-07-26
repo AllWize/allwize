@@ -109,11 +109,11 @@
 #define DATARATE_6400bps                0x05
 
 // Power modes
-#define POWER_10dBm                     0x01
-#define POWER_14dBm                     0x02
-#define POWER_17dBm                     0x03
-#define POWER_20dBm                     0x04
-#define POWER_24dBm                     0x05
+#define POWER_14dBm                     0x01
+#define POWER_17dBm                     0x02
+#define POWER_20dBm                     0x03
+#define POWER_24dBm                     0x04
+#define POWER_27dBm                     0x05
 
 // MBus modes
 #define MBUS_MODE_S2                    0x00
