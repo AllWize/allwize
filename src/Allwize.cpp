@@ -32,10 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
 Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
-    if (GPIO_NONE != _reset_gpio) {
-        pinMode(_reset_gpio, OUTPUT);
-        digitalWrite(_reset_gpio, HIGH);
-    }
+    _init();
 }
 
 /**
@@ -43,12 +40,9 @@ Allwize::Allwize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  * @param stream        SoftwareSerial object to communicate with the module
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
-#if not defined(ARDUINO_ARCH_SAMD)
+#if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 Allwize::Allwize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
-    if (GPIO_NONE != _reset_gpio) {
-        pinMode(_reset_gpio, OUTPUT);
-        digitalWrite(_reset_gpio, HIGH);
-    }
+    _init();
 }
 #endif
 
@@ -67,10 +61,17 @@ Allwize::Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx),
     #else
         _stream = _sw_serial = new SoftwareSerial(_rx, _tx);
     #endif
+    _init();
+}
+
+
+void Allwize::_init() {
     if (GPIO_NONE != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
         digitalWrite(_reset_gpio, HIGH);
     }
+    randomSeed(analogRead(0));
+    _access_number = random(0,256);
 }
 
 /**
@@ -176,7 +177,7 @@ bool Allwize::factoryReset() {
  * @brief               Sets the module in master mode
  */
 void Allwize::master() {
-    setMBusMode(MBUS_MODE_N1, true);
+    setMBusMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_MASTER);
     setInstallMode(INSTALL_MODE_HOST);
     setSleepMode(SLEEP_MODE_DISABLE);
@@ -190,7 +191,7 @@ void Allwize::master() {
  * @brief               Sets the module in slave mode
  */
 void Allwize::slave() {
-    setMBusMode(MBUS_MODE_N1, true);
+    setMBusMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_SLAVE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
@@ -200,7 +201,7 @@ void Allwize::slave() {
  * @brief               Sets the module in repeater mode
  */
 void Allwize::repeater() {
-    setMBusMode(MBUS_MODE_OSP, true);
+    setMBusMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_REPEATER);
 }
 
@@ -297,24 +298,29 @@ void Allwize::dump(Stream & debug) {
  * @return              Returns true if message has been correctly sent
  */
 bool Allwize::send(uint8_t * buffer, uint8_t len) {
+
     if (_config) return false;
     if (0 == len) return (1 == _send(0xFE));
+
     if (_encrypt) {
 
-        // CI
-        if (1 != _send(0x7A)) return false;
+        // length
+        if (1 != _send(len+7)) return false;
 
-        // counter
-        if (1 != _send(_counter)) return false;
+        // CI
+        if (1 != _send(_ci)) return false;
+
+        // access number
+        if (1 != _send(_access_number)) return false;
 
         // status
         if (1 != _send(0x00)) return false;
 
-        // length
-        if (1 != _send(len+2)) return false;
+        // configuration word
+        if (1 != _send(0x00)) return false;
 
         // signature field
-        if (1 != _send(SIGNATURE_FIELD)) return false;
+        if (1 != _send(0x05)) return false;
 
         // 2F pad
         if (1 != _send(0x2F)) return false;
@@ -336,7 +342,7 @@ bool Allwize::send(uint8_t * buffer, uint8_t len) {
 
     }
 
-    _counter++;
+    _access_number++;
     return true;
 
 }
@@ -629,8 +635,10 @@ uint8_t Allwize::getControlField() {
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setInstallMode(uint8_t mode, bool persist) {
-    if (persist) _setMemory(MEM_INSTALL_MODE, mode);
-    _sendCommand(CMD_INSTALL_MODE, mode);
+    if (0 <= mode && mode <= 2) {
+        if (persist) _setMemory(MEM_INSTALL_MODE, mode);
+        _sendCommand(CMD_INSTALL_MODE, mode);
+    }
 }
 
 /**
@@ -646,8 +654,10 @@ uint8_t Allwize::getInstallMode() {
  * @param flag          Encrypt flag
  */
 void Allwize::setEncryptFlag(uint8_t flag) {
-    _encrypt = (flag > 0);
-    _setMemory(MEM_ENCRYPT_FLAG, flag);
+    if (0 == flag || 1 == flag || 3 == flag) {
+        _encrypt = (flag & 0x01) == 0x01;
+        _setMemory(MEM_ENCRYPT_FLAG, flag);
+    }
 }
 
 /**
@@ -1093,11 +1103,23 @@ bool Allwize::_decode() {
         in += 2;
 
         // Address
-        memcpy(_message.address, &_local[in], 6);
+        _message.address[0] = _local[in + 3];
+        _message.address[1] = _local[in + 2];
+        _message.address[2] = _local[in + 1];
+        _message.address[3] = _local[in + 0];
+
+        // Type
+        _message.type = _local[in + 5];
+
+        // Version
+        _message.version = _local[in + 4];
+
         in += 6;
 
     } else {
         _message.c = 0xFF;
+        _message.type = 0;
+        _message.version = 0;
         _message.man[0] = 0;
         memset(_message.address, 0, 6);
     }

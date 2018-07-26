@@ -113,11 +113,12 @@ void wizeLoop() {
 
         snprintf(
             buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X%02X%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
+            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
             message.c,
             message.man,
-            message.address[0], message.address[1], message.address[2],
-            message.address[3], message.address[4], message.address[5],
+            message.address[0], message.address[1],
+            message.address[2], message.address[3],
+            message.type, message.version,
             message.ci, message.rssi
         );
         DEBUG_SERIAL.print(buffer);

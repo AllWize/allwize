@@ -48,15 +48,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
 #define HARDWARE_SERIAL_PORT            1
-#define SIGNATURE_FIELD                 0x05            // TODO: should not be here
+#define SIGNATURE_FIELD                 0x04            // TODO: should not be here
 #define START_BYTE                      0x68
 #define STOP_BYTE                       0x16
+#define DEFAULT_MBUS_MODE               MBUS_MODE_N1
 
 typedef struct {
     uint8_t c;
     uint8_t ci;
     char man[4];
-    uint8_t address[6];
+    uint8_t type;
+    uint8_t version;
+    uint8_t address[4];
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
@@ -88,7 +91,7 @@ class Allwize {
     public:
 
         Allwize(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
-        #if not defined(ARDUINO_ARCH_SAMD)
+        #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
         Allwize(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
         #endif
         Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE);
@@ -163,6 +166,8 @@ class Allwize {
 
     protected:
 
+        void _init();
+
         bool _setConfig(bool value);
         int8_t _sendCommand(uint8_t command, uint8_t * data, uint8_t len);
         int8_t _sendCommand(uint8_t command, uint8_t data);
@@ -221,7 +226,7 @@ class Allwize {
 
 
         bool _encrypt = false;
-        unsigned char _counter = 0;
+        unsigned char _access_number = 0;
 
         String _model;
         String _fw;
