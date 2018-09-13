@@ -1,7 +1,7 @@
 # AllWize - Vineryard monitoring
 
 This example use cases uses a simple analog higrometer to measure humidity in
-the soil as a measure of vineyard hidro-stress and a SI7021 I2C sensor to
+the soil as a measure of vineyard hidro-stress and a HTU21D I2C sensor to
 retrieve environment temperature and humidity.
 
 The higrometer is an analog sensor, but some also sport a comparator fed by a
@@ -17,7 +17,7 @@ the board you are using (5V for Uno/Leonardo, 3V3 almost anywhere else) and
 connect your sensor to the analog grove connector (the middle one).
 Check that the yellow cable goes to the analog output of the sensor (sometimes labeled A0).
 
-The SI7021 is very straight forward to use. If using the K1 check that the yellow cable is
+The HTU21D is very straight forward to use. If using the K1 check that the yellow cable is
 connected to SCL and the white one to SDA.
 
 Always remember to connect the antenna before powering the board!

@@ -1,7 +1,6 @@
 /*
 
-Allwize - Pollution Use Case
-Using a MICS-4514 sensor
+Allwize - Shit happens
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
 
@@ -35,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define RESET_PIN           7
     #define DEBUG_SERIAL        SerialUSB
     #define MODULE_SERIAL       Serial1
-    #define ANALOG_DEPTH        12
+    #define ANALOG_DEPTH        10
 #endif // ARDUINO_ARCH_SAMD
 
 // -----------------------------------------------------------------------------
@@ -47,23 +46,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_DATARATE       DATARATE_2400bps
 #define WIZE_NODE_ID        0x20
 
-#define PRE_PIN             8
-#define NOX_PIN             A0
-#define RED_PIN             A1
-#define CALIB_R0_NO2        2200      // R0 calibration value for the NO2 sensor
-#define CALIB_R0_CO         750000    // R0 calibration value for the CO sensor
-
-#define PRE_HEAT_TIME       10000   // in ms
+#define POT_PIN             A0
 #define SLEEP_TIME          5000    // in ms
 #define SAMPLE_COUNT        10
 #define ANALOG_MAX          (1 << ANALOG_DEPTH)
 
-// -----------------------------------------------------------------------------
-// State
-// -----------------------------------------------------------------------------
-
-uint16_t co;
-uint16_t no2;
+#define VALUE_FOR_0_DEG     526.0   // value of the pot when the lever is completely horizontal
+#define VALUE_FOR_90_DEG    175.0   // value of the pot when the lever is completely vertical
+#define ANGLE_THRESHOLD     22      // angle at which the lever lies flat over an empty toilet roll
 
 // -----------------------------------------------------------------------------
 // Allwize
@@ -111,59 +101,23 @@ void wizeSend(const char * payload) {
 }
 
 // -----------------------------------------------------------------------------
-// Sensor
+// Sensors
 // -----------------------------------------------------------------------------
 
-void read_MICS_4514() {
+int16_t getAngle() {
 
-    uint16_t reading;
-    float volt, res;
-
-    // ------------
-    // CO2 sensor
-    // ------------
-
-    reading = analogRead(RED_PIN);
-    volt = (reading * 5.0) / ANALOG_MAX;
-    res = (1 - volt / 5.0) * CALIB_R0_CO / 1000;
-
-    DEBUG_SERIAL.print("[Sensor] R(CO): ");
-    DEBUG_SERIAL.println(res);
-    co = 10 * res;
-
-    // Convert to ppm
-    /*
-    if (res > 0.7) res = 0.7;
-    if (res > 0.6) {
-        co = (0.711 - res) / 0.011;
-    } else if (res > 0.3) {
-        co = (0.7 - res) / 0.01;
-    } else {
-        co = (0.3233 - res) / 0.00058;
+    double value = 0;
+    for (unsigned char i=0; i<SAMPLE_COUNT; i++) {
+        value += analogRead(POT_PIN);
     }
-    */
+    value = value / SAMPLE_COUNT;
 
-    // ------------
-    // NO2 sensor
-    // ------------
+    // Uncomment this line to get a reading of the sensor immersed in water,
+    // set HIGROMETER_MIN to this value
+    //Serial.print("Sensor reading: "); Serial.println(value);
 
-    reading = analogRead(NOX_PIN);
-    volt = (reading * 5.0) / ANALOG_MAX;
-    res = (1 - volt / 5.0) * CALIB_R0_NO2 / 1000;
-
-    DEBUG_SERIAL.print("[Sensor] R(NO2): ");
-    DEBUG_SERIAL.println(res);
-    no2 = 10 * res;
-
-    // Convert to ppm
-    /*
-    if (res < 3.0) res = 3.0;
-    if (res >= 3.0 && res < 8.0) {
-        no2 = (res - 0.5) / 0.25;
-    } else {
-        no2 = (res + 129.655) / 4.589;
-    }
-    */
+    value = map(value, VALUE_FOR_0_DEG, VALUE_FOR_90_DEG, 0.0, 90.0);
+    return value;
 
 }
 
@@ -182,20 +136,13 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("Pollution Use Case");
+    DEBUG_SERIAL.println("Toilet Paper Use Case");
 
-    // Init Sensor
-    #if defined(ARDUINO_ARCH_SAMD) 
+    // Init Higrometer
+    #if defined(ARDUINO_ARCH_SAMD)
         analogReadResolution(ANALOG_DEPTH);
     #endif
-    pinMode(RED_PIN, INPUT);
-    pinMode(NOX_PIN, INPUT);
-    pinMode(PRE_PIN, OUTPUT);
-    DEBUG_SERIAL.print("Preheating sensor... ");
-    digitalWrite(PRE_PIN, 1);
-    delay(PRE_HEAT_TIME);
-    digitalWrite(PRE_PIN, 0);
-    DEBUG_SERIAL.println("Done");
+    pinMode(POT_PIN, INPUT);
 
     // Init radio
     wizeSetup();
@@ -204,10 +151,10 @@ void setup() {
 
 void loop() {
 
-    read_MICS_4514();
+    int16_t angle = getAngle();
 
     char payload[16];
-    snprintf(payload, sizeof(payload), "%u,%u", co, no2);
+    snprintf(payload, sizeof(payload), "%d,%d", angle, angle > ANGLE_THRESHOLD ? 1 : 0);
     wizeSend(payload);
 
     sleep(SLEEP_TIME);

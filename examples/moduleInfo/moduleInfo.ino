@@ -33,52 +33,58 @@ Allwize * allwize;
 // -----------------------------------------------------------------------------
 
 #if defined(ARDUINO_AVR_UNO)
+
+    // Common
     #define RESET_PIN           7
+    #define DEBUG_SERIAL        Serial
+
+    // Using software serial:
     #define RX_PIN              8
     #define TX_PIN              9
-    #define DEBUG_SERIAL        Serial
+
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_LEONARDO
 
-/*
-#if defined(ARDUINO_AVR_LEONARDO)
+    // Common:
     #define RESET_PIN           7
-    #define RX_PIN              8
-    #define TX_PIN              9
-    SoftwareSerial SerialWize(RX_PIN, TX_PIN);
-    #define MODULE_SERIAL       SerialWize
     #define DEBUG_SERIAL        Serial
+
+    // Using hardware serial:
+    #define MODULE_SERIAL       Serial1
+
+    // Using Software serial:
+    //#define RX_PIN              8
+    //#define TX_PIN              9
+    //SoftwareSerial SerialWize(RX_PIN, TX_PIN);
+    //#define MODULE_SERIAL       SerialWize
+
 #endif // ARDUINO_AVR_LEONARDO
-*/
 
 #if defined(ARDUINO_ARCH_SAMD)
+
+    // Common:
     #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        SerialUSB
-#endif // ARDUINO_ARCH_SAMD
 
-/*
-#if defined(ARDUINO_ARCH_SAMD)
+    // Using exposed hardware serials:
+    #define MODULE_SERIAL       Serial1
 
-    //Possible combinations:
+    // Configuring additional hardware serials:
+    // Possible combinations:
     //
-    //SERCOM1:
+    // SERCOM1:
     //    RX on 10,11,12,13
     //    TX on 10,11
     //    Mode PIO_SERCOM
     //
-    //SERCOM3:
+    // SERCOM3:
     //    RX on 6,7,10,11,12,13
     //    TX on 6,10,11
     //    Mode PIO_SERCOM_ALT
     //    6-10 and 7-12 are not compatible
     //
-    //Pads:
+    // Pads:
     //    6   pad 2
     //    7   pad 3 (only RX)
     //    10  pad 2
@@ -86,37 +92,44 @@ Allwize * allwize;
     //    12  pad 3 (only RX)
     //    13  pad 1 (only RX)
 
-    #define RESET_PIN           8
-    #define RX_PIN              7
-    #define TX_PIN              6
+    /*
+    #define RX_PIN              10
+    #define TX_PIN              11
     #define SERCOM_PORT         sercom3
     #define SERCOM_HANDLER      SERCOM3_Handler
     #define SERCOM_MODE         PIO_SERCOM_ALT
-    #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
-    #define SERCOM_TX_PAD       UART_TX_PAD_2
-
+    #define SERCOM_RX_PAD       SERCOM_RX_PAD_2
+    #define SERCOM_TX_PAD       UART_TX_PAD_0
     #include "wiring_private.h" // pinPeripheral() function
     Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
     void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
-
     #define MODULE_SERIAL       SerialWize
-    #define DEBUG_SERIAL        SerialUSB
+    */
 
 #endif // ARDUINO_ARCH_SAMD
-*/
 
 #if defined(ARDUINO_ARCH_ESP8266)
+
+    // Common:
     #define RESET_PIN           14
+    #define DEBUG_SERIAL        Serial
+
+    // Using Software serial:
     #define RX_PIN              12
     #define TX_PIN              13
-    #define DEBUG_SERIAL        Serial
+
 #endif // ARDUINO_ARCH_ESP8266
 
 #if defined(ARDUINO_ARCH_ESP32)
+
+    // Common:
     #define RESET_PIN           14
+    #define DEBUG_SERIAL        Serial
+
+    // Using Hardware serial on random GPIOs:
     #define RX_PIN              12
     #define TX_PIN              13
-    #define DEBUG_SERIAL        Serial
+
 #endif // ARDUINO_ARCH_ESP32
 
 // -----------------------------------------------------------------------------
@@ -144,6 +157,37 @@ void format(const char * name, int value) {
 }
 
 // -----------------------------------------------------------------------------
+// Radio
+// -----------------------------------------------------------------------------
+
+void wizeSetup() {
+
+    DEBUG_SERIAL.println("Checking radio module");
+
+    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
+        pinPeripheral(RX_PIN, SERCOM_MODE);
+        pinPeripheral(TX_PIN, SERCOM_MODE);
+    #endif
+
+    // Create and init AllWize object
+    #if defined(MODULE_SERIAL)
+        allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
+    #else
+        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+    #endif
+
+    allwize->begin();
+
+    if (!allwize->waitForReady()) {
+        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        while (true);
+    }
+
+    DEBUG_SERIAL.println("Radio module OK");
+
+}
+
+// -----------------------------------------------------------------------------
 // Main
 // -----------------------------------------------------------------------------
 
@@ -155,24 +199,9 @@ void setup() {
     DEBUG_SERIAL.println("Allwize - Module Info");
     DEBUG_SERIAL.println();
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
+    // -------------------------------------------------------------------------
 
-    allwize->begin();
-
-    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
-        pinPeripheral(RX_PIN, SERCOM_MODE);
-        pinPeripheral(TX_PIN, SERCOM_MODE);
-    #endif
-
-    if (!allwize->waitForReady()) {
-        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
-        while (true);
-    }
+    wizeSetup();
 
     // -------------------------------------------------------------------------
 

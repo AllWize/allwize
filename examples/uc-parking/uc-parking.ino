@@ -24,38 +24,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
-    #define RESET_PIN           7
-    #define RX_PIN              8
-    #define TX_PIN              9
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_UNO
-
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
     #define DEBUG_SERIAL        SerialUSB
+    #define MODULE_SERIAL       Serial1
 #endif // ARDUINO_ARCH_SAMD
-
-#if defined(ARDUINO_ARCH_ESP8266)
-    #define RESET_PIN           14
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_ARCH_ESP8266
-
-#if defined(ARDUINO_ARCH_ESP32)
-    #define RESET_PIN           14
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_ARCH_ESP32
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -80,12 +59,15 @@ Allwize * allwize;
 
 void wizeSetup() {
 
-    // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
-    #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+    DEBUG_SERIAL.println("Checking radio module");
+
+    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
+        pinPeripheral(RX_PIN, SERCOM_MODE);
+        pinPeripheral(TX_PIN, SERCOM_MODE);
     #endif
+
+    // Create and init AllWize object
+    allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
@@ -98,15 +80,17 @@ void wizeSetup() {
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setControlInformation(WIZE_NODE_ID);
 
+    DEBUG_SERIAL.println("Radio module OK");
+
 }
 
 void wizeSend(const char * payload) {
 
-    DEBUG_SERIAL.print("[Allwize] Payload: ");
+    DEBUG_SERIAL.print("Payload: ");
     DEBUG_SERIAL.println(payload);
 
     if (!allwize->send(payload)) {
-        DEBUG_SERIAL.println("[Allwize] Error sending message");
+        DEBUG_SERIAL.println("Error sending message");
     }
 
 }
@@ -146,7 +130,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[Allwize] Parking Use Case");
+    DEBUG_SERIAL.println("Parking Use Case");
 
     // Init HC-SR04
     pinMode(TRIGGER_PIN, OUTPUT);
@@ -159,8 +143,10 @@ void setup() {
 
 void loop() {
 
-    char payload[2];
-    snprintf(payload, sizeof(payload), "%d",  getDistance() < THRESHOLD_DISTANCE ? 1 : 0);
+    uint16_t distance = getDistance();
+
+    char payload[16];
+    snprintf(payload, sizeof(payload), "%d,%d", distance, distance < THRESHOLD_DISTANCE ? 1 : 0);
     wizeSend(payload);
 
     sleep(SLEEP_TIME);
