@@ -120,7 +120,7 @@ void read_MICS_4514() {
     float volt, res;
 
     // ------------
-    // CO2 sensor
+    // CO sensor
     // ------------
 
     reading = analogRead(RED_PIN);
@@ -185,7 +185,7 @@ void setup() {
     DEBUG_SERIAL.println("Pollution Use Case");
 
     // Init Sensor
-    #if defined(ARDUINO_ARCH_SAMD) 
+    #if defined(ARDUINO_ARCH_SAMD)
         analogReadResolution(ANALOG_DEPTH);
     #endif
     pinMode(RED_PIN, INPUT);

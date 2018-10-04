@@ -85,7 +85,7 @@ void wizeSetup() {
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
-        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
@@ -93,7 +93,6 @@ void wizeSetup() {
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
-    allwize->setDataInterface(DATA_INTERFACE_CRC_START_STOP);
 
     allwize->dump(DEBUG_SERIAL);
 
@@ -101,38 +100,41 @@ void wizeSetup() {
 
 }
 
+void wizeDebugMessage(allwize_message_t message) {
+
+    // Code to pretty-print the message
+    char buffer[128];
+    snprintf(
+        buffer, sizeof(buffer),
+        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
+        message.c,
+        message.man,
+        message.address[0], message.address[1],
+        message.address[2], message.address[3],
+        message.type, message.version,
+        message.ci, message.rssi
+    );
+    DEBUG_SERIAL.print(buffer);
+
+    for (uint8_t i=0; i<message.len; i++) {
+        char ch = message.data[i];
+        snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
+        DEBUG_SERIAL.print(buffer);
+    }
+    DEBUG_SERIAL.print("}, STR: \"");
+    DEBUG_SERIAL.print((char *) message.data);
+    DEBUG_SERIAL.println("\"");
+
+}
 void wizeLoop() {
 
     if (allwize->available()) {
 
+        // Get the message
         allwize_message_t message = allwize->read();
 
-        // Code to pretty-print the message
-        char buffer[128];
-        char ascii[message.len+1];
-
-        snprintf(
-            buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
-            message.c,
-            message.man,
-            message.address[0], message.address[1],
-            message.address[2], message.address[3],
-            message.type, message.version,
-            message.ci, message.rssi
-        );
-        DEBUG_SERIAL.print(buffer);
-
-        for (uint8_t i=0; i<message.len; i++) {
-            char ch = message.data[i];
-            snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
-            DEBUG_SERIAL.print(buffer);
-            ascii[i] = (31 < ch && ch < 127) ? ch : ' ';
-        }
-        ascii[message.len] = 0;
-        DEBUG_SERIAL.print("}, STR: \"");
-        DEBUG_SERIAL.print(ascii);
-        DEBUG_SERIAL.println("\"");
+        // Show it to console
+        wizeDebugMessage(message);
 
     }
 

@@ -8,3 +8,4 @@ docs
 
 # Project files
 credentials.h
+configuration.h

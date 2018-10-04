@@ -1,15 +1,22 @@
-# Allwize - WIZE 2 MQTT Bridge
+# Allwize - WIZE 2 TheThings.IO
 
 Listens to messages on the same channel, data rate and CF and
 forwards them to an MQTT broker.
 This example is meant to run on a Wemos D1 board (ESP8266).
 
 Configuration: copy the `configuration.sample.h` file to `configuration.h` and
-edit it to configure your WiFi network credentials and the MQTT broker data.
+edit it to configure your WiFi network credentials and the TheThings.IO mapping.
 
 The payload format is very simple at the moment being just a comma separated list of values.
 The topic is configured to be a placeholder with the node identification
 (now using the message CI file) and an index for each value in the payload.
+
+The TheThings.IO mapping is encoded as a JSON document inside the code and parsed on boot.
+This document is an array of devices. Each device has the following fields:
+
+- `id` for the node id, currently using the CI field
+- `token` for the thing token in TheThings.io
+- `keys` is an array of keys that will be mapped to values in the message payload
 
 Always remember to connect the antenna before powering the board!
 

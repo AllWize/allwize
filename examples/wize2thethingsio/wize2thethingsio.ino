@@ -1,9 +1,9 @@
 /*
 
-Allwize - WIZE 2 MQTT Bridge
+Allwize - WIZE 2 TheThings.io
 
 Listens to messages on the same channel, data rate and CF and
-forwards them to an MQTT broker.
+forwards them to TheThings.io.
 This example is meant to run on a Wemos D1 board (ESP8266).
 
 Copyright (C) 2018 by Allwize <github@allwize.io>
@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <ESP8266WiFi.h>
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
+#include <vector>
+#include <ArduinoJson.h>
 #include "configuration.h"
 
 // -----------------------------------------------------------------------------
@@ -43,6 +45,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AsyncMqttClient mqtt;
 Ticker mqttTimer;
+
+typedef struct {
+    unsigned char id;
+    char * token;
+    std::vector<const char *> keys;
+} node_config_t;
+std::vector<node_config_t> _config;
 
 WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
@@ -90,6 +99,105 @@ void mqttSetup() {
             mqtt.setCredentials(MQTT_USER, MQTT_PASS);
         }
     #endif
+}
+
+// -----------------------------------------------------------------------------
+// TheThings.io
+// -----------------------------------------------------------------------------
+
+void ttioSetup() {
+
+    // read configuration
+    DynamicJsonBuffer jsonBuffer;
+    JsonArray& config = jsonBuffer.parseArray(THETHINGSIO_CONFIG);
+    if (!config.success()) {
+        DEBUG_SERIAL.println("[TTIO] Error parsing the configuration file!");
+        while (true);
+    }
+
+    // Parse array of objects
+    for (JsonObject& element : config) {
+
+        // Test node integrity
+        if (!element.containsKey("id") || !element.containsKey("token") || !element.containsKey("keys")) {
+            DEBUG_SERIAL.printf("[TTIO] Missing key for node %d\n", _config.size());
+            while (true);
+        }
+
+        node_config_t node;
+        node.id = element.get<unsigned char>("id");
+        node.token = strdup(element.get<const char *>("token"));
+        JsonArray& keys = element["keys"];
+        for (JsonVariant& key : keys) {
+            node.keys.push_back(strdup(key.as<const char *>()));
+        }
+        _config.push_back(node);
+    }
+
+    DEBUG_SERIAL.printf("[TTIO] %d node(s) parsed\n", _config.size());
+
+}
+
+char ttioGet(unsigned char node_id) {
+    for (unsigned char i=0; i<_config.size(); i++) {
+        if (node_id == _config[i].id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool ttioSend(allwize_message_t message) {
+
+    if (!mqtt.connected()) return false;
+
+    // We are using the CI field as node_id
+    char index = ttioGet(message.ci);
+    if (-1 == index) {
+        DEBUG_SERIAL.printf("[TTIO] No map for node_id %d\n", message.ci);
+        return false;
+    }
+    node_config_t node = _config[index];
+    unsigned char key_count = node.keys.size();
+
+    // Build topic string
+    char topic[64];
+    snprintf(topic, sizeof(topic), MQTT_TOPIC, node.token);
+
+    // Build payload structure
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    JsonArray& values = root.createNestedArray("values");
+
+    // Parse payload
+    char * value;
+    unsigned char count = 0;
+    value = strtok((char *) message.data, ",");
+    while (NULL != value) {
+
+        // check if there is a key for this value
+        if (count == key_count) break;
+
+        // Assign the value to the key
+        JsonObject& line = values.createNestedObject();
+        line["key"] = node.keys[count];
+        line["value"] = value;
+
+        // Get new value
+        value = strtok (NULL, ",");
+
+        // Update counter
+        ++count;
+
+    }
+
+    // Publish message
+    String output;
+    root.printTo(output);
+    mqttSend(topic, output.c_str());
+
+    return true;
+
 }
 
 // -----------------------------------------------------------------------------
@@ -153,36 +261,8 @@ void wizeLoop() {
         // Show it to console
         wizeDebugMessage(message);
 
-        // Sending message via MQTT
-        if (mqtt.connected()) {
-
-            // Init field counter
-            uint8_t field = 1;
-            char buffer[64];
-
-            // Parse a comma-separated payload
-            char * payload;
-            payload = strtok((char *) message.data, ",");
-
-            // While there is a field
-            while (NULL != payload) {
-
-                // Build topic string with CI and field number
-                char topic[32];
-                snprintf(topic, sizeof(topic), MQTT_TOPIC, message.ci, field);
-
-                // Publish message
-                snprintf(buffer, sizeof(buffer), "[WIZE] MQTT message: %s => %s\n", topic, payload);
-                DEBUG_SERIAL.print(buffer);
-                mqtt.publish(topic, MQTT_QOS, MQTT_RETAIN, payload);
-
-                // Get new token and update field counter
-                payload = strtok (NULL, ",");
-                field++;
-
-            }
-
-        }
+        // Send message to TheThings.io
+        ttioSend(message);
 
     }
 
@@ -223,10 +303,11 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[MAIN] Wize 2 MQTT bridge");
+    DEBUG_SERIAL.println("[MAIN] Wize 2 TheThings.io bridge");
     DEBUG_SERIAL.println();
 
     mqttSetup();
+    ttioSetup();
     wifiSetup();
     wizeSetup();
 
