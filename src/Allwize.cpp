@@ -302,45 +302,14 @@ bool Allwize::send(uint8_t * buffer, uint8_t len) {
     if (_config) return false;
     if (0 == len) return (1 == _send(0xFE));
 
-    if (_encrypt) {
+    // length
+    if (1 != _send(len+1)) return false;
 
-        // length
-        if (1 != _send(len+7)) return false;
+    // CI
+    if (1 != _send(_ci)) return false;
 
-        // CI
-        if (1 != _send(_ci)) return false;
-
-        // access number
-        if (1 != _send(_access_number)) return false;
-
-        // status
-        if (1 != _send(0x00)) return false;
-
-        // configuration word
-        if (1 != _send(0x00)) return false;
-
-        // signature field
-        if (1 != _send(0x05)) return false;
-
-        // 2F pad
-        if (1 != _send(0x2F)) return false;
-        if (1 != _send(0x2F)) return false;
-
-        // payload
-        if (len != _send(buffer, len)) return false;
-
-    } else {
-
-        // length
-        if (1 != _send(len+1)) return false;
-
-        // CI
-        if (1 != _send(_ci)) return false;
-
-        // payload
-        if (len != _send(buffer, len)) return false;
-
-    }
+    // payload
+    if (len != _send(buffer, len)) return false;
 
     _access_number++;
     return true;
