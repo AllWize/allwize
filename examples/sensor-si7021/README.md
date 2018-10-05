@@ -7,10 +7,10 @@ If you are using the Allwize K1 you must set the sensor power jumper to 3V3 and
 connect your sensor to the I2C grove connector (the one closer to the barrel jack).
 Remember that Grove I2C sensor use the following color convention:
 
-  * Black - Negative / Ground
-  * Red - Positive / Power / 3V3 / 5V
-  * White - SDA / DA
-  * Yellow - SCL / CL
+* Black - Negative / Ground
+* Red - Positive / Power / 3V3 / 5V
+* White - SDA / DA
+* Yellow - SCL / CL
 
 Always remember to connect the antenna before powering the board!
 

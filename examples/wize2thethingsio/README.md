@@ -14,9 +14,9 @@ The topic is configured to be a placeholder with the node identification
 The TheThings.IO mapping is encoded as a JSON document inside the code and parsed on boot.
 This document is an array of devices. Each device has the following fields:
 
-  * `id` for the node id, currently using the CI field
-  * `token` for the thing token in TheThings.io
-  * `keys` is an array of keys that will be mapped to values in the message payload
+* `id` for the node id, currently using the CI field
+* `token` for the thing token in TheThings.io
+* `keys` is an array of keys that will be mapped to values in the message payload
 
 Always remember to connect the antenna before powering the board!
 

@@ -12,14 +12,14 @@ Library to interface a Wize radio module
 
 Compatible radios:
 
-  * RadioCrafts RC1701HP-OSP (Ondeo version)
-  * RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
+* RadioCrafts RC1701HP-OSP (Ondeo version)
+* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
 
 Compatible platforms:
 
-  * AVR (Arduino Uno, Arduino Leonardo)
-  * SAMD21 (Arduino Zero, Arduino MKR family)
-  * ESP8266
+* AVR (Arduino Uno, Arduino Leonardo)
+* SAMD21 (Arduino Zero, Arduino MKR family)
+* ESP8266
 
 ## License
 
