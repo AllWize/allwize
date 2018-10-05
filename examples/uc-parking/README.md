@@ -5,7 +5,7 @@ If there is something closer than 200mm (defined in the THRESHOLD_DISTANCE setti
 a 1, otherwise it sends a 0. The measure is taken every SLEEP_TIME milliseconds.
 
 The HC-SR04 is a 5V digital sensor.
-If you are using the Allwize K1 you must set the sensor power jumper to 5V and
+If you are using the AllWize K1 you must set the sensor power jumper to 5V and
 connect your sensor to the digital grove connector (the one closer to the USB connector).
 The connect the white cable to the ECHO pin and the yellow one to the TRIG pin
 in the HC-SR04.

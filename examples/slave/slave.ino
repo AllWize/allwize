@@ -1,10 +1,10 @@
 /*
 
-Allwize - Simple Slave Example
+AllWize - Simple Slave Example
 
 Simple slave that sends an auto-increment number every 5 seconds.
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -68,19 +68,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_NODE_ID            0x46
 
 // -----------------------------------------------------------------------------
-// Allwize
+// AllWize
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 void wizeSetup() {
 
     // Create and init AllWize object
     #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
@@ -98,11 +98,11 @@ void wizeSetup() {
 
 void wizeSend(const char * payload) {
 
-    DEBUG_SERIAL.print("[Allwize] Payload: ");
+    DEBUG_SERIAL.print("[AllWize] Payload: ");
     DEBUG_SERIAL.println(payload);
 
     if (!allwize->send(payload)) {
-        DEBUG_SERIAL.println("[Allwize] Error sending message");
+        DEBUG_SERIAL.println("[AllWize] Error sending message");
     }
 
 }
@@ -117,7 +117,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[Allwize] Basic slave example");
+    DEBUG_SERIAL.println("[AllWize] Basic slave example");
 
     // Init radio
     wizeSetup();

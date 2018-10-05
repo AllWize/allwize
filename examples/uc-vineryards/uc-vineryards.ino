@@ -1,9 +1,9 @@
 /*
 
-Allwize - Vineyard Case
+AllWize - Vineyard Case
 Using an analog higrometer and a SI7021 temp & hum sensor
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,11 +54,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ANALOG_MAX          ((1 << ANALOG_DEPTH) - 1)
 
 // -----------------------------------------------------------------------------
-// Allwize
+// AllWize
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 void wizeSetup() {
 
@@ -70,7 +70,7 @@ void wizeSetup() {
     #endif
 
     // Create and init AllWize object
-    allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
+    allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");

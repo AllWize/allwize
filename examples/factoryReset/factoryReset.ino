@@ -1,10 +1,10 @@
 /*
 
-Allwize - Returns the module to factory settings
+AllWize - Returns the module to factory settings
 
 Resets the module non-volatile memory to factory settings.
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -62,8 +62,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Config & globals
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 // -----------------------------------------------------------------------------
 // Main
@@ -74,14 +74,14 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("Allwize - Factory reset");
+    DEBUG_SERIAL.println("AllWize - Factory reset");
     DEBUG_SERIAL.println();
 
     // Create and init AllWize object
     #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {

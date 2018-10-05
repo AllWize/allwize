@@ -12,7 +12,7 @@ it still has an analog out.
 To calibrate the sensor immerse it in water and check the analog value
 (see the getHumidity method in the code). Then set HIGROMETER_MIN to that value.
 
-If you are using the Allwize K1 you must set the sensor power jumper to the nominal value of
+If you are using the AllWize K1 you must set the sensor power jumper to the nominal value of
 the board you are using (5V for Uno/Leonardo, 3V3 almost anywhere else) and
 connect your sensor to the analog grove connector (the middle one).
 Check that the yellow cable goes to the analog output of the sensor (sometimes labeled A0).

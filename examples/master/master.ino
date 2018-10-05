@@ -1,11 +1,11 @@
 /*
 
-Allwize - Simple Master example
+AllWize - Simple Master example
 
 Listens to messages on the same channel, data rate and CF and
 prints them out via the serial monitor.
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -72,16 +72,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Wize
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 void wizeSetup() {
 
     // Create and init AllWize object
     #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {

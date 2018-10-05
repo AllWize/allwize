@@ -1,10 +1,10 @@
 /*
 
-Allwize - Module Info Example
+AllWize - Module Info Example
 
 Pretty-prints out the configuration settings stored in the module non-volatile memory.
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Config & globals
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -171,9 +171,9 @@ void wizeSetup() {
 
     // Create and init AllWize object
     #if defined(MODULE_SERIAL)
-        allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
 
     allwize->begin();
@@ -196,7 +196,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("Allwize - Module Info");
+    DEBUG_SERIAL.println("AllWize - Module Info");
     DEBUG_SERIAL.println();
 
     // -------------------------------------------------------------------------

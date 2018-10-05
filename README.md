@@ -1,25 +1,26 @@
 # AllWize
 
-Library to interface a Wize radio module
+Arduino-compatible library to interface a **RC1701HP-OSP/WIZE radio module**.
 
-[![version](https://img.shields.io/badge/version-0.2.1-brightgreen.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)](CHANGELOG.md)
 [![travis](https://travis-ci.com/AllWize/allwize.svg?branch=master)](https://travis-ci.com/AllWize/allwize)
 [![codacy](https://api.codacy.com/project/badge/Grade/5b0345d3b4994a1eb2e51f02fa9a5d22)](https://www.codacy.com/app/AllWize/allwize)
-[![license](https://img.shields.io/github/license/Allwize/allwize.svg)](LICENSE)
+[![license](https://img.shields.io/github/license/AllWize/allwize.svg)](LICENSE)
 
 [![web](https://img.shields.io/badge/web-http%3A%2F%2Fallwize.io-yellowgreen.svg)](LICENSE)
 [![twitter](https://img.shields.io/twitter/follow/allwize_iot.svg?style=social)](https://twitter.com/intent/follow?screen_name=allwize_iot)
 
 Compatible radios:
 
-* RadioCrafts RC1701HP-OSP (Ondeo version)
-* RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
+*   RadioCrafts RC1701HP-OSP (Ondeo version)
+*   RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
 
 Compatible platforms:
 
-* AVR (Arduino Uno, Arduino Leonardo)
-* SAMD21 (Arduino Zero, Arduino MKR family)
-* ESP8266
+*   AVR (Arduino Uno, Arduino Leonardo)
+*   SAMD21 (Arduino Zero, Arduino MKR family)
+*   ESP8266
+*   ESP32
 
 ## License
 

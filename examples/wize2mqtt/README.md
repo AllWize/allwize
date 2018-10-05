@@ -1,4 +1,4 @@
-# Allwize - WIZE 2 MQTT Bridge
+# AllWize - WIZE 2 MQTT Bridge
 
 Listens to messages on the same channel, data rate and CF and
 forwards them to an MQTT broker.

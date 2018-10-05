@@ -1,16 +1,16 @@
-# Allwize - SI7021/HTU21C Slave Example
+# AllWize - SI7021/HTU21C Slave Example
 
 Shows how to use an SI7021 or HTU21C sensor (temperature & humidity) to send environmental data.
 
 The SI7021 is a I2C sensor that must be powered with 3V3.
-If you are using the Allwize K1 you must set the sensor power jumper to 3V3 and
+If you are using the AllWize K1 you must set the sensor power jumper to 3V3 and
 connect your sensor to the I2C grove connector (the one closer to the barrel jack).
 Remember that Grove I2C sensor use the following color convention:
 
-* Black - Negative / Ground
-* Red - Positive / Power / 3V3 / 5V
-* White - SDA / DA
-* Yellow - SCL / CL
+*   Black - Negative / Ground
+*   Red - Positive / Power / 3V3 / 5V
+*   White - SDA / DA
+*   Yellow - SCL / CL
 
 Always remember to connect the antenna before powering the board!
 

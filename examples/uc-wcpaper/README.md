@@ -5,7 +5,7 @@ the angle of a lever lying over the paper roll. If the angle is greater than a
 certain threshold an alarm should be trigger to notify **someone** that we are
 about to run out of paper.
 
-If you are using the Allwize K1 you must set the sensor power jumper to the nominal value of
+If you are using the AllWize K1 you must set the sensor power jumper to the nominal value of
 the board you are using (5V for Uno/Leonardo, 3V3 almost anywhere else) and
 connect your potentiometer to the analog grove connector (the middle one).
 Check that the yellow cable goes to the center pin of the pot.

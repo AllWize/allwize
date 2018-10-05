@@ -4,21 +4,28 @@
     "description": "Library to interface a Wize radio module",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Allwize/allwize"
+        "url": "https://github.com/AllWize/allwize"
     },
-    "version": "0.2.1",
+    "version": "1.0.0",
     "license": "LGPL-3.0",
     "exclude": "tests",
     "frameworks": "arduino",
     "platforms": ["atmelavr", "atmelsam", "espressif8266", "espressif32"],
     "dependencies": [
     ],
-    "authors": {
-        "name": "AllWize",
-        "email": "github@allwize.io",
-        "url": "http://allwize.io",
-        "maintainer": true
-    },
+    "authors": [
+        {
+            "name": "Marc Fàbregas",
+            "email": "marc@allwize.io",
+            "url": "http://allwize.io",
+        },
+        {
+            "name": "Xose Pérez",
+            "email": "xose@allwize.io",
+            "url": "http://allwize.io",
+            "maintainer": true
+        }
+    ],
     "examples": [
         "examples/*/*.ino"
     ]
