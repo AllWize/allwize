@@ -1,6 +1,6 @@
 # AllWize
 
-Arduino-compatible library to interface a **RC1701HP-OSP/WIZE radio module**.
+Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 
 [![version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)](CHANGELOG.md)
 [![travis](https://travis-ci.com/AllWize/allwize.svg?branch=master)](https://travis-ci.com/AllWize/allwize)

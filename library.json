@@ -1,7 +1,7 @@
 {
     "name": "AllWize",
-    "keywords": "wize,radio,radiocrafts",
-    "description": "Library to interface a Wize radio module",
+    "keywords": "wize,radio,radiocrafts,wmbus4",
+    "description": "Arduino-compatible library to interface RC1701HP-OSP/WIZE radio modules",
     "repository": {
         "type": "git",
         "url": "https://github.com/AllWize/allwize"
@@ -14,11 +14,6 @@
     "dependencies": [
     ],
     "authors": [
-        {
-            "name": "Marc Fàbregas",
-            "email": "marc@allwize.io",
-            "url": "http://allwize.io",
-        },
         {
             "name": "Xose Pérez",
             "email": "xose@allwize.io",
