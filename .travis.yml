@@ -11,4 +11,4 @@ script:
     - pushd examples/master && pio run && popd
     - pushd examples/moduleInfo && pio run && popd
     - pushd examples/slave && pio run && popd
-    - pushd examples/wize2mqtt && pio run && popd
+    - pushd examples/wize2mqtt && cp configuration.sample.h confirguration.h && pio run && popd
