@@ -566,7 +566,7 @@ uint8_t Allwize::getLEDControl() {
  * @param               Value from 0x00 to 0x0C
  */
 void Allwize::setDataInterface(uint8_t value) {
-    if (0 <= value && value <= 0x0C) {
+    if (value <= 0x0C) {
         _setMemory(MEM_DATA_INTERFACE, value);
         _data_interface = value;
     }
@@ -604,7 +604,7 @@ uint8_t Allwize::getControlField() {
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void Allwize::setInstallMode(uint8_t mode, bool persist) {
-    if (0 <= mode && mode <= 2) {
+    if (mode <= 2) {
         if (persist) _setMemory(MEM_INSTALL_MODE, mode);
         _sendCommand(CMD_INSTALL_MODE, mode);
     }

@@ -116,7 +116,7 @@ void i2cScan() {
 // Formatting
 // -----------------------------------------------------------------------------
 
-char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 
     bool negative = value < 0;
 

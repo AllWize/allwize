@@ -116,7 +116,7 @@ void i2cScan() {
 // Formatting
 // -----------------------------------------------------------------------------
 
-char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 
     bool negative = value < 0;
 
@@ -212,7 +212,7 @@ void loop() {
     snfloat(t_s, sizeof(t_s), 1, t_n);
 
     char payload[20];
-    snprintf(payload, sizeof(payload), "%s,%u,%lu", t_s, h_n, p_n);
+    snprintf(payload, sizeof(payload), "%s,%u,%u", t_s, h_n, p_n);
 
     wizeSend(payload);
 

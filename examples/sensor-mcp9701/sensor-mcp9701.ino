@@ -60,7 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Formatting
 // -----------------------------------------------------------------------------
 
-char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 
     bool negative = value < 0;
 
