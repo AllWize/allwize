@@ -396,7 +396,7 @@ uint8_t AllWize::getControlInformation() {
 void AllWize::setChannel(uint8_t channel, bool persist) {
     if (persist) {
         _setMemory(MEM_CHANNEL, channel);
-    }s
+    }
     _sendCommand(CMD_CHANNEL, channel);
 }
 
