@@ -337,7 +337,6 @@ bool AllWize::available() {
     if (!_config) {
 
         static uint32_t when = millis();
-        pointer = 0;
         
         while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
             uint8_t ch = _stream->read();
