@@ -337,8 +337,8 @@ bool AllWize::available() {
     if (!_config) {
 
         static uint32_t when = millis();
-
-        while (_stream->available()) {
+        
+        while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
             uint8_t ch = _stream->read();
             _buffer[_pointer++] = ch;
             when = millis();
@@ -393,7 +393,9 @@ uint8_t AllWize::getControlInformation() {
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void AllWize::setChannel(uint8_t channel, bool persist) {
-    if (persist) _setMemory(MEM_CHANNEL, channel);
+    if (persist) {
+        _setMemory(MEM_CHANNEL, channel);
+    }
     _sendCommand(CMD_CHANNEL, channel);
 }
 
@@ -412,7 +414,9 @@ uint8_t AllWize::getChannel() {
  */
 void AllWize::setPower(uint8_t power, bool persist) {
     if (0 < power && power < 6) {
-        if (persist) _setMemory(MEM_RF_POWER, power);
+        if (persist) {
+            _setMemory(MEM_RF_POWER, power);
+        }
         _sendCommand(CMD_RF_POWER, power);
     }
 }
@@ -449,7 +453,9 @@ uint8_t AllWize::getDataRate() {
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void AllWize::setMBusMode(uint8_t mode, bool persist) {
-    if (persist) _setMemory(MEM_MBUS_MODE, mode);
+    if (persist) {
+        _setMemory(MEM_MBUS_MODE, mode);
+    }
     _sendCommand(CMD_MBUS_MODE, mode);
     _mbus_mode = mode;
 }
@@ -483,7 +489,11 @@ uint8_t AllWize::getSleepMode() {
  * @param value         Set to true to append RSSI value to received data
  */
 void AllWize::setAppendRSSI(bool value) {
-    _setMemory(MEM_RSSI_MODE, value ? 1 : 0);
+    if (value == 1) {
+        _setMemory(MEM_RSSI_MODE, 1);
+    } else {
+        _setMemory(MEM_RSSI_MODE, 0);
+    }
     _append_rssi = value;
 }
 
@@ -586,7 +596,9 @@ uint8_t AllWize::getDataInterface() {
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void AllWize::setControlField(uint8_t value, bool persist) {
-    if (persist) _setMemory(MEM_CONTROL_FIELD, value);
+    if (persist) {
+        _setMemory(MEM_CONTROL_FIELD, value);
+    }
     _sendCommand(CMD_CONTROL_FIELD, value);
 }
 
@@ -605,7 +617,9 @@ uint8_t AllWize::getControlField() {
  */
 void AllWize::setInstallMode(uint8_t mode, bool persist) {
     if (mode <= 2) {
-        if (persist) _setMemory(MEM_INSTALL_MODE, mode);
+        if (persist) {
+            _setMemory(MEM_INSTALL_MODE, mode);
+        }
         _sendCommand(CMD_INSTALL_MODE, mode);
     }
 }
@@ -704,8 +718,15 @@ float AllWize::getRSSI() {
  */
 uint8_t AllWize::getTemperature() {
     uint8_t response = _sendCommand(CMD_TEMPERATURE);
-    if (response > 0) return (_buffer[0] - 128);
-    return 0;
+    uint8_t ret_val = 0;
+
+    if (response > 0) {
+        ret_val = _buffer[0] - 128;
+    } else {
+        ret_val = 0;
+    }
+    
+    return ret_val;
 }
 
 /**
@@ -714,8 +735,14 @@ uint8_t AllWize::getTemperature() {
  */
 uint16_t AllWize::getVoltage() {
     uint8_t response = _sendCommand(CMD_VOLTAGE);
-    if (response > 0) return 30 * _buffer[0];
-    return 0;
+    uint16_t ret_val;
+    if (response > 0) {
+        ret_val = 30 * _buffer[0];
+    } else {
+        ret_val = 0;
+    }
+    
+    return ret_val;
 }
 
 /**
