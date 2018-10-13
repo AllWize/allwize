@@ -39,10 +39,10 @@ Configuration file
 // MQTT configuration
 //------------------------------------------------------------------------------
 
-#define MQTT_HOST               "io.adafruit.com"
+#define MQTT_HOST               "192.168.2.2"
 #define MQTT_PORT               1883
-#define MQTT_USER               "..."
-#define MQTT_PASS               "..."
+#define MQTT_USER               ""
+#define MQTT_PASS               ""
 #define MQTT_QOS                2
 #define MQTT_RETAIN             0
-#define MQTT_TOPIC              ".../f/node_%u-field_%u"    // CI, field#
+#define MQTT_TOPIC              "team/%u/field_%u"    // CI, field#

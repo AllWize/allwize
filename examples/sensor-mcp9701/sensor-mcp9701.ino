@@ -48,10 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Configuration
 // -----------------------------------------------------------------------------
 
-#define WIZE_CHANNEL        CHANNEL_04
+#define WIZE_CHANNEL        CHANNEL_11
 #define WIZE_POWER          POWER_20dBm
 #define WIZE_DATARATE       DATARATE_2400bps
-#define WIZE_NODE_ID        0x08
+#define WIZE_NODE_ID        0x0A
 
 #define TEMPERATURE_PIN     A2
 #define TEMPERATURE_SAMPLES 10
