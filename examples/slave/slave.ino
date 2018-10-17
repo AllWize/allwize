@@ -89,7 +89,7 @@ void wizeSetup() {
     }
 
     allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL);
+    allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setControlInformation(WIZE_NODE_ID);
