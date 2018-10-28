@@ -119,13 +119,13 @@ void i2cScan() {
 char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 
     bool negative = value < 0;
+    if (negative) value = -value;
 
     uint32_t mul = 1;
     for (uint8_t i=0; i<decimals; i++) mul *= 10;
 
-    value = abs(value);
     uint32_t value_int = int(value);
-    uint32_t value_dec = int((value - value_int) * mul);
+    uint32_t value_dec = int(mul * (value - value_int));
 
     char format[20];
     snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
@@ -212,7 +212,7 @@ void loop() {
     snfloat(t_s, sizeof(t_s), 1, t_n);
 
     char payload[20];
-    snprintf(payload, sizeof(payload), "%s,%u,%u", t_s, h_n, p_n);
+    snprintf(payload, sizeof(payload), "%s,%u,%lu", t_s, h_n, p_n);
 
     wizeSend(payload);
 
