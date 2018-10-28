@@ -1,6 +1,7 @@
-# AllWize - MH-Z16 CO2 Sensor Example
+# AllWize - Aire quality use case
 
-This example uses the MH-Z16 sensor PWM output to get the CO2 PPM from the sensor. 
+This example uses the MH-Z16 sensor PWM output to get the CO2 PPM from the sensor,
+and a BME280 I2C sensor for temperature, humidity and pressure.
 
 Always remember to connect the antenna before powering the board!
 
