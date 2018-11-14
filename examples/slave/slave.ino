@@ -84,7 +84,7 @@ void wizeSetup() {
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
-        DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
+        DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
@@ -94,15 +94,21 @@ void wizeSetup() {
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setControlInformation(WIZE_NODE_ID);
 
+    DEBUG_SERIAL.println("[WIZE] Ready...");
+
 }
 
 void wizeSend(const char * payload) {
 
-    DEBUG_SERIAL.print("[AllWize] Payload: ");
-    DEBUG_SERIAL.println(payload);
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer),
+        "[WIZE] CH: %d, TX: %d, DR: %d, Payload: %s\n",
+        allwize->getChannel(), allwize->getPower(), allwize->getDataRate(), payload
+    );
+    DEBUG_SERIAL.print(buffer);
 
     if (!allwize->send(payload)) {
-        DEBUG_SERIAL.println("[AllWize] Error sending message");
+        DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
 }
@@ -117,7 +123,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[AllWize] Basic slave example");
+    DEBUG_SERIAL.println("[MAIN] Basic slave example");
 
     // Init radio
     wizeSetup();

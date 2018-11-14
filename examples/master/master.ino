@@ -66,7 +66,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
-#define WIZE_NETWORK_ID         0x46
 
 // -----------------------------------------------------------------------------
 // Wize
@@ -94,9 +93,11 @@ void wizeSetup() {
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
 
-    allwize->dump(DEBUG_SERIAL);
+    //allwize->dump(DEBUG_SERIAL);
 
-    DEBUG_SERIAL.println("[WIZE] Listening...");
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize->getChannel(), allwize->getDataRate());
+    DEBUG_SERIAL.print(buffer);
 
 }
 
@@ -106,13 +107,13 @@ void wizeDebugMessage(allwize_message_t message) {
     char buffer[128];
     snprintf(
         buffer, sizeof(buffer),
-        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
+        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: %d, DATA: { ",
         message.c,
         message.man,
         message.address[0], message.address[1],
         message.address[2], message.address[3],
         message.type, message.version,
-        message.ci, message.rssi
+        message.ci, (int16_t) message.rssi / -2
     );
     DEBUG_SERIAL.print(buffer);
 
@@ -126,6 +127,7 @@ void wizeDebugMessage(allwize_message_t message) {
     DEBUG_SERIAL.println("\"");
 
 }
+
 void wizeLoop() {
 
     if (allwize->available()) {
