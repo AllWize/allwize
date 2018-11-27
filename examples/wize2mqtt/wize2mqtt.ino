@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #error "This example is meant to run on an ESP8266 board!"
 #endif
 
+#include "SoftwareSerial.h"
 #include "AllWize.h"
 #include <ESP8266WiFi.h>
 #include <AsyncMqttClient.h>
