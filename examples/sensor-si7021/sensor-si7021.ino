@@ -1,11 +1,11 @@
 /*
 
-Allwize - SI7021/HTU21C Slave Example
+AllWize - SI7021/HTU21C Slave Example
 
 Shows how to use an SI7021 or HTU21C sensor (temperature & humidity)
 to send environmental data.
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -116,16 +116,16 @@ void i2cScan() {
 // Formatting
 // -----------------------------------------------------------------------------
 
-char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 
     bool negative = value < 0;
+    if (negative) value = -value;
 
     uint32_t mul = 1;
     for (uint8_t i=0; i<decimals; i++) mul *= 10;
 
-    value = abs(value);
     uint32_t value_int = int(value);
-    uint32_t value_dec = int((value - value_int) * mul);
+    uint32_t value_dec = int(mul * (value - value_int));
 
     char format[20];
     snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
@@ -136,19 +136,19 @@ char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
 }
 
 // -----------------------------------------------------------------------------
-// Allwize
+// AllWize
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 void wizeSetup() {
 
     // Create and init AllWize object
     #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
@@ -166,11 +166,11 @@ void wizeSetup() {
 
 void wizeSend(const char * payload) {
 
-    DEBUG_SERIAL.print("[Allwize] Payload: ");
+    DEBUG_SERIAL.print("[AllWize] Payload: ");
     DEBUG_SERIAL.println(payload);
 
     if (!allwize->send(payload)) {
-        DEBUG_SERIAL.println("[Allwize] Error sending message");
+        DEBUG_SERIAL.println("[AllWize] Error sending message");
     }
 
 }
@@ -185,7 +185,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[Allwize] SI7021 sensor example");
+    DEBUG_SERIAL.println("[AllWize] SI7021 sensor example");
 
     delay(100);
     i2cScan();

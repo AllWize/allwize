@@ -1,10 +1,10 @@
 /*
 
-Allwize - MCP9701 Thermistor Slave Example
+AllWize - MCP9701 Thermistor Slave Example
 
 Sends the data for the built-in MCP9701 thermistor in the AllWize K1.
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,10 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Configuration
 // -----------------------------------------------------------------------------
 
-#define WIZE_CHANNEL        CHANNEL_04
+#define WIZE_CHANNEL        CHANNEL_11
 #define WIZE_POWER          POWER_20dBm
 #define WIZE_DATARATE       DATARATE_2400bps
-#define WIZE_NODE_ID        0x08
+#define WIZE_NODE_ID        0x0A
 
 #define TEMPERATURE_PIN     A2
 #define TEMPERATURE_SAMPLES 10
@@ -60,16 +60,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Formatting
 // -----------------------------------------------------------------------------
 
-char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
+char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 
     bool negative = value < 0;
+    if (negative) value = -value;
 
     uint32_t mul = 1;
     for (uint8_t i=0; i<decimals; i++) mul *= 10;
 
-    value = abs(value);
     uint32_t value_int = int(value);
-    uint32_t value_dec = int((value - value_int) * mul);
+    uint32_t value_dec = int(mul * (value - value_int));
 
     char format[20];
     snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
@@ -80,19 +80,19 @@ char * snfloat(char * buffer, size_t len, size_t decimals, float value) {
 }
 
 // -----------------------------------------------------------------------------
-// Allwize
+// AllWize
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 void wizeSetup() {
 
     // Create and init AllWize object
     #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
@@ -110,11 +110,11 @@ void wizeSetup() {
 
 void wizeSend(const char * payload) {
 
-    DEBUG_SERIAL.print("[Allwize] Payload: ");
+    DEBUG_SERIAL.print("[AllWize] Payload: ");
     DEBUG_SERIAL.println(payload);
 
     if (!allwize->send(payload)) {
-        DEBUG_SERIAL.println("[Allwize] Error sending message");
+        DEBUG_SERIAL.println("[AllWize] Error sending message");
     }
 
 }
@@ -174,7 +174,7 @@ void setup() {
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[Allwize] MCP9701 sensor example");
+    DEBUG_SERIAL.println("[AllWize] MCP9701 sensor example");
 
     // Init temperature pin
     pinMode(TEMPERATURE_PIN, INPUT);

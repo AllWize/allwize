@@ -1,12 +1,12 @@
 /*
 
-Allwize - WIZE 2 MQTT Bridge
+AllWize - WIZE 2 MQTT Bridge
 
 Listens to messages on the same channel, data rate and CF and
 forwards them to an MQTT broker.
 This example is meant to run on a Wemos D1 board (ESP8266).
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #error "This example is meant to run on an ESP8266 board!"
 #endif
 
-#include "Allwize.h"
+#include "SoftwareSerial.h"
+#include "AllWize.h"
 #include <ESP8266WiFi.h>
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
@@ -48,7 +49,7 @@ WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
 Ticker wifiTimer;
 
-Allwize * allwize;
+AllWize * allwize;
 
 // -----------------------------------------------------------------------------
 // MQTT
@@ -98,7 +99,7 @@ void mqttSetup() {
 
 void wizeSetup() {
 
-    allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+    allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");

@@ -3,20 +3,20 @@
 Shows how to use a BME280 sensor (temperature, humidity & pressure) to send environmental data.
 
 The BME280 is a I2C sensor that must be powered with 3V3.
-If you are using the Allwize K1 you must set the sensor power jumper to 3V3 and
+If you are using the AllWize K1 you must set the sensor power jumper to 3V3 and
 connect your sensor to the I2C grove connector (the one closer to the barrel jack).
 Remember that Grove I2C sensor use the following color convention:
 
-* Black - Negative / Ground
-* Red - Positive / Power / 3V3 / 5V
-* White - SDA / DA
-* Yellow - SCL / CL
+*   Black - Negative / Ground
+*   Red - Positive / Power / 3V3 / 5V
+*   White - SDA / DA
+*   Yellow - SCL / CL
 
 Always remember to connect the antenna before powering the board!
 
 ## License
 
-Copyright (C) 2018 by AllWize (http://allwize.io)
+Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

@@ -1,20 +1,14 @@
-language: generic
-env:
-  global:
-    - IDE_VERSION=1.8.5
-  matrix:
-    - BOARD="arduino:samd:mkrzero"
-before_install:
-  - wget http://downloads.arduino.cc/arduino-$IDE_VERSION-linux64.tar.xz
-  - tar xf arduino-$IDE_VERSION-linux64.tar.xz
-  - mv arduino-$IDE_VERSION $HOME/arduino-ide
-  - export PATH=$PATH:$HOME/arduino-ide
-  - if [[ "$BOARD" =~ "arduino:samd:" ]]; then
-      arduino --install-boards arduino:samd;
-    fi
-  - buildExampleSketch() { arduino --verbose-build --verify --board $BOARD $PWD/examples/$1/$1.ino; }
+language: python
+python:
+    - '2.7'
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
 install:
-  - mkdir -p $HOME/Arduino/libraries
-  - ln -s $PWD $HOME/Arduino/libraries/.
+    - pip install -U platformio
 script:
-  - #buildExampleSketch helloWorld
+    - pushd examples/master && pio run && popd
+    - pushd examples/moduleInfo && pio run && popd
+    - pushd examples/slave && pio run && popd
+    - pushd examples/wize2mqtt && cp configuration.sample.h configuration.h && pio run && popd

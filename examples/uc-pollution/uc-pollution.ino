@@ -1,9 +1,9 @@
 /*
 
-Allwize - Pollution Use Case
+AllWize - Pollution Use Case
 Using a MICS-4514 sensor
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -66,11 +66,11 @@ uint16_t co;
 uint16_t no2;
 
 // -----------------------------------------------------------------------------
-// Allwize
+// AllWize
 // -----------------------------------------------------------------------------
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 void wizeSetup() {
 
@@ -82,7 +82,7 @@ void wizeSetup() {
     #endif
 
     // Create and init AllWize object
-    allwize = new Allwize(&MODULE_SERIAL, RESET_PIN);
+    allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");

@@ -1,6 +1,6 @@
-# AllWize - Simple Master Example
+# AllWize - MH-Z16 CO2 Sensor Example
 
-Listens to messages on the same channel, data rate and CF and prints them out via the serial monitor.
+This example uses the MH-Z16 sensor PWM output to get the CO2 PPM from the sensor. 
 
 Always remember to connect the antenna before powering the board!
 

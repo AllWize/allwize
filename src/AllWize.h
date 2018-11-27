@@ -2,7 +2,7 @@
 
 AllWize Library
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file Allwize library header file
+ * @file AllWize library header file
  */
 
 #ifndef ALLWIZE_H
@@ -86,15 +86,15 @@ typedef struct {
 // Class prototype
 // -----------------------------------------------------------------------------
 
-class Allwize {
+class AllWize {
 
     public:
 
-        Allwize(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
+        AllWize(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
         #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-        Allwize(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
+        AllWize(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE);
         #endif
-        Allwize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE);
+        AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE);
 
         void begin();
         bool reset();

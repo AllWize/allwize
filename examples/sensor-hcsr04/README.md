@@ -3,7 +3,7 @@
 Shows how to use an ultrasonic HC-SR04 to send data about distance to a target.
 
 The HC-SR04 is a 5V digital sensor.
-If you are using the Allwize K1 you must set the sensor power jumper to 5V and
+If you are using the AllWize K1 you must set the sensor power jumper to 5V and
 connect your sensor to the digital grove connector (the one closer to the USB connector).
 The connect the white cable to the ECHO pin and the yellow one to the TRIG pin
 in the HC-SR04.
@@ -12,7 +12,7 @@ Always remember to connect the antenna before powering the board!
 
 ## License
 
-Copyright (C) 2018 by AllWize (http://allwize.io)
+Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

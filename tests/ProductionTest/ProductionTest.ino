@@ -1,12 +1,12 @@
 /*
 
-Allwize - Production Test suite
+AllWize - Production Test suite
 
 This test suite tests the hardware by running a series of commands over a RC1701XX module.
 This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
 
 
-Copyright (C) 2018 by Allwize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "Allwize.h"
+#include "AllWize.h"
 
 #include "AUnit.h"
 using namespace aunit;
@@ -110,8 +110,8 @@ using namespace aunit;
 
 #define COLUMN_PAD  20
 
-#include "Allwize.h"
-Allwize * allwize;
+#include "AllWize.h"
+AllWize * allwize;
 
 // -----------------------------------------------------------------------------
 // Tests
@@ -183,9 +183,9 @@ void setup() {
 
     // Create and init AllWize object
     #if defined(HARDWARE_SERIAL)
-        allwize = new Allwize(&HARDWARE_SERIAL, RESET_PIN);
+        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
     #else
-        allwize = new Allwize(RX_PIN, TX_PIN, RESET_PIN);
+        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {

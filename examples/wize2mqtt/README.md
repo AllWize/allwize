@@ -1,4 +1,4 @@
-# Allwize - WIZE 2 MQTT Bridge
+# AllWize - WIZE 2 MQTT Bridge
 
 Listens to messages on the same channel, data rate and CF and
 forwards them to an MQTT broker.
@@ -15,7 +15,7 @@ Always remember to connect the antenna before powering the board!
 
 ## License
 
-Copyright (C) 2018 by AllWize (http://allwize.io)
+Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

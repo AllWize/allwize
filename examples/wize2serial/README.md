@@ -1,6 +1,12 @@
-# AllWize - Simple Master Example
+# AllWize - WIZE 2 Serial Bridge
 
-Listens to messages on the same channel, data rate and CF and prints them out via the serial monitor.
+Listens to messages on the same channel, data rate and CF and forwards them via serial.
+
+The payload format is very simple at the moment being just a comma separated list of values.
+The topic is configured to be a placeholder with the node identification
+(now using the message CI file) and an index for each value in the payload.
+
+The `serial2mqtt.py` script show how to parse and forward the messages to an MQTT broker
 
 Always remember to connect the antenna before powering the board!
 

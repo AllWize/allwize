@@ -2,7 +2,7 @@
 
 This example use cases uses a MICS-4514 sensor to retrieve CO and NO2 values.
 
-If you are using the Allwize K1 you must connect the grove cable to the analog
+If you are using the AllWize K1 you must connect the grove cable to the analog
 port (the middle one). Connect the yellow cable leading to that port (A0) to the NOX pin
 and the white cable to the RED pin.
 
@@ -15,7 +15,7 @@ Always remember to connect the antenna before powering the board!
 
 ## License
 
-Copyright (C) 2018 by AllWize (http://allwize.io)
+Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

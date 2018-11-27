@@ -1,24 +1,31 @@
 {
     "name": "AllWize",
-    "keywords": "wize,radio,radiocrafts",
-    "description": "Library to interface a Wize radio module",
+    "keywords": "wize,radio,radiocrafts,wmbus4",
+    "description": "Arduino-compatible library to interface RC1701HP-OSP/WIZE radio modules",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Allwize/allwize"
+        "url": "https://github.com/AllWize/allwize"
     },
-    "version": "0.2.0",
+    "version": "1.0.2",
     "license": "LGPL-3.0",
     "exclude": "tests",
     "frameworks": "arduino",
     "platforms": ["atmelavr", "atmelsam", "espressif8266", "espressif32"],
     "dependencies": [
     ],
-    "authors": {
-        "name": "AllWize",
-        "email": "github@allwize.io",
-        "url": "http://allwize.io",
-        "maintainer": true
-    },
+    "authors": [
+        {
+            "name": "AllWize.io",
+            "email": "github@allwize.io",
+            "url": "http://allwize.io"
+        },
+        {
+            "name": "Xose Pérez",
+            "email": "xose@allwize.io",
+            "url": "http://allwize.io",
+            "maintainer": true
+        }
+    ],
     "examples": [
         "examples/*/*.ino"
     ]
