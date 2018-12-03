@@ -209,14 +209,16 @@ void AllWize::repeater() {
  * @brief               Sets the radio module in sleep mode
  */
 void AllWize::sleep() {
-    _sendCommand(CMD_SLEEP);
+    if (!_setConfig(true)) return;
+    _send(CMD_SLEEP);
 }
 
 /**
  * @brief               Wakes up the radio from sleep mode
  */
 void AllWize::wakeup() {
-    _sendAndReceive(CMD_EXIT_CONFIG);
+    _send(CMD_AWAKE);
+    ready();
 }
 
 /**
@@ -337,7 +339,7 @@ bool AllWize::available() {
     if (!_config) {
 
         static uint32_t when = millis();
-        
+
         while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
             uint8_t ch = _stream->read();
             _buffer[_pointer++] = ch;
@@ -725,7 +727,7 @@ uint8_t AllWize::getTemperature() {
     } else {
         ret_val = 0;
     }
-    
+
     return ret_val;
 }
 
@@ -741,7 +743,7 @@ uint16_t AllWize::getVoltage() {
     } else {
         ret_val = 0;
     }
-    
+
     return ret_val;
 }
 

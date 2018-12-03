@@ -44,6 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define END_OF_RESPONSE                 '>'
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58
+#define CMD_AWAKE                       (char) 0xFF
 #define CMD_EXIT_MEMORY                 (char) 0xFF
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
