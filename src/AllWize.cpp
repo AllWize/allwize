@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param stream        HardwareSerial object to communicate with the module
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
-AllWize::AllWize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
+AllWize::AllWize(HardwareSerial *serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
     _init();
 }
 
@@ -41,7 +41,7 @@ AllWize::AllWize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
 #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-AllWize::AllWize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
+AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
     _init();
 }
 #endif
@@ -53,17 +53,16 @@ AllWize::AllWize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
 AllWize::AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx), _reset_gpio(reset_gpio) {
-    #if defined(ARDUINO_ARCH_SAMD)
-        // Software serial not implemented for SAMD
-        assert(false);
-    #elif defined(ARDUINO_ARCH_ESP32)
-        _stream = _hw_serial = new HardwareSerial(HARDWARE_SERIAL_PORT);
-    #else
-        _stream = _sw_serial = new SoftwareSerial(_rx, _tx);
-    #endif
+#if defined(ARDUINO_ARCH_SAMD)
+    // Software serial not implemented for SAMD
+    assert(false);
+#elif defined(ARDUINO_ARCH_ESP32)
+    _stream = _hw_serial = new HardwareSerial(HARDWARE_SERIAL_PORT);
+#else
+    _stream = _sw_serial = new SoftwareSerial(_rx, _tx);
+#endif
     _init();
 }
-
 
 void AllWize::_init() {
     if (GPIO_NONE != _reset_gpio) {
@@ -71,7 +70,7 @@ void AllWize::_init() {
         digitalWrite(_reset_gpio, HIGH);
     }
     randomSeed(analogRead(0));
-    _access_number = random(0,256);
+    _access_number = random(0, 256);
 }
 
 /**
@@ -93,27 +92,27 @@ void AllWize::_reset_serial() {
     if (_hw_serial) {
 
         _hw_serial->end();
-        #if defined(ARDUINO_ARCH_ESP32)
-            if ((_rx != -1) && (_tx != -1)) {
-                pinMode(_rx, FUNCTION_4);
-                pinMode(_tx, FUNCTION_4);
-                _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
-            } else {
-                _hw_serial->begin(MODEM_BAUDRATE);
-            }
-        #else
+#if defined(ARDUINO_ARCH_ESP32)
+        if ((_rx != -1) && (_tx != -1)) {
+            pinMode(_rx, FUNCTION_4);
+            pinMode(_tx, FUNCTION_4);
+            _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
+        } else {
             _hw_serial->begin(MODEM_BAUDRATE);
-        #endif
+        }
+#else
+        _hw_serial->begin(MODEM_BAUDRATE);
+#endif
 
     } else {
 
-        #if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD)
-            // It should never hit this block
-            assert(false);
-        #else
-            _sw_serial->end();
-            _sw_serial->begin(MODEM_BAUDRATE);
-        #endif
+#if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD)
+        // It should never hit this block
+        assert(false);
+#else
+        _sw_serial->end();
+        _sw_serial->begin(MODEM_BAUDRATE);
+#endif
 
     }
 
@@ -209,7 +208,8 @@ void AllWize::repeater() {
  * @brief               Sets the radio module in sleep mode
  */
 void AllWize::sleep() {
-    if (!_setConfig(true)) return;
+    if (!_setConfig(true))
+        return;
     _send(CMD_SLEEP);
 }
 
@@ -226,7 +226,8 @@ void AllWize::wakeup() {
  */
 bool AllWize::ready() {
     bool response = _setConfig(true);
-    if (response) _setConfig(false);
+    if (response)
+        _setConfig(false);
     return response;
 }
 
@@ -236,7 +237,8 @@ bool AllWize::ready() {
 bool AllWize::waitForReady(uint32_t timeout) {
     uint32_t start = millis();
     while (millis() - start < timeout) {
-        if (ready()) return true;
+        if (ready())
+            return true;
         delay(100);
     }
     return false;
@@ -246,7 +248,7 @@ bool AllWize::waitForReady(uint32_t timeout) {
  * @brief               Dumps the current memory configuration to the given stream
  * @param debug         Data stream to dump the data to
  */
-void AllWize::dump(Stream & debug) {
+void AllWize::dump(Stream &debug) {
 
     _setConfig(true);
     _send(CMD_TEST_MODE_0);
@@ -269,16 +271,17 @@ void AllWize::dump(Stream & debug) {
 
         for (uint16_t address = 0; address <= 255; address++) {
             if ((address % 16) == 0) {
-                if (address > 0) debug.print(ascii);
+                if (address > 0)
+                    debug.print(ascii);
                 snprintf(ch, sizeof(ch), "\n0x%02X:  ", address);
                 debug.print(ch);
             }
             if (31 < buffer[address] && buffer[address] < 127) {
-                ascii[address % 16] = (char) buffer[address];
+                ascii[address % 16] = (char)buffer[address];
             } else {
                 ascii[address % 16] = ' ';
             }
-            snprintf(ch, sizeof(ch), "%02X ", (uint8_t) buffer[address]);
+            snprintf(ch, sizeof(ch), "%02X ", (uint8_t)buffer[address]);
             debug.print(ch);
         }
 
@@ -299,19 +302,24 @@ void AllWize::dump(Stream & debug) {
  * @param len           Length of the payload
  * @return              Returns true if message has been correctly sent
  */
-bool AllWize::send(uint8_t * buffer, uint8_t len) {
+bool AllWize::send(uint8_t *buffer, uint8_t len) {
 
-    if (_config) return false;
-    if (0 == len) return (1 == _send(0xFE));
+    if (_config)
+        return false;
+    if (0 == len)
+        return (1 == _send(0xFE));
 
     // length
-    if (1 != _send(len+1)) return false;
+    if (1 != _send(len + 1))
+        return false;
 
     // CI
-    if (1 != _send(_ci)) return false;
+    if (1 != _send(_ci))
+        return false;
 
     // payload
-    if (len != _send(buffer, len)) return false;
+    if (len != _send(buffer, len))
+        return false;
 
     _access_number++;
     return true;
@@ -323,8 +331,8 @@ bool AllWize::send(uint8_t * buffer, uint8_t len) {
  * @param buffer        C-string with the application payload
  * @return              Returns true if message has been correctly sent
  */
-bool AllWize::send(const char * buffer) {
-    return send((uint8_t *) buffer, strlen(buffer));
+bool AllWize::send(const char *buffer) {
+    return send((uint8_t *)buffer, strlen(buffer));
 }
 
 /**
@@ -344,9 +352,9 @@ bool AllWize::available() {
             uint8_t ch = _stream->read();
             _buffer[_pointer++] = ch;
             when = millis();
-            #if defined(ARDUINO_ARCH_ESP8266)
-                yield();
-            #endif
+#if defined(ARDUINO_ARCH_ESP8266)
+            yield();
+#endif
         }
 
         // Check if message finished and decode it
@@ -674,7 +682,7 @@ uint8_t AllWize::getDecryptFlag() {
  * @param reg           Register number (1-64)
  * @param key           A 16-byte encryption key as binary array
  */
-void AllWize::setKey(uint8_t reg, const uint8_t * key) {
+void AllWize::setKey(uint8_t reg, const uint8_t *key) {
     if (0 < reg && reg < 65) {
         uint8_t data[17];
         data[0] = reg;
@@ -687,15 +695,15 @@ void AllWize::setKey(uint8_t reg, const uint8_t * key) {
  * @brief               Sets the default encryption key
  * @param key           A 16-byte encryption key as binary array
  */
-void AllWize::setDefaultKey(const uint8_t * key) {
-    _setMemory(MEM_DEFAULT_KEY, (uint8_t *) key, 16);
+void AllWize::setDefaultKey(const uint8_t *key) {
+    _setMemory(MEM_DEFAULT_KEY, (uint8_t *)key, 16);
 }
 
 /**
  * @brief               Gets the default encryption key
  * @param key           A binary buffer to store the key (16 bytes)
  */
-void AllWize::getDefaultKey(uint8_t * key) {
+void AllWize::getDefaultKey(uint8_t *key) {
     _getMemory(MEM_DEFAULT_KEY, key, 16);
 }
 
@@ -848,9 +856,10 @@ bool AllWize::_setConfig(bool value) {
  * @param len           Length of the binary data
  * @protected
  */
-int8_t AllWize::_sendCommand(uint8_t command, uint8_t * data, uint8_t len) {
+int8_t AllWize::_sendCommand(uint8_t command, uint8_t *data, uint8_t len) {
     int8_t response = -1;
-    if (!_setConfig(true)) return response;
+    if (!_setConfig(true))
+        return response;
     if (_sendAndReceive(command) != -1) {
         response = _sendAndReceive(data, len);
     }
@@ -867,7 +876,8 @@ int8_t AllWize::_sendCommand(uint8_t command, uint8_t * data, uint8_t len) {
  */
 int8_t AllWize::_sendCommand(uint8_t command, uint8_t data) {
     int8_t response = -1;
-    if (!_setConfig(true)) return response;
+    if (!_setConfig(true))
+        return response;
     if (_sendAndReceive(command) != -1) {
         response = _sendAndReceive(data);
     }
@@ -883,7 +893,8 @@ int8_t AllWize::_sendCommand(uint8_t command, uint8_t data) {
  */
 int8_t AllWize::_sendCommand(uint8_t command) {
     int8_t response = -1;
-    if (!_setConfig(true)) return response;
+    if (!_setConfig(true))
+        return response;
     response = _sendAndReceive(command);
     _setConfig(false);
     return response;
@@ -897,14 +908,14 @@ int8_t AllWize::_sendCommand(uint8_t command) {
  * @return              True if the data was successfully saved
  * @protected
  */
-bool AllWize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
-    uint8_t buffer[len*2+1];
-    for (uint8_t i=0; i<len; i++) {
-        buffer[i*2]   = address + i;
-        buffer[i*2+1] = data[i];
+bool AllWize::_setMemory(uint8_t address, uint8_t *data, uint8_t len) {
+    uint8_t buffer[len * 2 + 1];
+    for (uint8_t i = 0; i < len; i++) {
+        buffer[i * 2] = address + i;
+        buffer[i * 2 + 1] = data[i];
     }
-    buffer[len*2] = CMD_EXIT_MEMORY;
-    return (_sendCommand(CMD_WRITE_MEMORY, buffer, len*2+1) != -1);
+    buffer[len * 2] = CMD_EXIT_MEMORY;
+    return (_sendCommand(CMD_WRITE_MEMORY, buffer, len * 2 + 1) != -1);
 }
 
 /**
@@ -915,7 +926,7 @@ bool AllWize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
  * @protected
  */
 bool AllWize::_setMemory(uint8_t address, uint8_t value) {
-    uint8_t buffer[3] = {address, value, (uint8_t) CMD_EXIT_MEMORY};
+    uint8_t buffer[3] = {address, value, (uint8_t)CMD_EXIT_MEMORY};
     return (_sendCommand(CMD_WRITE_MEMORY, buffer, 3) != -1);
 }
 
@@ -927,12 +938,14 @@ bool AllWize::_setMemory(uint8_t address, uint8_t value) {
  * @return              Number of positions actually read
  * @protected
  */
-uint8_t AllWize::_getMemory(uint8_t address, uint8_t * buffer, uint8_t len) {
+uint8_t AllWize::_getMemory(uint8_t address, uint8_t *buffer, uint8_t len) {
     uint8_t count = 0;
     if (_setConfig(true)) {
-        for (uint8_t i=0; i<len; i++) {
-            if (_sendAndReceive(CMD_READ_MEMORY) == -1) break;
-            if (_sendAndReceive(address + i) != 1) break;
+        for (uint8_t i = 0; i < len; i++) {
+            if (_sendAndReceive(CMD_READ_MEMORY) == -1)
+                break;
+            if (_sendAndReceive(address + i) != 1)
+                break;
             count++;
             buffer[i] = _buffer[0];
         }
@@ -949,7 +962,8 @@ uint8_t AllWize::_getMemory(uint8_t address, uint8_t * buffer, uint8_t len) {
  */
 uint8_t AllWize::_getMemory(uint8_t address) {
     uint8_t response = _sendCommand(CMD_READ_MEMORY, address);
-    if (response > 0) return _buffer[0];
+    if (response > 0)
+        return _buffer[0];
     return 0;
 }
 
@@ -962,7 +976,7 @@ uint8_t AllWize::_getMemory(uint8_t address) {
  */
 String AllWize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
     uint8_t bin[len];
-    char hex[2*len+1];
+    char hex[2 * len + 1];
     hex[0] = 0;
     if (len == _getMemory(address, bin, len)) {
         _bin2hex(bin, hex, len);
@@ -979,11 +993,11 @@ String AllWize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
  */
 String AllWize::_getMemoryAsString(uint8_t address, uint8_t len) {
     uint8_t bin[len];
-    char hex[len+1];
+    char hex[len + 1];
     hex[0] = 0;
     if (len == _getMemory(address, bin, len)) {
         memcpy(hex, bin, len);
-        hex[len-1] = 0;
+        hex[len - 1] = 0;
     }
     return String(hex);
 }
@@ -993,11 +1007,14 @@ String AllWize::_getMemoryAsString(uint8_t address, uint8_t len) {
  */
 void AllWize::_readModel() {
 
-    if (_model.length() > 0) return;
+    if (_model.length() > 0)
+        return;
     String line = _getMemoryAsString(MEM_PART_NUMBER_NEW, 32);
-    if (line.indexOf("RC") != 0) String line = _getMemoryAsString(MEM_PART_NUMBER_OLD, 32);
+    if (line.indexOf("RC") != 0)
+        String line = _getMemoryAsString(MEM_PART_NUMBER_OLD, 32);
 
     if (line.indexOf("RC") != 0) {
+
         _model = String("Unknown");
 
     } else {
@@ -1050,7 +1067,7 @@ bool AllWize::_decode() {
     #if defined(ALLWIZE_DEBUG_PORT)
     {
         char ch[10];
-        for (uint8_t i = 0; i<_pointer; i++) {
+        for (uint8_t i = 0; i < _pointer; i++) {
             snprintf(ch, sizeof(ch), "%02X ", _buffer[i]);
             ALLWIZE_DEBUG_PRINT(ch);
         }
@@ -1077,13 +1094,15 @@ bool AllWize::_decode() {
 
     // Start byte
     if (has_start) {
-        if (START_BYTE != _local[in]) return false;
+        if (START_BYTE != _local[in])
+            return false;
         in += 1;
     };
 
     // Get and check buffer length
     uint8_t len = _local[in];
-    if (_pointer != len + bytes_not_in_len) return false;
+    if (_pointer != len + bytes_not_in_len)
+        return false;
     in += 1;
 
     if (has_header) {
@@ -1093,10 +1112,10 @@ bool AllWize::_decode() {
         in += 1;
 
         // Manufacturer
-        unsigned int man = (_local[in+1] << 8) + _local[in];
+        uint16_t man = (_local[in + 1] << 8) + _local[in];
         _message.man[0] = ((man >> 10) & 0x001F) + 64;
-        _message.man[1] = ((man >>  5) & 0x001F) + 64;
-        _message.man[2] = ((man >>  0) & 0x001F) + 64;
+        _message.man[1] = ((man >> 5) & 0x001F) + 64;
+        _message.man[2] = ((man >> 0) & 0x001F) + 64;
         _message.man[3] = 0;
         in += 2;
 
@@ -1147,7 +1166,8 @@ bool AllWize::_decode() {
 
     // Stop byte
     if (has_start) {
-        if (STOP_BYTE != _local[in]) return false;
+        if (STOP_BYTE != _local[in])
+            return false;
     }
 
     return true;
@@ -1184,10 +1204,11 @@ uint8_t AllWize::_send(uint8_t ch) {
  * @return              Number of bytes actually sent
  * @protected
  */
-uint8_t AllWize::_send(uint8_t * buffer, uint8_t len) {
+uint8_t AllWize::_send(uint8_t *buffer, uint8_t len) {
     uint8_t n = 0;
-    for (uint8_t i=0; i<len; i++) {
-        if (_send(buffer[i])) n++;
+    for (uint8_t i = 0; i < len; i++) {
+        if (_send(buffer[i]))
+            n++;
     }
     return n;
 }
@@ -1198,7 +1219,7 @@ uint8_t AllWize::_send(uint8_t * buffer, uint8_t len) {
  * @protected
  */
 int8_t AllWize::_receive() {
-    return _readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
+    return _readBytesUntil(END_OF_RESPONSE, (char *)_buffer, RX_BUFFER_SIZE);
 }
 
 /**
@@ -1208,8 +1229,9 @@ int8_t AllWize::_receive() {
  * @return              Number of bytes received, -1 if timed out or error sending
  * @protected
  */
-int8_t AllWize::_sendAndReceive(uint8_t * buffer, uint8_t len) {
-    if (_send(buffer, len) != len) return -1;
+int8_t AllWize::_sendAndReceive(uint8_t *buffer, uint8_t len) {
+    if (_send(buffer, len) != len)
+        return -1;
     return _receive();
 }
 
@@ -1220,7 +1242,8 @@ int8_t AllWize::_sendAndReceive(uint8_t * buffer, uint8_t len) {
  * @protected
  */
 int8_t AllWize::_sendAndReceive(uint8_t ch) {
-    if (_send(ch) != 1) return -1;
+    if (_send(ch) != 1)
+        return -1;
     return _receive();
 }
 
@@ -1237,10 +1260,11 @@ int AllWize::_timedRead() {
     uint32_t _start = millis();
     while (millis() - _start < _timeout) {
         int ch = _stream->read();
-        if (ch >= 0) return ch;
-        #if defined(ARDUINO_ARCH_ESP8266)
-            yield();
-        #endif
+        if (ch >= 0)
+            return ch;
+#if defined(ARDUINO_ARCH_ESP8266)
+        yield();
+#endif
     };
     return -1;
 }
@@ -1252,13 +1276,15 @@ int AllWize::_timedRead() {
  * @return              Number of bytes read or -1 if timed out
  * @protected
  */
-int AllWize::_readBytes(char * buffer, uint16_t len) {
-    if (len < 1) return 0;
+int AllWize::_readBytes(char *buffer, uint16_t len) {
+    if (len < 1)
+        return 0;
     uint16_t index = 0;
     while (index < len) {
         int ch = _timedRead();
-        if (ch < 0) break;
-        *buffer++ = (char) ch;
+        if (ch < 0)
+            break;
+        *buffer++ = (char)ch;
         index++;
     }
     return index;
@@ -1272,17 +1298,20 @@ int AllWize::_readBytes(char * buffer, uint16_t len) {
  * @return              Number of bytes read or -1 if timed out
  * @protected
  */
-int AllWize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
-    if (len < 1) return 0;
+int AllWize::_readBytesUntil(char terminator, char *buffer, uint16_t len) {
+    if (len < 1)
+        return 0;
     uint16_t index = 0;
     while (index < len) {
         int ch = _timedRead();
-        if (ch < 0) break;
-        if (ch == terminator) break;
+        if (ch < 0)
+            break;
+        if (ch == terminator)
+            break;
         ALLWIZE_DEBUG_PRINT("r ");
         ALLWIZE_DEBUG_PRINT(ch, HEX);
         ALLWIZE_DEBUG_PRINTLN("");
-        *buffer++ = (char) ch;
+        *buffer++ = (char)ch;
         index++;
     }
     return index;
@@ -1295,9 +1324,9 @@ int AllWize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
  * @param len           Length of the hex c-string
  * @protected
  */
-void AllWize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
-    for (uint8_t i=0; i<len; i+=2) {
-        bin[i/2] = ((hex[i] - '0') * 16 + (hex[i+1] - '0')) & 0xFF;
+void AllWize::_hex2bin(char *hex, uint8_t *bin, uint8_t len) {
+    for (uint8_t i = 0; i < len; i += 2) {
+        bin[i / 2] = ((hex[i] - '0') * 16 + (hex[i + 1] - '0')) & 0xFF;
     }
 }
 
@@ -1308,8 +1337,8 @@ void AllWize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
  * @param len           Length of the input buffer
  * @protected
  */
-void AllWize::_bin2hex(uint8_t * bin, char * hex, uint8_t len) {
-    for (uint8_t i=0; i<len; i++) {
-        sprintf(&hex[i*2], "%02X", bin[i]);
+void AllWize::_bin2hex(uint8_t *bin, char *hex, uint8_t len) {
+    for (uint8_t i = 0; i < len; i++) {
+        sprintf(&hex[i * 2], "%02X", bin[i]);
     }
 }

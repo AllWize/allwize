@@ -227,7 +227,7 @@ class AllWize {
 
 
         bool _encrypt = false;
-        unsigned char _access_number = 0;
+        uint8_t _access_number = 0;
 
         String _model;
         String _fw;
