@@ -67,6 +67,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
 
+#define WIZE_ENCRYPT_KEY        { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c }
+
 // -----------------------------------------------------------------------------
 // Wize
 // -----------------------------------------------------------------------------
@@ -135,6 +137,12 @@ void wizeLoop() {
         // Get the message
         allwize_message_t message = allwize->read();
 
+        // Decrypt
+        #if defined(ALLWIZE_EXTERNAL_AES) && defined(WIZE_ENCRYPT_KEY)
+            uint8_t key[] = WIZE_ENCRYPT_KEY;
+            allwize->decrypt(message.data, key, message.len);
+        #endif
+        
         // Show it to console
         wizeDebugMessage(message);
 

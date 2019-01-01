@@ -2,6 +2,11 @@
 
 Simple slave that sends an auto-increment number every 5 seconds.
 
+You can enable AES128 encryption using the external 
+Arduino CryptoLibs library by Rhys Weatherley.
+To do so, pass the ALLWIZE_EXTERNAL_AES bluid flag and 
+set the appropiate key in WIZE_ENCRYPT_KEY.
+
 Always remember to connect the antenna before powering the board!
 
 ## License

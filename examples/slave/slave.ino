@@ -67,6 +67,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_DATARATE           DATARATE_2400bps
 #define WIZE_NODE_ID            0x46
 
+#define WIZE_ENCRYPT_KEY        { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c }
+
 // -----------------------------------------------------------------------------
 // AllWize
 // -----------------------------------------------------------------------------
@@ -98,16 +100,22 @@ void wizeSetup() {
 
 }
 
-void wizeSend(const char * payload) {
+void wizeSend(uint8_t * payload, size_t len) {
 
     char buffer[64];
     snprintf(buffer, sizeof(buffer),
-        "[WIZE] CH: %d, TX: %d, DR: %d, Payload: %s\n",
-        allwize->getChannel(), allwize->getPower(), allwize->getDataRate(), payload
+        "[WIZE] CH: %d, TX: %d, DR: %d, Payload: ",
+        allwize->getChannel(), allwize->getPower(), allwize->getDataRate()
     );
     DEBUG_SERIAL.print(buffer);
 
-    if (!allwize->send(payload)) {
+    for (uint8_t i = 0; i<len; i++) {
+        snprintf(buffer, sizeof(buffer), "%02X", payload[i]);
+        DEBUG_SERIAL.print(buffer);
+    }
+    DEBUG_SERIAL.print("\n");
+
+    if (!allwize->send(payload, len)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
@@ -134,13 +142,22 @@ void loop() {
 
     // This static variables will hold the number as int and char string
     static uint8_t count = 0;
-    static char payload[4];
+
+    // Payload length must be a multiple of 16
+    // You can create it so or use the pad() method to add the extra needed bytes
+    uint8_t payload[16] = {0};
 
     // Convert the number to a string
-    itoa(count, payload, 10);
+    itoa(count, (char *) payload, 10);
+
+    // Encrypt
+    #if defined(ALLWIZE_EXTERNAL_AES) && defined(WIZE_ENCRYPT_KEY)
+        uint8_t key[] = WIZE_ENCRYPT_KEY;
+        allwize->encrypt(payload, key, 16);
+    #endif
 
     // Send the string as payload
-    wizeSend(payload);
+    wizeSend(payload, 16);
 
     // Increment the number (it will overflow at 255)
     count++;

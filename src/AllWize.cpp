@@ -304,16 +304,16 @@ bool AllWize::send(uint8_t * buffer, uint8_t len) {
     if (_config) return false;
     if (0 == len) return (1 == _send(0xFE));
 
-    // length
-    if (1 != _send(len+1)) return false;
 
-    // CI
+    if (1 != _send(len+1)) return false;
+    // Encrypt
+
     if (1 != _send(_ci)) return false;
 
-    // payload
+            
     if (len != _send(buffer, len)) return false;
-
-    _access_number++;
+            // Build a 16 bytes payload
+                _access_number++;
     return true;
 
 }
@@ -640,7 +640,6 @@ uint8_t AllWize::getInstallMode() {
  */
 void AllWize::setEncryptFlag(uint8_t flag) {
     if (0 == flag || 1 == flag || 3 == flag) {
-        _encrypt = (flag & 0x01) == 0x01;
         _setMemory(MEM_ENCRYPT_FLAG, flag);
     }
 }
@@ -670,7 +669,7 @@ uint8_t AllWize::getDecryptFlag() {
 }
 
 /**
- * @brief               Sets the default encryption key
+ * @brief               Sets the encryption key
  * @param reg           Register number (1-64)
  * @param key           A 16-byte encryption key as binary array
  */
@@ -1313,3 +1312,70 @@ void AllWize::_bin2hex(uint8_t * bin, char * hex, uint8_t len) {
         sprintf(&hex[i*2], "%02X", bin[i]);
     }
 }
+
+// -----------------------------------------------------------------------------
+// External AES support based on Crypto library
+// -----------------------------------------------------------------------------
+
+#if defined(ALLWIZE_EXTERNAL_AES)
+
+#include <Crypto.h>
+#include <AES.h>
+
+uint8_t AllWize::pad(uint8_t * data, uint8_t len, uint8_t * output, uint8_t key_size) {
+    uint8_t new_len = (len + key_size - 1) / key_size;
+    output = (uint8_t *) malloc(new_len);
+    memset(output, 0, new_len);
+    memcpy(output, data, len);
+    return new_len;
+}
+
+bool AllWize::encrypt(uint8_t * data, const uint8_t * key, uint8_t len) {
+    
+    // Instantiate the cipher
+    AES128 cipher;
+    uint8_t key_size = cipher.keySize();
+
+    // Data length must be a multiple of the keysize
+    if ((0 == len) || (0 != (len % key_size))) return false;
+
+    // Set the key
+    cipher.setKey(key, key_size);
+    
+    // Do each block independently
+    uint8_t buffer[key_size];
+    uint8_t blocks = len / key_size;
+    for (uint8_t i=0; i<blocks; i++) {
+        cipher.encryptBlock(buffer, &data[key_size*i]);
+        memcpy(&data[key_size*i], buffer, key_size);
+    }
+
+    return true;
+
+}
+
+bool AllWize::decrypt(uint8_t * data, const uint8_t * key, uint8_t len) {
+    
+    // Instantiate the cipher
+    AES128 cipher;
+    uint8_t key_size = cipher.keySize();
+
+    // Data length must be a multiple of the keysize
+    if ((0 == len) || (0 != (len % key_size))) return false;
+
+    // Set the key
+    cipher.setKey(key, key_size);
+    
+    // Do each block independently
+    uint8_t buffer[key_size];
+    uint8_t blocks = len / key_size;
+    for (uint8_t i=0; i<blocks; i++) {
+        cipher.decryptBlock(buffer, &data[key_size*i]);
+        memcpy(&data[key_size*i], buffer, key_size);
+    }
+
+    return true;
+
+}
+
+#endif

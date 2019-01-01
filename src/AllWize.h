@@ -165,6 +165,12 @@ class AllWize {
         String getFirmwareVersion();
         String getSerialNumber();
 
+        #if defined(ALLWIZE_EXTERNAL_AES)
+        uint8_t pad(uint8_t * data, uint8_t len, uint8_t * output, uint8_t key_size);
+        bool encrypt(uint8_t * data, const uint8_t * key, uint8_t len);
+        bool decrypt(uint8_t * data, const uint8_t * key, uint8_t len);
+        #endif
+
     protected:
 
         void _init();
@@ -225,8 +231,6 @@ class AllWize {
         uint8_t _data_interface = 0xFF;
         bool _append_rssi = false;
 
-
-        bool _encrypt = false;
         unsigned char _access_number = 0;
 
         String _model;
