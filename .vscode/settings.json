@@ -1,2 +1,6 @@
 {
+    "C_Cpp.dimInactiveRegions": false,
+    "files.associations": {
+        "array": "cpp"
+    }
 }

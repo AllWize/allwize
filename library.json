@@ -11,7 +11,15 @@
     "exclude": "tests",
     "frameworks": "arduino",
     "platforms": ["atmelavr", "atmelsam", "espressif8266", "espressif32"],
-    "dependencies": [
+    "dependencies": [        
+        {
+            "name": "SoftwareSerial",
+            "platforms": "atmelavr"
+        },
+        {
+            "name": "EspSoftwareSerial",
+            "platforms": "espressif8266"
+        }
     ],
     "authors": [
         {

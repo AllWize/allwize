@@ -822,6 +822,45 @@ String AllWize::getSerialNumber() {
     return _getMemoryAsHexString(MEM_SERIAL_NUMBER_NEW, 8);
 }
 
+
+/**
+ * @brief               Returns the frequency for the given channel
+ * @param channel       Channel
+ * @return              Frequency (float) in MHz for the given channel
+ */
+double AllWize::getFrequency(uint8_t channel) {
+    if (channel <   7) {
+        return 169.40625 + 0.0125 * (channel - 1);
+    } else if (channel ==  7) {
+        return 169.41250;
+    } else if (channel ==  8) {
+        return 169.43750;
+    } else if (channel ==  9) {
+        return 169.46250;
+    } else if (channel == 10) {
+        return 169.43750;
+    } else if (channel <  38) {
+        return 169.48125 + 0.0125 * (channel - 11);
+    } else if (channel <  42) {
+        return 169.62500 + 0.0500 * (channel - 38);
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * @brief               Returns the speed for te given datarate
+ * @param dr            Datarate
+ * @return              Speed in bps
+ */
+uint16_t AllWize::getDataRateSpeed(uint8_t dr) {
+    if (DATARATE_2400bps == dr) return 2400;
+    if (DATARATE_4800bps == dr) return 4800;
+    if (DATARATE_19200bps == dr) return 19200;
+    if (DATARATE_6400bps == dr) return 6400;
+    return 0;
+}
+
 // -----------------------------------------------------------------------------
 // Protected
 // -----------------------------------------------------------------------------

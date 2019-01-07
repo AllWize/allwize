@@ -164,6 +164,9 @@ class AllWize {
         String getHardwareVersion();
         String getFirmwareVersion();
         String getSerialNumber();
+        
+        double getFrequency(uint8_t channel);
+        uint16_t getDataRateSpeed(uint8_t dr);
 
     protected:
 
