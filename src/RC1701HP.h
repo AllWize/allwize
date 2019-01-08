@@ -25,6 +25,7 @@
 #define CMD_WRITE_MAILBOX               'W'
 #define CMD_READ_MEMORY                 'Y'
 #define CMD_SLEEP                       'Z'
+#define CMD_RSSI_CONTINUOUS             's'
 #define CMD_TEST_MODE_0                 '0'
 
 // Memory addresses

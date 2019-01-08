@@ -156,6 +156,14 @@ void format(const char * name, int value) {
     format(name, buffer);
 }
 
+void format(const char * name, uint32_t value, uint8_t len) {
+    char f[8];
+    snprintf(f, sizeof(f), "0x%%0%dlX", len*2);
+    char buffer[len*2+3] = {0};
+    snprintf(buffer, sizeof(buffer), f,  value, len);
+    format(name, buffer);
+}
+
 // -----------------------------------------------------------------------------
 // Radio
 // -----------------------------------------------------------------------------
@@ -212,6 +220,7 @@ void setup() {
     format("Property", "Value");
     DEBUG_SERIAL.println("------------------------------");
 
+    format("Is WIZE?", allwize->isWize() ? "YES": "NO");
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());
     format("MBUS Mode", allwize->getMBusMode());
@@ -222,8 +231,8 @@ void setup() {
     format("Network Role", allwize->getNetworkRole());
     format("Install Mode", allwize->getInstallMode());
 
-    format("Manufacturer ID", allwize->getMID());
-    format("Unique ID", allwize->getUID());
+    format("Manufacturer ID", allwize->getMID(), 2);
+    format("Unique ID", allwize->getUID(), 4);
     format("Version", allwize->getVersion());
     format("Device", allwize->getDevice());
     format("Part Number", allwize->getPartNumber());
@@ -249,4 +258,6 @@ void setup() {
 
 }
 
-void loop() {}
+void loop() {
+    delay(1);
+}

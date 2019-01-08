@@ -82,6 +82,7 @@ void AllWize::begin() {
     _append_rssi = _getMemory(MEM_RSSI_MODE) == 0x01;
     _mbus_mode = _getMemory(MEM_MBUS_MODE);
     _data_interface = _getMemory(MEM_DATA_INTERFACE);
+    _is_wize = getPartNumber().equals("RC1701HP-WIZE");
 }
 
 /**
@@ -303,23 +304,44 @@ void AllWize::dump(Stream &debug) {
  * @return              Returns true if message has been correctly sent
  */
 bool AllWize::send(uint8_t *buffer, uint8_t len) {
-
-    if (_config)
+ 
+    if (_config) {
         return false;
-    if (0 == len)
+    }
+
+    if (0 == len) {
         return (1 == _send(0xFE));
+    }
+
+    // message length is payload length + 1 (CI) + 2 (for timestamp if wize)
+    uint8_t message_len = len + 1;
+    if (_is_wize) message_len += 2;
+
+    // max payload size is 238 bytes
+    if (message_len > 238) {
+        return false;
+    }
 
     // length
-    if (1 != _send(len + 1))
+    if (1 != _send(message_len)) {
         return false;
+    }
 
     // CI
-    if (1 != _send(_ci))
+    if (1 != _send(_is_wize ? CONTROL_INFORMATION_WIZE : _ci)) {
         return false;
+    }
 
     // payload
-    if (len != _send(buffer, len))
+    if (len != _send(buffer, message_len)) {
         return false;
+    }
+
+    // timestamp, TODO: add option to provide a timestamp
+    if (_is_wize) {
+        _send(0);
+        _send(0);
+    }
 
     _access_number++;
     return true;
@@ -756,19 +778,57 @@ uint16_t AllWize::getVoltage() {
 }
 
 /**
- * @brief               Returns the Manufacturer ID string
- * @return              2-byte hex string with the manufacturer ID
+ * @brief               Returns the Manufacturer ID
+ * @return              Manufacturer ID
  */
-String AllWize::getMID() {
-    return _getMemoryAsHexString(MEM_MANUFACTURER_ID, 2);
+uint16_t AllWize::getMID() {
+    uint8_t buffer[2];
+    if (_getMemory(MEM_MANUFACTURER_ID, buffer, 2) != 2) return 0;
+    uint16_t value = 0;
+    for (uint8_t i=0; i<2; i++) {
+        value <<= 8;
+        value += buffer[i];
+    }
+    return value;
 }
 
 /**
- * @brief               Returns the Unique ID string
- * @return              4-byte hex string with the unique ID
+ * @brief               Sets the Manufacturer ID
+ * @uint8_t * uid       UID to save
  */
-String AllWize::getUID() {
-    return _getMemoryAsHexString(MEM_UNIQUE_ID, 4);
+bool AllWize::setMID(uint16_t mid) {
+    uint8_t buffer[2];
+    buffer[0] = (mid >> 8) & 0xFF;
+    buffer[1] = (mid >> 0) & 0xFF;
+    return _setMemory(MEM_MANUFACTURER_ID, buffer, 2);
+}
+
+/**
+ * @brief               Returns the Unique ID as a byte array
+ * @uint8_t * uid       UID
+ */
+uint32_t AllWize::getUID() {
+    uint8_t buffer[4];
+    if (_getMemory(MEM_UNIQUE_ID, buffer, 4) != 4) return 0;
+    uint32_t value = 0;
+    for (uint8_t i=0; i<4; i++) {
+        value <<= 8;
+        value += buffer[i];
+    }
+    return value;
+}
+
+/**
+ * @brief               Saved the UID into the module memory
+ * @uint8_t * uid       UID to save
+ */
+bool AllWize::setUID(uint32_t uid) {
+    uint8_t buffer[4];
+    buffer[0] = (uid >> 24) & 0xFF;
+    buffer[1] = (uid >> 16) & 0xFF;
+    buffer[2] = (uid >>  8) & 0xFF;
+    buffer[3] = (uid >>  0) & 0xFF;
+    return _setMemory(MEM_UNIQUE_ID, buffer, 4);
 }
 
 /**
@@ -820,6 +880,14 @@ String AllWize::getFirmwareVersion() {
  */
 String AllWize::getSerialNumber() {
     return _getMemoryAsHexString(MEM_SERIAL_NUMBER_NEW, 8);
+}
+
+/**
+ * @brief               Returns if the module is Wize-compatible
+ * @return              boolean
+ */
+bool AllWize::isWize() {
+    return _is_wize;
 }
 
 // -----------------------------------------------------------------------------
