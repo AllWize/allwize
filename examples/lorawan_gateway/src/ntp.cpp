@@ -23,7 +23,7 @@ bool ntpSynced() {
 String ntpDateTime(time_t t) {
     char buffer[30];
     snprintf_P(buffer, sizeof(buffer),
-        PSTR("%04d-%02d-%02dT%02d:%02d:%02d.000000Z"),
+        PSTR("%04d-%02d-%02d %02d:%02d:%02d"),
         year(t), month(t), day(t), hour(t), minute(t), second(t)
     );
     return String(buffer);

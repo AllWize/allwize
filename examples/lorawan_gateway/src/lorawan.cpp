@@ -62,11 +62,14 @@ void lorawanPing() {
     float ackr = (0 == _lorawan_stats.rxfw) ? 0 : 100.0 * (float) _lorawan_stats.acks / (float) _lorawan_stats.rxfw;
 
     // Build JSON payload
+    String timestamp = ntpDateTime().c_str();
+
+    // Build JSON payload
     char buffer[512];
     snprintf_P(
         buffer, sizeof(buffer), 
-        PSTR("{\"stat\":{\"time\":\"%s\",\"lati\":%.5f,\"long\":%.5f,\"alti\":%d,\"rxnb\":%d,\"rxok\":%d,\"rxfw\":%d,\"ackr\":%.2f,\"dwnb\":%d,\"txnb\":%d,\"pfrm\":\"%s\",\"mail\":\"%s\",\"desc\":\"%s\"}}"),
-        ntpDateTime().c_str(), LORAWAN_LATITUDE, LORAWAN_LONGITUDE, LORAWAN_ALTITUDE,
+        PSTR("{\"stat\":{\"time\":\"%s GMT\",\"lati\":%.5f,\"long\":%.5f,\"alti\":%d,\"rxnb\":%d,\"rxok\":%d,\"rxfw\":%d,\"ackr\":%.2f,\"dwnb\":%d,\"txnb\":%d,\"pfrm\":\"%s\",\"mail\":\"%s\",\"desc\":\"%s\"}}"),
+        timestamp.c_str(), LORAWAN_LATITUDE, LORAWAN_LONGITUDE, LORAWAN_ALTITUDE,
         _lorawan_stats.rxnb, _lorawan_stats.rxok, _lorawan_stats.rxfw, ackr, _lorawan_stats.dwnb, _lorawan_stats.txnb,
         LORAWAN_GATEWAY_TYPE, LORAWAN_EMAIL, LORAWAN_DESCRIPTION
     );
@@ -89,12 +92,16 @@ void lorawanMessage(allwize_message_t message) {
     // Get BASE64 of payload
     String data = base64::encode(message.data, message.len, false);
 
+    // Get current time
+    String timestamp = ntpDateTime().c_str();
+    timestamp.replace(" ", "T");
+
     // Build JSON payload
     char buffer[512];
     snprintf_P(
         buffer, sizeof(buffer), 
-        PSTR("{\"rxpk\":[{\"tmst\":%lu,\"time\":\"%s\",\"chan\":%d,\"rfch\":%d,\"freq\":%.5f,\"stat\":%d,\"modu\":\"FSK\",\"datr\":%d,\"codr\":\"WIZE/DR%d\",\"rssi\":%d,\"lsnr\":0.0,\"size\":%d,\"data\":\"%s\"}]}"),
-        now(), ntpDateTime().c_str(), 
+        PSTR("{\"rxpk\":[{\"tmst\":%lu,\"time\":\"%s.00000Z\",\"chan\":%d,\"rfch\":%d,\"freq\":%.5f,\"stat\":%d,\"modu\":\"FSK\",\"datr\":%d,\"codr\":\"WIZE/DR%d\",\"rssi\":%d,\"lsnr\":0.0,\"size\":%d,\"data\":\"%s\"}]}"),
+        now(), timestamp.c_str(), 
         WIZE_CHANNEL, 0, wizeFrequency(WIZE_CHANNEL), 1,
         wizeDataRateSpeed(WIZE_DATARATE), WIZE_DATARATE,
         (int16_t) message.rssi / -2, message.len, data.c_str()

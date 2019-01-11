@@ -97,25 +97,11 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     //Set Current package length
     LoRaWAN_Data_Length = 9;
 
-    #if defined(ALLWIZE_DEBUG_PORT)
-        for (i = 0; i < LoRaWAN_Data_Length; i++) {
-            ALLWIZE_DEBUG_PRINT(LoRaWAN_Data[i], HEX);
-        }
-        ALLWIZE_DEBUG_PRINTLN();
-    #endif
-
     // MAC Payload - Frame Payload
     for(i = 0; i < Data_Length; i++) {
         LoRaWAN_Data[LoRaWAN_Data_Length + i] = tmpData[i];
     }
     LoRaWAN_Data_Length += Data_Length;
-
-    #if defined(ALLWIZE_DEBUG_PORT)
-        for (i = 0; i < LoRaWAN_Data_Length; i++) {
-            ALLWIZE_DEBUG_PRINT(LoRaWAN_Data[i], HEX);
-        }
-        ALLWIZE_DEBUG_PRINTLN();
-    #endif
 
     // Calculate MIC
     Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _frame_counter, Direction);
@@ -128,14 +114,6 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
 
     // Update frame counter
     ++_frame_counter;
-
-    // Debug
-    #if defined(ALLWIZE_DEBUG_PORT)
-        for (i = 0; i < LoRaWAN_Data_Length; i++) {
-            ALLWIZE_DEBUG_PRINT(LoRaWAN_Data[i], HEX);
-        }
-        ALLWIZE_DEBUG_PRINTLN();
-    #endif
 
     // Send Package
     return AllWize::send(LoRaWAN_Data, LoRaWAN_Data_Length);

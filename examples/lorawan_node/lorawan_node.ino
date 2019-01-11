@@ -159,7 +159,7 @@ void loop() {
     // Increment the number (it will overflow at 255)
     count++;
 
-    // Wait 5 seconds and redo
+    // Wait 20 seconds and redo
     delay(20000);
 
 }
