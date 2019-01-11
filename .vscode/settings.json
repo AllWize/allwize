@@ -1,6 +1,7 @@
 {
     "C_Cpp.dimInactiveRegions": false,
     "files.associations": {
-        "array": "cpp"
+       "system_error": "cpp",
+        "type_traits": "cpp"
     }
 }

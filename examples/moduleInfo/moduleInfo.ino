@@ -138,21 +138,27 @@ AllWize * allwize;
 
 #define COLUMN_PAD  20
 
-void format(const char * name, const char * value) {
+void format(const char * name, const char * value, bool isHex = false) {
     DEBUG_SERIAL.print(name);
     for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) DEBUG_SERIAL.print(" ");
+    if (isHex) DEBUG_SERIAL.print("0x");
     DEBUG_SERIAL.println(value);
 }
 
-void format(const char * name, String value) {
+void format(const char * name, String value, bool isHex = false) {
     DEBUG_SERIAL.print(name);
     for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) DEBUG_SERIAL.print(" ");
+    if (isHex) DEBUG_SERIAL.print("0x");
     DEBUG_SERIAL.println(value);
 }
 
-void format(const char * name, int value) {
+void format(const char * name, int value, bool asHex = false) {
     char buffer[10];
-    snprintf(buffer, sizeof(buffer), "%d", value);
+    if (asHex) {
+        snprintf(buffer, sizeof(buffer), "0x%X", value);
+    } else {
+        snprintf(buffer, sizeof(buffer), "%d", value);
+    }
     format(name, buffer);
 }
 
@@ -212,24 +218,25 @@ void setup() {
     format("Property", "Value");
     DEBUG_SERIAL.println("------------------------------");
 
+    format("Module type", allwize->getModuleType());
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());
-    format("MBUS Mode", allwize->getMBusMode());
+    format("MBUS Mode", allwize->getMBusMode(), true);
     format("Sleep Mode", allwize->getSleepMode());
     format("Data Rate", allwize->getDataRate());
     format("Preamble Length", allwize->getPreamble());
-    format("Control Field", allwize->getControlField());
+    format("Control Field", allwize->getControlField(), true);
     format("Network Role", allwize->getNetworkRole());
     format("Install Mode", allwize->getInstallMode());
 
-    format("Manufacturer ID", allwize->getMID());
-    format("Unique ID", allwize->getUID());
+    format("Manufacturer ID", allwize->getMID(), true);
+    format("Unique ID", allwize->getUID(), true);
     format("Version", allwize->getVersion());
     format("Device", allwize->getDevice());
     format("Part Number", allwize->getPartNumber());
     format("Hardware Version", allwize->getHardwareVersion());
     format("Firmware Version", allwize->getFirmwareVersion());
-    format("Serial Number", allwize->getSerialNumber());
+    format("Serial Number", allwize->getSerialNumber(), true);
 
     format("Temperature (C)", allwize->getTemperature());
     format("Voltage (mV)", allwize->getVoltage());
@@ -249,4 +256,6 @@ void setup() {
 
 }
 
-void loop() {}
+void loop() {
+    delay(1);
+}
