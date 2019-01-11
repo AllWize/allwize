@@ -138,6 +138,7 @@ class AllWize {
         void setDecryptFlag(uint8_t flag);
         void setKey(uint8_t reg, const uint8_t * key);
         void setDefaultKey(const uint8_t * key);
+        void setAccessNumber(uint8_t value);
 
         uint8_t getChannel();
         uint8_t getPower();
@@ -156,12 +157,12 @@ class AllWize {
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
 
-        //float getRSSI();
+        float getRSSI();
         uint8_t getTemperature();
         uint16_t getVoltage();
-        uint16_t getMID();
+        String getMID();
         bool setMID(uint16_t mid);
-        uint32_t getUID();
+        String getUID();
         bool setUID(uint32_t uid);
         uint8_t getVersion();
         uint8_t getDevice();
@@ -169,13 +170,13 @@ class AllWize {
         String getHardwareVersion();
         String getFirmwareVersion();
         String getSerialNumber();
-
-        bool isWize();
+        uint8_t getModuleType();
 
     protected:
 
         void _init();
 
+        uint8_t _getAddress(uint8_t slot);
         bool _setConfig(bool value);
         int8_t _sendCommand(uint8_t command, uint8_t * data, uint8_t len);
         int8_t _sendCommand(uint8_t command, uint8_t data);
@@ -236,7 +237,8 @@ class AllWize {
         bool _encrypt = false;
         uint8_t _access_number = 0;
 
-        bool _is_wize = false;
+        uint8_t _module = MODULE_UNKNOWN;
+
         String _model;
         String _fw;
         String _hw;
