@@ -327,9 +327,27 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
         return (1 == _send(0xFE));
     }
 
+    // Debug
+    #if defined(ALLWIZE_DEBUG_PORT)
+    {
+        char ch[4];
+        ALLWIZE_DEBUG_PRINT("send (");
+        ALLWIZE_DEBUG_PRINT(len);
+        ALLWIZE_DEBUG_PRINT("):");
+        for (uint8_t i = 0; i < len; i++) {
+            snprintf(ch, sizeof(ch), " %02X", buffer[i]);
+            ALLWIZE_DEBUG_PRINT(ch);
+        }
+        ALLWIZE_DEBUG_PRINTLN();
+    }
+    #endif
+
     // message length is payload length + 1 (CI) + 2 (for timestamp if wize)
     uint8_t message_len = len + 1;
-    if (MODULE_WIZE == _module) message_len += 2;
+    if (MODULE_WIZE == _module) {
+	message_len += 2;
+        if (_wize_send_transport_layer) message_len += 6;
+    }
 
     // max payload size is 238 bytes
     if (message_len > 238) {
@@ -346,8 +364,18 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
         return false;
     }
 
-    // payload
-    if (len != _send(buffer, message_len)) {
+    // transport layer
+    if ((MODULE_WIZE == _module) && (_wize_send_transport_layer)) {
+        _send(_wize_control);                   // Wize Control
+        _send((_wize_operator_id >> 0) & 0xFF); // Operator ID HIGH
+        _send((_wize_operator_id >> 8) & 0xFF); // Operator ID HIGH
+        _send((_counter >> 0) & 0xFF);          // Frame counter LOW
+        _send((_counter >> 8) & 0xFF);          // Frame counter HIGH
+        _send(_wize_application);               // Wize app indicator
+    }
+
+    // application payload
+    if (len != _send(buffer, len)) {
         return false;
     }
 
@@ -358,6 +386,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     }
 
     _access_number++;
+    _counter++;
     return true;
 
 }
@@ -413,6 +442,49 @@ allwize_message_t AllWize::read() {
     return _message;
 }
 
+/**
+ * @brief               Sets the wize control field in the transpoprt layer
+ * @param uint8_t       Wize Control (defined the key to be used)
+ * @return              True is correctly set
+ */
+bool AllWize::setWizeControl(uint8_t wize_control) {
+    if (wize_control > 14) return false;
+    _wize_control = wize_control;
+    return true;
+}
+
+/**
+ * @brief               Sets the wize operator ID field in the transpoprt layer
+ * @param uint16_t      Wize Operator ID
+ */
+void AllWize::setWizeOperatorId(uint16_t wize_operator_id) {
+    _wize_operator_id = wize_operator_id;
+}
+
+/**
+ * @brief               Sets the wize applicaton field in the transpoprt layer
+ * @param uint8_t       Wize Application
+ */
+void AllWize::setWizeApplication(uint8_t wize_application) {
+    _wize_application = wize_application;
+}
+
+/**
+ * @brief               Sets the wize couonter field in the transpoprt layer
+ * @param uint16_t      Wize counter
+ */
+void AllWize::setCounter(uint16_t counter) { 
+    _counter = counter; 
+}
+
+/**
+ * @brief               Gets the current wize counter
+ * @return              Counter
+ */
+uint16_t AllWize::getCounter() { 
+    return _counter; 
+}
+
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
@@ -442,6 +514,9 @@ void AllWize::setChannel(uint8_t channel, bool persist) {
     if (channel > 41) return;
     if (persist) {
         _setMemory(MEM_CHANNEL, channel);
+        if (MODULE_WIZE == _module) {
+            _setMemory(MEM_CHANNEL_RX, channel);
+        }
     }
     _sendCommand(CMD_CHANNEL, channel);
 }
@@ -483,6 +558,9 @@ uint8_t AllWize::getPower() {
 void AllWize::setDataRate(uint8_t dr) {
     if (0 < dr && dr < 6 && dr != 3) {
         _setMemory(MEM_DATA_RATE, dr);
+        if (MODULE_WIZE == _module) {
+            _setMemory(MEM_DATA_RATE_RX, dr);
+        }
     }
 }
 
@@ -685,7 +763,6 @@ uint8_t AllWize::getInstallMode() {
  */
 void AllWize::setEncryptFlag(uint8_t flag) {
     if (0 == flag || 1 == flag || 3 == flag) {
-        _encrypt = (flag & 0x01) == 0x01;
         _setMemory(MEM_ENCRYPT_FLAG, flag);
     }
 }
@@ -1145,11 +1222,15 @@ void AllWize::_readModel() {
 
     // Loop all module types
     String part_number = String();
+    uint8_t buffer[2];
     uint8_t module_old = _module;
     for (uint8_t type = 1; type < MODULE_MAX; type++) {
         _module = type;
-        part_number = _getMemoryAsString(MEM_PART_NUMBER, 32);   
-         if (part_number.indexOf("RC") == 0) break;
+        _getMemory(MEM_PART_NUMBER, buffer, 2);
+        if ((buffer[0] == 'R') && (buffer[1] == 'C')) {
+            part_number = _getMemoryAsString(MEM_PART_NUMBER, 32);   
+            break;
+        }
     }
     _module = module_old;
 
@@ -1208,9 +1289,10 @@ bool AllWize::_decode() {
 
     #if defined(ALLWIZE_DEBUG_PORT)
     {
-        char ch[10];
+        char ch[4];
+        ALLWIZE_DEBUG_PRINT("recv:");
         for (uint8_t i = 0; i < _pointer; i++) {
-            snprintf(ch, sizeof(ch), "%02X ", _buffer[i]);
+            snprintf(ch, sizeof(ch), " %02X", _buffer[i]);
             ALLWIZE_DEBUG_PRINT(ch);
         }
         ALLWIZE_DEBUG_PRINTLN();
@@ -1287,6 +1369,29 @@ bool AllWize::_decode() {
     _message.ci = _buffer[in];
     in += 1;
 
+    // Wize transport layer
+    if ((MODULE_WIZE == _module) && (_message.ci == CONTROL_INFORMATION_WIZE)) {
+        
+        bytes_not_in_app += 6;
+        
+        // Wize control
+        _message.wize_control = _buffer[in];
+        in += 1;
+
+        // Wize operator ID
+        _message.wize_operator_id = (_local[in + 1] << 8) + _local[in];
+        in += 2;
+
+        // Wize counter
+        _message.wize_counter = (_local[in + 1] << 8) + _local[in];
+        in += 2;
+
+        // Wize application
+        _message.wize_application = _buffer[in];
+        in += 1;
+
+    }
+
     // Application data
     _message.len = len - bytes_not_in_app;
     memcpy(_message.data, &_local[in], _message.len);
@@ -1333,9 +1438,13 @@ void AllWize::_flush() {
  * @protected
  */
 uint8_t AllWize::_send(uint8_t ch) {
-    ALLWIZE_DEBUG_PRINT("w ");
-    ALLWIZE_DEBUG_PRINT(ch, HEX);
-    ALLWIZE_DEBUG_PRINTLN("");
+    #if defined(ALLWIZE_DEBUG_PORT)
+    {
+        char buffer[5];
+        snprintf(buffer, sizeof(buffer), "w %02X", ch);
+        ALLWIZE_DEBUG_PRINTLN(buffer);
+    }
+    #endif
     return _stream->write(ch);
 }
 
@@ -1445,14 +1554,21 @@ int AllWize::_readBytesUntil(char terminator, char *buffer, uint16_t len) {
         return 0;
     uint16_t index = 0;
     while (index < len) {
+
         int ch = _timedRead();
         if (ch < 0)
             break;
         if (ch == terminator)
             break;
-        ALLWIZE_DEBUG_PRINT("r ");
-        ALLWIZE_DEBUG_PRINT(ch, HEX);
-        ALLWIZE_DEBUG_PRINTLN("");
+
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[5];
+            snprintf(buffer, sizeof(buffer), "r %02X", ch);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
+        }
+        #endif
+
         *buffer++ = (char)ch;
         index++;
     }

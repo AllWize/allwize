@@ -67,6 +67,10 @@ typedef struct {
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
+    uint8_t wize_control;
+    uint16_t wize_operator_id;
+    uint16_t wize_counter;
+    uint8_t wize_application;
 } allwize_message_t;
 
 // -----------------------------------------------------------------------------
@@ -174,6 +178,13 @@ class AllWize {
         uint16_t getDataRateSpeed(uint8_t dr);
         uint8_t getModuleType();
 
+        // Wize specific
+        bool setWizeControl(uint8_t wize_control);
+        void setWizeOperatorId(uint16_t wize_operator_id);
+        void setWizeApplication(uint8_t wize_application);
+        void setCounter(uint16_t counter);
+        uint16_t getCounter();
+
     protected:
 
         void _init();
@@ -234,19 +245,22 @@ class AllWize {
         uint8_t _mbus_mode = 0xFF;
         uint8_t _data_interface = 0xFF;
         bool _append_rssi = false;
-
-
-        bool _encrypt = false;
         uint8_t _access_number = 0;
-
         uint8_t _module = MODULE_UNKNOWN;
 
         String _model;
         String _fw;
         String _hw;
 
-        allwize_message_t _message;
+        // Wize specific
+        uint8_t _wize_control = 0x00;
+        uint16_t _wize_operator_id = 0;
+        uint8_t _wize_application = 0;
+        uint16_t _counter = 0;
+        bool _wize_send_transport_layer = true;
 
+        // Message buffers
+        allwize_message_t _message;
         uint8_t _buffer[RX_BUFFER_SIZE];
         uint8_t _pointer;
 
