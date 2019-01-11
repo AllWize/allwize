@@ -101,10 +101,7 @@ void wizeSetup() {
 void wizeSend(const char * payload) {
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer),
-        "[WIZE] CH: %d, TX: %d, DR: %d, Payload: %s\n",
-        allwize->getChannel(), allwize->getPower(), allwize->getDataRate(), payload
-    );
+    snprintf(buffer, sizeof(buffer), "[WIZE] Sending: %s\n", payload);
     DEBUG_SERIAL.print(buffer);
 
     if (!allwize->send(payload)) {
