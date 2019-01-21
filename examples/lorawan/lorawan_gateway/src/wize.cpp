@@ -33,7 +33,6 @@ void wizeSetup() {
 
     allwize->master();
     allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
 
     #if defined(DEBUG_PORT)
