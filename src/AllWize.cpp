@@ -345,7 +345,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // message length is payload length + 1 (CI) + 2 (for timestamp if wize)
     uint8_t message_len = len + 1;
     if (MODULE_WIZE == _module) {
-	message_len += 2;
+	    message_len += 2;
         if (_wize_send_transport_layer) message_len += 6;
     }
 
@@ -442,13 +442,17 @@ allwize_message_t AllWize::read() {
     return _message;
 }
 
+// -----------------------------------------------------------------------------
+// Wize specific
+// -----------------------------------------------------------------------------
+
 /**
  * @brief               Sets the wize control field in the transpoprt layer
  * @param uint8_t       Wize Control (defined the key to be used)
  * @return              True is correctly set
  */
 bool AllWize::setWizeControl(uint8_t wize_control) {
-    if (wize_control > 14) return false;
+    if ((wize_control < 1) || (14 < wize_control)) return false;
     _wize_control = wize_control;
     return true;
 }
@@ -757,6 +761,10 @@ uint8_t AllWize::getInstallMode() {
     return _getMemory(MEM_INSTALL_MODE);
 }
 
+// -----------------------------------------------------------------------------
+// Encryption
+// -----------------------------------------------------------------------------
+
 /**
  * @brief               Sets the encrypt flag setting
  * @param flag          Encrypt flag
@@ -792,12 +800,12 @@ uint8_t AllWize::getDecryptFlag() {
 }
 
 /**
- * @brief               Sets the default encryption key
- * @param reg           Register number (1-64)
+ * @brief               Sets an encryption key
+ * @param reg           Register number (1-128), slave only 1-16
  * @param key           A 16-byte encryption key as binary array
  */
 void AllWize::setKey(uint8_t reg, const uint8_t *key) {
-    if (reg > 128) return;
+    if ((reg < 1) || (128 < reg)) return;
     uint8_t data[17];
     data[0] = reg;
     memcpy(&data[1], key, 16);
@@ -805,7 +813,7 @@ void AllWize::setKey(uint8_t reg, const uint8_t *key) {
 }
 
 /**
- * @brief               Sets the default encryption key
+ * @brief               Sets the default encryption key (not used in WIZE)
  * @param key           A 16-byte encryption key as binary array
  */
 void AllWize::setDefaultKey(const uint8_t *key) {
@@ -813,7 +821,7 @@ void AllWize::setDefaultKey(const uint8_t *key) {
 }
 
 /**
- * @brief               Gets the default encryption key
+ * @brief               Gets the default encryption key (not used in WIZE)
  * @param key           A binary buffer to store the key (16 bytes)
  */
 void AllWize::getDefaultKey(uint8_t *key) {
@@ -826,6 +834,32 @@ void AllWize::getDefaultKey(uint8_t *key) {
  */
 void AllWize::setAccessNumber(uint8_t value) {
     _sendCommand(CMD_ACCESS_NUMBER, value);
+}
+
+/**
+ * @brief               Send a key challenge to the radio module to decrypt the latest received message
+ * @param key           A binary buffer holding the key (16 bytes)
+ */
+void AllWize::keyChallenge(uint8_t *key) {
+    _send(0xFC);
+    _send(key, 16);
+    //_send(0xFF);
+}
+
+/**
+ * @brief               Registers a slave in the master module
+ *                      The registry value is used for decrption
+ * @param reg           Register number (1-128)
+ */
+void AllWize::bindSlave(uint8_t reg, uint16_t manufacturer_id, uint32_t unique_id, uint8_t version, uint8_t type) {
+    if ((reg < 1) || (128 < reg)) return;
+    uint8_t data[9];
+    data[0] = reg;
+    memcpy(&data[1], manufacturer_id, 2);
+    memcpy(&data[3], unique_id, 4);
+    data[7] = version;
+    data[8] = type;
+    _sendCommand(CMD_BIND, data, 9);
 }
 
 // -----------------------------------------------------------------------------

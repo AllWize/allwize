@@ -232,3 +232,22 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 // Preamble Length
 #define PREAMBLE_FORMAT_A               0x00
 #define PREAMBLE_FORMAT_B               0x02
+
+// Encryption Keys
+#define ENCRYPTION_KEY_01               0x01
+#define ENCRYPTION_KEY_02               0x02
+#define ENCRYPTION_KEY_03               0x03
+#define ENCRYPTION_KEY_04               0x04
+#define ENCRYPTION_KEY_05               0x05
+#define ENCRYPTION_KEY_06               0x06
+#define ENCRYPTION_KEY_07               0x07
+#define ENCRYPTION_KEY_08               0x08
+#define ENCRYPTION_KEY_09               0x09
+#define ENCRYPTION_KEY_10               0x0A
+#define ENCRYPTION_KEY_11               0x0B
+#define ENCRYPTION_KEY_12               0x0C
+#define ENCRYPTION_KEY_13               0x0D
+#define ENCRYPTION_KEY_14               0x0E
+#define ENCRYPTION_KEY_CHANGE           0x0F
+#define ENCRYPTION_KEY_AUTH             0x10
+
