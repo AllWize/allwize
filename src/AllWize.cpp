@@ -685,6 +685,7 @@ uint8_t AllWize::getNetworkRole() {
  * @param value         LED control value
  */
 void AllWize::setLEDControl(uint8_t value) {
+    if (value > 3) return;
     _setMemory(MEM_LED_CONTROL, value);
 }
 

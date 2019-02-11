@@ -215,6 +215,7 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define LED_CONTROL_DISABLED            0x00
 #define LED_CONTROL_RX_TX               0x01
 #define LED_CONTROL_UART_RF_IDLE        0x02
+#define LED_CONTROL_RF_RX_TX            0x03
 
 // Encrypt/Decrypt flags
 #define ENCRYPT_DISABLED                0x00
