@@ -34,13 +34,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
@@ -80,8 +80,8 @@ AllWize * allwize;
 void wizeSetup() {
 
     // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
+    #if defined(MODULE_SERIAL)
+        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     #else
         allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
