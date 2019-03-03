@@ -194,14 +194,21 @@ class AllWize {
         int8_t _sendCommand(uint8_t command, uint8_t * data, uint8_t len);
         int8_t _sendCommand(uint8_t command, uint8_t data);
         int8_t _sendCommand(uint8_t command);
-        bool _setMemory(uint8_t address, uint8_t * data, uint8_t len);
-        bool _setMemory(uint8_t address, uint8_t data);
-        uint8_t _getMemory(uint8_t address, uint8_t * buffer, uint8_t len);
-        uint8_t _getMemory(uint8_t address);
-        String _getMemoryAsHexString(uint8_t address, uint8_t len);
-        String _getMemoryAsString(uint8_t address, uint8_t len);
-        void _readModel();
 
+        void _cacheMemory();
+        uint8_t _getMemory(uint8_t address);
+        uint8_t _getMemory(uint8_t address, uint8_t *buffer, uint8_t len);
+        bool _setMemory(uint8_t address, uint8_t data);
+        bool _setMemory(uint8_t address, uint8_t * data, uint8_t len);
+
+        bool _setSlot(uint8_t slot, uint8_t data);
+        bool _setSlot(uint8_t slot, uint8_t * data, uint8_t len);
+        uint8_t _getSlot(uint8_t slot);
+        uint8_t _getSlot(uint8_t slot, uint8_t * buffer, uint8_t len);
+        String _getSlotAsHexString(uint8_t slot, uint8_t len);
+        String _getSlotAsString(uint8_t slot, uint8_t len);
+
+        void _readModel();
         bool _decode();
 
         void _flush();
@@ -248,9 +255,13 @@ class AllWize {
         uint8_t _access_number = 0;
         uint8_t _module = MODULE_UNKNOWN;
 
+        // Memory buffer
+        bool _ready = false;
+        uint8_t _memory[0x100] = {0};
+
         String _model;
-        String _fw;
         String _hw;
+        String _fw;
 
         // Wize specific
         uint8_t _wize_control = 0x00;
