@@ -105,16 +105,17 @@ void wizeLoop() {
         // Get the message
         allwize_message_t message = allwize->read();
 
-        // Send it to serial port
+	    // Build frame
         snprintf(
             buffer, sizeof(buffer),
-            "%d,%02X%02X%02X%02X,%d,%d,%d,%s\n",
-            message.c,
+            "%02X%02X%02X%02X,%d,%d,%s\n",
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.type, message.ci, message.rssi,
+            message.c, (int16_t) message.rssi / -2,
             (char *) message.data
         );
+
+        // Send it to serial port
         PC_SERIAL.print(buffer);
 
     }
