@@ -25,12 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MOTEINO)
     #define RESET_PIN           7
     #define RX_PIN              8
     #define TX_PIN              9
     #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_UNO
+#endif // ARDUINO_AVR_UNO || ARDUINO_AVR_MOTEINO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7

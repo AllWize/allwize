@@ -32,7 +32,7 @@ AllWize * allwize;
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MOTEINO)
 
     // Common
     #define RESET_PIN           7
