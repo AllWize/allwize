@@ -44,6 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define END_OF_RESPONSE                 '>'
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58
+#define CMD_EXIT_MEMORY_ENABLE_RF       (char) 0xFD
+#define CMD_EXIT_MEMORY_DISABLE_RF      (char) 0xFF
+#define CMD_AWAKE                       (char) 0xFF     // Deprecated
 #define CMD_EXIT_MEMORY                 (char) 0xFF
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
@@ -156,7 +159,9 @@ class AllWize {
         uint8_t getTemperature();
         uint16_t getVoltage();
         String getMID();
+        bool setMID(uint16_t mid);
         String getUID();
+        bool setUID(uint32_t uid);
         uint8_t getVersion();
         uint8_t getDevice();
         String getPartNumber();

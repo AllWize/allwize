@@ -209,14 +209,16 @@ void AllWize::repeater() {
  * @brief               Sets the radio module in sleep mode
  */
 void AllWize::sleep() {
-    _sendCommand(CMD_SLEEP);
+    if (!_setConfig(true)) return;
+    _send(CMD_SLEEP);
 }
 
 /**
  * @brief               Wakes up the radio from sleep mode
  */
 void AllWize::wakeup() {
-    _sendAndReceive(CMD_EXIT_CONFIG);
+    _send(CMD_AWAKE);
+    ready();
 }
 
 /**
@@ -754,11 +756,35 @@ String AllWize::getMID() {
 }
 
 /**
+ * @brief               Sets the Manufacturer ID
+ * @uint16_t mid        MID to save
+ */
+bool AllWize::setMID(uint16_t mid) {
+    uint8_t buffer[2];
+    buffer[0] = (mid >> 8) & 0xFF;
+    buffer[1] = (mid >> 0) & 0xFF;
+    return _setMemory(MEM_MANUFACTURER_ID, buffer, 2);
+}
+
+/**
  * @brief               Returns the Unique ID string
  * @return              4-byte hex string with the unique ID
  */
 String AllWize::getUID() {
     return _getMemoryAsHexString(MEM_UNIQUE_ID, 4);
+}
+
+/**
+ * @brief               Saved the UID into the module memory
+ * @uint32_t uid        UID to save
+ */
+bool AllWize::setUID(uint32_t uid) {
+    uint8_t buffer[4];
+    buffer[0] = (uid >> 24) & 0xFF;
+    buffer[1] = (uid >> 16) & 0xFF;
+    buffer[2] = (uid >>  8) & 0xFF;
+    buffer[3] = (uid >>  0) & 0xFF;
+    return _setMemory(MEM_UNIQUE_ID, buffer, 4);
 }
 
 /**
