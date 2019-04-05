@@ -48,6 +48,8 @@ setLEDControl KEYWORD2
 setDataInterface KEYWORD2
 setControlField KEYWORD2
 setInstallMode KEYWORD2
+setMID KEYWORD2
+setUID KEYWORD2
 setEncryptFlag KEYWORD2
 setDecryptFlag KEYWORD2
 setKey KEYWORD2
