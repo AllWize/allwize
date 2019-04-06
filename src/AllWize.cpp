@@ -352,7 +352,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // message length is payload length + 1 (CI) + 2 (for timestamp if wize)
     uint8_t message_len = len + 1;
     if (MODULE_WIZE == _module) {
-	message_len += 2;
+	    message_len += 2;
         if (_wize_send_transport_layer) message_len += 6;
     }
 
@@ -892,7 +892,7 @@ String AllWize::getMID() {
 
 /**
  * @brief               Sets the Manufacturer ID
- * @uint8_t * uid       UID to save
+ * @uint16_t mid        MID to save
  */
 bool AllWize::setMID(uint16_t mid) {
     uint8_t buffer[2];
@@ -902,8 +902,8 @@ bool AllWize::setMID(uint16_t mid) {
 }
 
 /**
- * @brief               Returns the Unique ID as a byte array
- * @return              UID
+ * @brief               Returns the Unique ID string
+ * @return              4-byte hex string with the unique ID
  */
 String AllWize::getUID() {
     return _getSlotAsHexString(MEM_UNIQUE_ID, 4);
@@ -911,7 +911,7 @@ String AllWize::getUID() {
 
 /**
  * @brief               Saved the UID into the module memory
- * @uint8_t * uid       UID to save
+ * @uint32_t uid        UID to save
  */
 bool AllWize::setUID(uint32_t uid) {
     uint8_t buffer[4];
@@ -1539,7 +1539,7 @@ uint8_t AllWize::_send(uint8_t *buffer, uint8_t len) {
  * @protected
  */
 int8_t AllWize::_receive() {
-    return _readBytesUntil(END_OF_RESPONSE, (char *)_buffer, RX_BUFFER_SIZE);
+    return _readBytesUntil(END_OF_RESPONSE, (char *) _buffer, RX_BUFFER_SIZE);
 }
 
 /**
@@ -1579,12 +1579,11 @@ int8_t AllWize::_sendAndReceive(uint8_t ch) {
 int AllWize::_timedRead() {
     uint32_t _start = millis();
     while (millis() - _start < _timeout) {
-        int ch = _stream->read();
-        if (ch >= 0)
-            return ch;
 #if defined(ARDUINO_ARCH_ESP8266)
         yield();
 #endif
+        int ch = _stream->read();
+        if (ch >= 0) return ch;
     };
     return -1;
 }
@@ -1625,8 +1624,8 @@ int AllWize::_readBytesUntil(char terminator, char *buffer, uint16_t len) {
     while (index < len) {
 
         int ch = _timedRead();
-        if (ch < 0)
-            break;
+        if (ch < 0) 
+            return -1;
         if (ch == terminator)
             break;
 
