@@ -45,4 +45,4 @@ Configuration file
 #define MQTT_PASS               ""
 #define MQTT_QOS                2
 #define MQTT_RETAIN             0
-#define MQTT_TOPIC              "team/%u/field_%u"    // CI, field#
+#define MQTT_TOPIC              "device/%s/field_%u"    // UID, field#

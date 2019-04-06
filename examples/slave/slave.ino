@@ -25,12 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MOTEINO)
     #define RESET_PIN           7
     #define RX_PIN              8
     #define TX_PIN              9
     #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_UNO
+#endif // ARDUINO_AVR_UNO || ARDUINO_AVR_MOTEINO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
@@ -39,10 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    
-    // Generic board
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
+
+    // Common:
     #define DEBUG_SERIAL        SerialUSB
 
     // Configuring additional hardware serials:
@@ -67,22 +65,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     //    12  pad 3 (only RX)
     //    13  pad 1 (only RX)
 
-    /*
-    // AllWize K2
-    #define RX_PIN              (29ul)
-    #define TX_PIN              (26ul)
-    #define SERCOM_PORT         sercom2
-    #define SERCOM_HANDLER      SERCOM2_Handler
-    #define SERCOM_MODE         PIO_SERCOM_ALT
-    #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
-    #define SERCOM_TX_PAD       UART_TX_PAD_0
-    #include "wiring_private.h" // pinPeripheral() function
-    Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
-    void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
-    #define MODULE_SERIAL       SerialWize
-    #define RESET_PIN           (30u)
-    #define DEBUG_SERIAL        SerialUSB
-    */
+    #if defined(ALLWIZE_K2)
+
+        #define RX_PIN              (29ul)
+        #define TX_PIN              (26ul)
+        #define SERCOM_PORT         sercom2
+        #define SERCOM_HANDLER      SERCOM2_Handler
+        #define SERCOM_MODE         PIO_SERCOM_ALT
+        #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
+        #define SERCOM_TX_PAD       UART_TX_PAD_0
+        #include "wiring_private.h" // pinPeripheral() function
+        Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
+        void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+        #define MODULE_SERIAL       SerialWize
+        #define RESET_PIN           (30u)
+
+    #else
+
+        // Using exposed hardware serials:
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+
+    #endif
 
 #endif // ARDUINO_ARCH_SAMD
 
@@ -141,7 +145,7 @@ void wizeSetup() {
     allwize->slave();
     allwize->setMBusMode(MBUS_MODE_OSP);
     allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
+    allwize->setPower(WIZE_POWER, true);
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setUID(WIZE_UID);
 

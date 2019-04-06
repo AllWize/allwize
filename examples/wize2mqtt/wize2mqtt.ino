@@ -123,13 +123,10 @@ void wizeDebugMessage(allwize_message_t message) {
     char buffer[128];
     snprintf(
         buffer, sizeof(buffer),
-        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: 0x%02X, DATA: { ",
-        message.c,
-        message.man,
+        "[WIZE] ADDR: 0x%02X%02X%02X%02X, RSSI: %d, DATA: { ",
         message.address[0], message.address[1],
         message.address[2], message.address[3],
-        message.type, message.version,
-        message.ci, message.rssi
+        (int16_t) message.rssi / -2
     );
     DEBUG_SERIAL.print(buffer);
 
@@ -157,6 +154,13 @@ void wizeLoop() {
         // Sending message via MQTT
         if (mqtt.connected()) {
 
+            char uid[10];
+            snprintf(
+                uid, sizeof(uid), "%02X%02X%02X%02X",
+                message.address[0], message.address[1],
+                message.address[2], message.address[3]
+            );
+
             // Init field counter
             uint8_t field = 1;
             char buffer[64];
@@ -170,7 +174,7 @@ void wizeLoop() {
 
                 // Build topic string with CI and field number
                 char topic[32];
-                snprintf(topic, sizeof(topic), MQTT_TOPIC, message.ci, field);
+                snprintf(topic, sizeof(topic), MQTT_TOPIC, uid, field);
 
                 // Publish message
                 snprintf(buffer, sizeof(buffer), "[WIZE] MQTT message: %s => %s\n", topic, payload);
