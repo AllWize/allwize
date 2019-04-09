@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // General
 #define MODEM_BAUDRATE                  19200
 #define GPIO_NONE                       0x99
-#define CONTROL_INFORMATION             0x7A
+#define CONTROL_INFORMATION             0x67
 #define END_OF_RESPONSE                 '>'
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58

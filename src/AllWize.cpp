@@ -64,7 +64,6 @@ AllWize::AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx),
     _init();
 }
 
-
 void AllWize::_init() {
     if (GPIO_NONE != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
@@ -1073,9 +1072,10 @@ bool AllWize::_decode() {
 
     #if defined(ALLWIZE_DEBUG_PORT)
     {
-        char ch[10];
-        for (uint8_t i = 0; i<_pointer; i++) {
-            snprintf(ch, sizeof(ch), "%02X ", _buffer[i]);
+        char ch[4];
+        ALLWIZE_DEBUG_PRINT("recv:");
+        for (uint8_t i = 0; i < _pointer; i++) {
+            snprintf(ch, sizeof(ch), " %02X", _buffer[i]);
             ALLWIZE_DEBUG_PRINT(ch);
         }
         ALLWIZE_DEBUG_PRINTLN();
@@ -1195,9 +1195,13 @@ void AllWize::_flush() {
  * @protected
  */
 uint8_t AllWize::_send(uint8_t ch) {
-    ALLWIZE_DEBUG_PRINT("w ");
-    ALLWIZE_DEBUG_PRINT(ch, HEX);
-    ALLWIZE_DEBUG_PRINTLN("");
+    #if defined(ALLWIZE_DEBUG_PORT)
+    {
+        char buffer[5];
+        snprintf(buffer, sizeof(buffer), "w %02X", ch);
+        ALLWIZE_DEBUG_PRINTLN(buffer);
+    }
+    #endif
     return _stream->write(ch);
 }
 
@@ -1282,6 +1286,15 @@ int AllWize::_readBytes(char * buffer, uint16_t len) {
     while (index < len) {
         int ch = _timedRead();
         if (ch < 0) break;
+
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[5];
+            snprintf(buffer, sizeof(buffer), "r %02X", ch);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
+        }
+        #endif
+
         *buffer++ = (char) ch;
         index++;
     }
@@ -1300,12 +1313,19 @@ int AllWize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
     if (len < 1) return 0;
     uint16_t index = 0;
     while (index < len) {
+
         int ch = _timedRead();
         if (ch < 0) break;
         if (ch == terminator) break;
-        ALLWIZE_DEBUG_PRINT("r ");
-        ALLWIZE_DEBUG_PRINT(ch, HEX);
-        ALLWIZE_DEBUG_PRINTLN("");
+
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[5];
+            snprintf(buffer, sizeof(buffer), "r %02X", ch);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
+        }
+        #endif
+
         *buffer++ = (char) ch;
         index++;
     }

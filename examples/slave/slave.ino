@@ -122,6 +122,8 @@ AllWize * allwize;
 
 void wizeSetup() {
 
+    DEBUG_SERIAL.println("Initializing radio module");
+
     #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
         pinPeripheral(RX_PIN, SERCOM_MODE);
         pinPeripheral(TX_PIN, SERCOM_MODE);
@@ -133,6 +135,7 @@ void wizeSetup() {
     #else
         allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
+    
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
@@ -152,10 +155,7 @@ void wizeSetup() {
 void wizeSend(const char * payload) {
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer),
-        "[WIZE] CH: %d, TX: %d, DR: %d, Payload: %s\n",
-        allwize->getChannel(), allwize->getPower(), allwize->getDataRate(), payload
-    );
+    snprintf(buffer, sizeof(buffer), "[WIZE] Sending '%s'\n", payload);
     DEBUG_SERIAL.print(buffer);
 
     if (!allwize->send(payload)) {
