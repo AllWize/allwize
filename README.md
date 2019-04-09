@@ -22,6 +22,11 @@ Compatible platforms:
 *   ESP8266
 *   ESP32
 
+## Documentation
+
+Visit the [online documentation for the AllWize Library](https://allwize.github.io/allwize/classAllWize.html).
+
+
 ## License
 
 Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
