@@ -56,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define START_BYTE                      0x68
 #define STOP_BYTE                       0x16
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define USE_MEMORY_CACHE                1
 
 typedef struct {
     uint8_t c;
@@ -177,6 +178,7 @@ class AllWize {
         double getFrequency(uint8_t channel);
         uint16_t getDataRateSpeed(uint8_t dr);
         uint8_t getModuleType();
+        String getModuleTypeName();
 
         // Wize specific
         bool setWizeControl(uint8_t wize_control);

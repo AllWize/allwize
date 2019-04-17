@@ -223,7 +223,7 @@ void setup() {
     format("Property", "Value");
     DEBUG_SERIAL.println("------------------------------");
 
-    format("Module type", allwize->getModuleType());
+    format("Module type", allwize->getModuleTypeName());
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());
     format("MBUS Mode", allwize->getMBusMode(), true);
