@@ -159,7 +159,6 @@ bool AllWize::reset() {
             _send('@');
             _send('R');
             _send('R');
-            _flush();
             delay(100);
             if (GPIO_NONE != _config_gpio) {
                 digitalWrite(_config_gpio, LOW);
@@ -195,7 +194,6 @@ bool AllWize::factoryReset() {
         _send('@');
         _send('R');
         _send('C');
-        _flush();
         delay(100);
         if (GPIO_NONE != _config_gpio) {
             digitalWrite(_config_gpio, LOW);
@@ -1107,8 +1105,12 @@ void AllWize::_cacheMemory() {
     _setConfig(true);
     _send(CMD_TEST_MODE_0);
     _ready = (256 == _readBytes((char *) _memory, 256));
+    
+    // Get tailing prompt
+    int ch = _timedRead();
+    if (ch < 0) _ready = false;
+
     _setConfig(false);
-    _flush();
 
 }
 
@@ -1527,8 +1529,13 @@ bool AllWize::_decode() {
  * @protected
  */
 void AllWize::_flush() {
+
+    // Flush TX line
     _stream->flush();
-    while (_stream->available()) _stream->read();
+
+    // Flush RX line
+    //while (_stream->available()) _stream->read();
+
 }
 
 /**
