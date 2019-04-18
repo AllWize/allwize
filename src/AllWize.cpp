@@ -29,19 +29,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @brief               AllWize object constructor
  * @param stream        HardwareSerial object to communicate with the module
- * @param _reset_gpio   GPIO connected to the module RESET pin
+ * @param reset_gpio    GPIO connected to the module RESET pin
+ * @param config_gpio   GPIO connected to the module CONFIG pin
  */
-AllWize::AllWize(HardwareSerial *serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
+AllWize::AllWize(HardwareSerial *serial, uint8_t reset_gpio, uint8_t config_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio), _config_gpio(config_gpio) {
     _init();
 }
 
 /**
  * @brief               AllWize object constructor
  * @param stream        SoftwareSerial object to communicate with the module
- * @param _reset_gpio   GPIO connected to the module RESET pin
+ * @param reset_gpio    GPIO connected to the module RESET pin
+ * @param config_gpio   GPIO connected to the module CONFIG pin
  */
 #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
+AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio, uint8_t config_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio), _config_gpio(config_gpio) {
     _init();
 }
 #endif
@@ -50,9 +52,10 @@ AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio) : _stream(serial), 
  * @brief               AllWize object constructor
  * @param rx            GPIO for RX
  * @param tx            GPIO for TX
- * @param _reset_gpio   GPIO connected to the module RESET pin
+ * @param reset_gpio    GPIO connected to the module RESET pin
+ * @param config_gpio   GPIO connected to the module CONFIG pin
  */
-AllWize::AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx), _reset_gpio(reset_gpio) {
+AllWize::AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio, uint8_t config_gpio) : _rx(rx), _tx(tx), _reset_gpio(reset_gpio), _config_gpio(config_gpio) {
 #if defined(ARDUINO_ARCH_SAMD)
     // Software serial not implemented for SAMD
     assert(false);
@@ -68,6 +71,10 @@ void AllWize::_init() {
     if (GPIO_NONE != _reset_gpio) {
         pinMode(_reset_gpio, OUTPUT);
         digitalWrite(_reset_gpio, HIGH);
+    }
+    if (GPIO_NONE != _config_gpio) {
+        pinMode(_config_gpio, OUTPUT);
+        digitalWrite(_config_gpio, LOW);
     }
     randomSeed(analogRead(0));
     _access_number = random(0, 256);
@@ -154,6 +161,9 @@ bool AllWize::reset() {
             _send('R');
             _flush();
             delay(100);
+            if (GPIO_NONE != _config_gpio) {
+                digitalWrite(_config_gpio, LOW);
+            }
             _config = false;
             _reset_serial();
             return true;
@@ -163,6 +173,9 @@ bool AllWize::reset() {
         delay(1);
         digitalWrite(_reset_gpio, HIGH);
         delay(100);
+        if (GPIO_NONE != _config_gpio) {
+            digitalWrite(_config_gpio, LOW);
+        }
         _config = false;
         _reset_serial();
         return true;
@@ -184,6 +197,9 @@ bool AllWize::factoryReset() {
         _send('C');
         _flush();
         delay(100);
+        if (GPIO_NONE != _config_gpio) {
+            digitalWrite(_config_gpio, LOW);
+        }
         _config = false;
         _reset_serial();
         return true;
@@ -1014,15 +1030,20 @@ bool AllWize::_setConfig(bool value) {
     if (value != _config) {
         _flush();
         if (value) {
-            if (_sendAndReceive(CMD_ENTER_CONFIG) == 0) {
+            if (GPIO_NONE != _config_gpio) {
+                digitalWrite(_config_gpio, HIGH);
                 _config = true;
-                delay(2);
+            } else {
+                _config = (_sendAndReceive(CMD_ENTER_CONFIG) == 0);
             }
         } else {
+            if (GPIO_NONE != _config_gpio) {
+                digitalWrite(_config_gpio, LOW);
+            }
             _send(CMD_EXIT_CONFIG);
             _config = false;
-            delay(10);
         }
+        delay(10);
     }
     return _config;
 }
