@@ -1,0 +1,6 @@
+<map id="AllWize::_sendAndReceive" name="AllWize::_sendAndReceive">
+<area shape="rect" id="node2" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="241,5,352,32"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incomming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="235,56,359,83"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="407,56,575,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="623,56,768,83"/>
+</map>

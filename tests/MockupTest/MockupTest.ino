@@ -195,14 +195,14 @@ testF(CustomTest, get_serial_number) {
     assertEqual(16, (int) sn.length());
     uint8_t expected[] = {
         0x00,
-        'Y', MEM_SERIAL_NUMBER_NEW + 0,
-        'Y', MEM_SERIAL_NUMBER_NEW + 1,
-        'Y', MEM_SERIAL_NUMBER_NEW + 2,
-        'Y', MEM_SERIAL_NUMBER_NEW + 3,
-        'Y', MEM_SERIAL_NUMBER_NEW + 4,
-        'Y', MEM_SERIAL_NUMBER_NEW + 5,
-        'Y', MEM_SERIAL_NUMBER_NEW + 6,
-        'Y', MEM_SERIAL_NUMBER_NEW + 7,
+        'Y', MEM_SERIAL_NUMBER + 0,
+        'Y', MEM_SERIAL_NUMBER + 1,
+        'Y', MEM_SERIAL_NUMBER + 2,
+        'Y', MEM_SERIAL_NUMBER + 3,
+        'Y', MEM_SERIAL_NUMBER + 4,
+        'Y', MEM_SERIAL_NUMBER + 5,
+        'Y', MEM_SERIAL_NUMBER + 6,
+        'Y', MEM_SERIAL_NUMBER + 7,
         0x58
     };
     compare(sizeof(expected), expected);

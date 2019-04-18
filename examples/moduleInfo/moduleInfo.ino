@@ -32,7 +32,7 @@ AllWize * allwize;
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MOTEINO)
 
     // Common
     #define RESET_PIN           7
@@ -64,11 +64,7 @@ AllWize * allwize;
 #if defined(ARDUINO_ARCH_SAMD)
 
     // Common:
-    #define RESET_PIN           7
     #define DEBUG_SERIAL        SerialUSB
-
-    // Using exposed hardware serials:
-    #define MODULE_SERIAL       Serial1
 
     // Configuring additional hardware serials:
     // Possible combinations:
@@ -92,19 +88,28 @@ AllWize * allwize;
     //    12  pad 3 (only RX)
     //    13  pad 1 (only RX)
 
-    /*
-    #define RX_PIN              10
-    #define TX_PIN              11
-    #define SERCOM_PORT         sercom3
-    #define SERCOM_HANDLER      SERCOM3_Handler
-    #define SERCOM_MODE         PIO_SERCOM_ALT
-    #define SERCOM_RX_PAD       SERCOM_RX_PAD_2
-    #define SERCOM_TX_PAD       UART_TX_PAD_0
-    #include "wiring_private.h" // pinPeripheral() function
-    Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
-    void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
-    #define MODULE_SERIAL       SerialWize
-    */
+    #if defined(ALLWIZE_K2)
+
+        #define RX_PIN              (29ul)
+        #define TX_PIN              (26ul)
+        #define SERCOM_PORT         sercom2
+        #define SERCOM_HANDLER      SERCOM2_Handler
+        #define SERCOM_MODE         PIO_SERCOM_ALT
+        #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
+        #define SERCOM_TX_PAD       UART_TX_PAD_0
+        #include "wiring_private.h" // pinPeripheral() function
+        Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
+        void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+        #define MODULE_SERIAL       SerialWize
+        #define RESET_PIN           (30u)
+
+    #else
+
+        // Using exposed hardware serials:
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+
+    #endif
 
 #endif // ARDUINO_ARCH_SAMD
 
@@ -138,21 +143,27 @@ AllWize * allwize;
 
 #define COLUMN_PAD  20
 
-void format(const char * name, const char * value) {
+void format(const char * name, const char * value, bool isHex = false) {
     DEBUG_SERIAL.print(name);
     for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) DEBUG_SERIAL.print(" ");
+    if (isHex) DEBUG_SERIAL.print("0x");
     DEBUG_SERIAL.println(value);
 }
 
-void format(const char * name, String value) {
+void format(const char * name, String value, bool isHex = false) {
     DEBUG_SERIAL.print(name);
     for (uint8_t i=0; i<COLUMN_PAD-strlen(name); i++) DEBUG_SERIAL.print(" ");
+    if (isHex) DEBUG_SERIAL.print("0x");
     DEBUG_SERIAL.println(value);
 }
 
-void format(const char * name, int value) {
+void format(const char * name, int value, bool asHex = false) {
     char buffer[10];
-    snprintf(buffer, sizeof(buffer), "%d", value);
+    if (asHex) {
+        snprintf(buffer, sizeof(buffer), "0x%X", value);
+    } else {
+        snprintf(buffer, sizeof(buffer), "%d", value);
+    }
     format(name, buffer);
 }
 
@@ -162,7 +173,7 @@ void format(const char * name, int value) {
 
 void wizeSetup() {
 
-    DEBUG_SERIAL.println("Checking radio module");
+    DEBUG_SERIAL.println("Initializing radio module");
 
     #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
         pinPeripheral(RX_PIN, SERCOM_MODE);
@@ -212,24 +223,25 @@ void setup() {
     format("Property", "Value");
     DEBUG_SERIAL.println("------------------------------");
 
+    format("Module type", allwize->getModuleTypeName());
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());
-    format("MBUS Mode", allwize->getMBusMode());
+    format("MBUS Mode", allwize->getMBusMode(), true);
     format("Sleep Mode", allwize->getSleepMode());
     format("Data Rate", allwize->getDataRate());
     format("Preamble Length", allwize->getPreamble());
-    format("Control Field", allwize->getControlField());
+    format("Control Field", allwize->getControlField(), true);
     format("Network Role", allwize->getNetworkRole());
     format("Install Mode", allwize->getInstallMode());
 
-    format("Manufacturer ID", allwize->getMID());
-    format("Unique ID", allwize->getUID());
+    format("Manufacturer ID", allwize->getMID(), true);
+    format("Unique ID", allwize->getUID(), true);
     format("Version", allwize->getVersion());
     format("Device", allwize->getDevice());
     format("Part Number", allwize->getPartNumber());
     format("Hardware Version", allwize->getHardwareVersion());
     format("Firmware Version", allwize->getFirmwareVersion());
-    format("Serial Number", allwize->getSerialNumber());
+    format("Serial Number", allwize->getSerialNumber(), true);
 
     format("Temperature (C)", allwize->getTemperature());
     format("Voltage (mV)", allwize->getVoltage());
@@ -249,4 +261,6 @@ void setup() {
 
 }
 
-void loop() {}
+void loop() {
+    delay(1);
+}

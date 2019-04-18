@@ -35,13 +35,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
@@ -79,8 +79,8 @@ AllWize * allwize;
 void wizeSetup() {
 
     // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
+    #if defined(MODULE_SERIAL)
+        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     #else
         allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
@@ -106,17 +106,31 @@ void wizeSetup() {
 void wizeDebugMessage(allwize_message_t message) {
 
     // Code to pretty-print the message
-    char buffer[128];
-    snprintf(
-        buffer, sizeof(buffer),
-        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: %d, DATA: { ",
-        message.c,
-        message.man,
-        message.address[0], message.address[1],
-        message.address[2], message.address[3],
-        message.type, message.version,
-        message.ci, (int16_t) message.rssi / -2
-    );
+    char buffer[512];
+    if (CONTROL_INFORMATION_WIZE == message.ci) {
+        snprintf(
+            buffer, sizeof(buffer),
+            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: { ",
+            message.c,
+            message.man,
+            message.address[0], message.address[1],
+            message.address[2], message.address[3],
+            message.type, message.version,
+            message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
+            (int16_t) message.rssi / -2
+        );
+    } else {
+        snprintf(
+            buffer, sizeof(buffer),
+            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: %d, DATA: { ",
+            message.c,
+            message.man,
+            message.address[0], message.address[1],
+            message.address[2], message.address[3],
+            message.type, message.version,
+            message.ci, (int16_t) message.rssi / -2
+        );
+    }
     DEBUG_SERIAL.print(buffer);
 
     for (uint8_t i=0; i<message.len; i++) {

@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ALLWIZE_H
 
 #include <Arduino.h>
-#include "Wize.h"
+#include "RC1701HP.h"
 #include <Stream.h>
 #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 #include <SoftwareSerial.h>
@@ -40,12 +40,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // General
 #define MODEM_BAUDRATE                  19200
 #define GPIO_NONE                       0x99
-#define CONTROL_INFORMATION             0x7A
+#define CONTROL_INFORMATION_WIZE        0x20            // Wize Control Information Field for Application Protocol (Wize User Manual, page 5)
+#define CONTROL_INFORMATION             0x67
 #define END_OF_RESPONSE                 '>'
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58
-#define CMD_AWAKE                       (char) 0xFF
-#define CMD_EXIT_MEMORY                 (char) 0xFF
+#define CMD_EXIT_MEMORY_ENABLE_RF       (char) 0xFD
+#define CMD_EXIT_MEMORY_DISABLE_RF      (char) 0xFF
+#define CMD_AWAKE                       (char) 0xFF     // Deprecated
+#define CMD_EXIT_MEMORY                 (char) 0xFF     // Deprecated
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
 #define HARDWARE_SERIAL_PORT            1
@@ -53,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define START_BYTE                      0x68
 #define STOP_BYTE                       0x16
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define USE_MEMORY_CACHE                1
 
 typedef struct {
     uint8_t c;
@@ -64,6 +68,10 @@ typedef struct {
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
+    uint8_t wize_control;
+    uint16_t wize_operator_id;
+    uint16_t wize_counter;
+    uint8_t wize_application;
 } allwize_message_t;
 
 // -----------------------------------------------------------------------------
@@ -135,6 +143,7 @@ class AllWize {
         void setDecryptFlag(uint8_t flag);
         void setKey(uint8_t reg, const uint8_t * key);
         void setDefaultKey(const uint8_t * key);
+        void setAccessNumber(uint8_t value);
 
         uint8_t getChannel();
         uint8_t getPower();
@@ -153,17 +162,30 @@ class AllWize {
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
 
-        //float getRSSI();
+        float getRSSI();
         uint8_t getTemperature();
         uint16_t getVoltage();
         String getMID();
+        bool setMID(uint16_t mid);
         String getUID();
+        bool setUID(uint32_t uid);
         uint8_t getVersion();
         uint8_t getDevice();
         String getPartNumber();
         String getHardwareVersion();
         String getFirmwareVersion();
         String getSerialNumber();
+        double getFrequency(uint8_t channel);
+        uint16_t getDataRateSpeed(uint8_t dr);
+        uint8_t getModuleType();
+        String getModuleTypeName();
+
+        // Wize specific
+        bool setWizeControl(uint8_t wize_control);
+        void setWizeOperatorId(uint16_t wize_operator_id);
+        void setWizeApplication(uint8_t wize_application);
+        void setCounter(uint16_t counter);
+        uint16_t getCounter();
 
         #if defined(ALLWIZE_EXTERNAL_AES)
         uint8_t pad(uint8_t * data, uint8_t len, uint8_t * output, uint8_t key_size);
@@ -175,18 +197,26 @@ class AllWize {
 
         void _init();
 
+        uint8_t _getAddress(uint8_t slot);
         bool _setConfig(bool value);
         int8_t _sendCommand(uint8_t command, uint8_t * data, uint8_t len);
         int8_t _sendCommand(uint8_t command, uint8_t data);
         int8_t _sendCommand(uint8_t command);
-        bool _setMemory(uint8_t address, uint8_t * data, uint8_t len);
-        bool _setMemory(uint8_t address, uint8_t data);
-        uint8_t _getMemory(uint8_t address, uint8_t * buffer, uint8_t len);
-        uint8_t _getMemory(uint8_t address);
-        String _getMemoryAsHexString(uint8_t address, uint8_t len);
-        String _getMemoryAsString(uint8_t address, uint8_t len);
-        void _readModel();
 
+        void _cacheMemory();
+        uint8_t _getMemory(uint8_t address);
+        uint8_t _getMemory(uint8_t address, uint8_t *buffer, uint8_t len);
+        bool _setMemory(uint8_t address, uint8_t data);
+        bool _setMemory(uint8_t address, uint8_t * data, uint8_t len);
+
+        bool _setSlot(uint8_t slot, uint8_t data);
+        bool _setSlot(uint8_t slot, uint8_t * data, uint8_t len);
+        uint8_t _getSlot(uint8_t slot);
+        uint8_t _getSlot(uint8_t slot, uint8_t * buffer, uint8_t len);
+        String _getSlotAsHexString(uint8_t slot, uint8_t len);
+        String _getSlotAsString(uint8_t slot, uint8_t len);
+
+        void _readModel();
         bool _decode();
 
         void _flush();
@@ -230,15 +260,26 @@ class AllWize {
         uint8_t _mbus_mode = 0xFF;
         uint8_t _data_interface = 0xFF;
         bool _append_rssi = false;
+        uint8_t _access_number = 0;
+        uint8_t _module = MODULE_UNKNOWN;
 
-        unsigned char _access_number = 0;
+        // Memory buffer
+        bool _ready = false;
+        uint8_t _memory[0x100] = {0};
 
         String _model;
-        String _fw;
         String _hw;
+        String _fw;
 
+        // Wize specific
+        uint8_t _wize_control = 0x00;
+        uint16_t _wize_operator_id = 0;
+        uint8_t _wize_application = 0;
+        uint16_t _counter = 0;
+        bool _wize_send_transport_layer = true;
+
+        // Message buffers
         allwize_message_t _message;
-
         uint8_t _buffer[RX_BUFFER_SIZE];
         uint8_t _pointer;
 

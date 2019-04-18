@@ -1,0 +1,27 @@
+<map id="AllWize::_getMemory" name="AllWize::_getMemory">
+<area shape="rect" id="node2" href="$classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f" title="Inits the module communications. " alt="" coords="907,266,1013,292"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a8894f865677d8a04b16fa38721e0a95e" title="Gets the channel stored in non&#45;volatile memory. " alt="" coords="228,78,369,104"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a9e5bf5f57dda3daf82d86c59ff9e7467" title="Gets the RF power stored in non&#45;volatile memory. " alt="" coords="233,128,364,155"/>
+<area shape="rect" id="node5" href="$classAllWize.html#ab52a8de7dee7626f4ac4434e980bb2be" title="Gets the data rate stored in non&#45;volatile memory. " alt="" coords="224,179,373,206"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a1b11333048ddf4fa02fe8aa21e22830d" title="Gets the sleep mode stored in non&#45;volatile memory. " alt="" coords="219,230,378,256"/>
+<area shape="rect" id="node7" href="$classAllWize.html#a244d701f186f73d622ecc57286e0e1ea" title="Gets the preamble length frame format. " alt="" coords="225,280,373,307"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a89dc5991c574226d707cf3f59ddf9b82" title="Gets the current timeout for auto sleep modes. " alt="" coords="229,331,369,358"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a5ba307bbd3710c0bafdd9ae44aaf0925" title="Gets the current network role. " alt="" coords="214,382,383,408"/>
+<area shape="rect" id="node10" href="$classAllWize.html#a3d723e9a6bf8417d196f3c6961b31c66" title="Gets the current LED control. " alt="" coords="218,432,379,459"/>
+<area shape="rect" id="node11" href="$classAllWize.html#a1b67d7074600f4097f483305c3b3db81" title="Gets the control field value stored in non&#45;volatile memory. " alt="" coords="217,483,380,510"/>
+<area shape="rect" id="node12" href="$classAllWize.html#a4bd269450531bac0e1495617990a0e56" title="Gets the install modevalue stored in non&#45;volatile memory. " alt="" coords="219,534,379,560"/>
+<area shape="rect" id="node13" href="$classAllWize.html#aaac3f5de0bdf7f61b3d547cd99282c21" title="Gets the encrypt flag setting. " alt="" coords="217,584,380,611"/>
+<area shape="rect" id="node14" href="$classAllWize.html#a74d06cbb120d0b74987edd7fa6a8accd" title="Gets the decrypt flag setting. " alt="" coords="217,635,381,662"/>
+<area shape="rect" id="node15" href="$classAllWize.html#a1a0f30d3bdd0aa6e9d7363237fd4d6a4" title="Gets the default encryption key. " alt="" coords="219,686,378,712"/>
+<area shape="rect" id="node16" href="$classAllWize.html#affe1d0ad7168d1311fb455a1898d0fe4" title="Returns the Manufacturer ID. " alt="" coords="239,736,358,763"/>
+<area shape="rect" id="node17" href="$classAllWize.html#a18ead3d5c58de35fe90c756014aa69ba" title="Returns the Unique ID as a byte array &#160;* uid UID. " alt="" coords="240,787,357,814"/>
+<area shape="rect" id="node18" href="$classAllWize.html#a44a8f3b0f8bceeaaad70fc5533365562" title="Returns the module version from non&#45;volatile memory. " alt="" coords="230,838,367,864"/>
+<area shape="rect" id="node19" href="$classAllWize.html#ac47dd707240ab13ad5e84c6dc924e204" title="Returns the device version from non&#45;volatile memory. " alt="" coords="231,888,366,915"/>
+<area shape="rect" id="node20" href="$classAllWize.html#a48dccaac94d8e75a05cd19fdd682803e" title="Returns the contents of the memory from a certain address as an HEX String. " alt="" coords="205,940,392,981"/>
+<area shape="rect" id="node22" href="$classAllWize.html#a1b356935cb6a521c673efef3ecf5610d" title="Returns the contents of the memory from a certain address as a String object. " alt="" coords="200,1006,397,1032"/>
+<area shape="rect" id="node21" href="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464" title="Returns the module serial number. " alt="" coords="445,947,617,974"/>
+<area shape="rect" id="node23" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Reads and caches the module model &amp; version. " alt="" coords="460,1002,603,1028"/>
+<area shape="rect" id="node24" href="$classAllWize.html#ac717b96d3682372b50506a1f49dc5791" title="Returns the module part number. " alt="" coords="681,503,843,530"/>
+<area shape="rect" id="node25" href="$classAllWize.html#ad48010be6a3bb025211da66d5499df6a" title="Returns the module hardware revision. " alt="" coords="665,976,859,1003"/>
+<area shape="rect" id="node26" href="$classAllWize.html#a764445116c012973343b12790ea70aa0" title="Returns the module firmware revision. " alt="" coords="667,1027,857,1054"/>
+</map>

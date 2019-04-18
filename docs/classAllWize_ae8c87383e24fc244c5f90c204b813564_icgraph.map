@@ -1,0 +1,6 @@
+<map id="AllWize::_readModel" name="AllWize::_readModel">
+<area shape="rect" id="node2" href="$classAllWize.html#ac717b96d3682372b50506a1f49dc5791" title="Returns the module part number. " alt="" coords="211,5,374,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#ad48010be6a3bb025211da66d5499df6a" title="Returns the module hardware revision. " alt="" coords="196,56,389,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a764445116c012973343b12790ea70aa0" title="Returns the module firmware revision. " alt="" coords="197,107,388,133"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f" title="Inits the module communications. " alt="" coords="437,5,544,32"/>
+</map>

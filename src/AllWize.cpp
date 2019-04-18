@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param stream        HardwareSerial object to communicate with the module
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
-AllWize::AllWize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
+AllWize::AllWize(HardwareSerial *serial, uint8_t reset_gpio) : _stream(serial), _hw_serial(serial), _reset_gpio(reset_gpio) {
     _init();
 }
 
@@ -41,7 +41,7 @@ AllWize::AllWize(HardwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
 #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-AllWize::AllWize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
+AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio) {
     _init();
 }
 #endif
@@ -53,17 +53,16 @@ AllWize::AllWize(SoftwareSerial * serial, uint8_t reset_gpio) : _stream(serial),
  * @param _reset_gpio   GPIO connected to the module RESET pin
  */
 AllWize::AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio) : _rx(rx), _tx(tx), _reset_gpio(reset_gpio) {
-    #if defined(ARDUINO_ARCH_SAMD)
-        // Software serial not implemented for SAMD
-        assert(false);
-    #elif defined(ARDUINO_ARCH_ESP32)
-        _stream = _hw_serial = new HardwareSerial(HARDWARE_SERIAL_PORT);
-    #else
-        _stream = _sw_serial = new SoftwareSerial(_rx, _tx);
-    #endif
+#if defined(ARDUINO_ARCH_SAMD)
+    // Software serial not implemented for SAMD
+    assert(false);
+#elif defined(ARDUINO_ARCH_ESP32)
+    _stream = _hw_serial = new HardwareSerial(HARDWARE_SERIAL_PORT);
+#else
+    _stream = _sw_serial = new SoftwareSerial(_rx, _tx);
+#endif
     _init();
 }
-
 
 void AllWize::_init() {
     if (GPIO_NONE != _reset_gpio) {
@@ -71,18 +70,34 @@ void AllWize::_init() {
         digitalWrite(_reset_gpio, HIGH);
     }
     randomSeed(analogRead(0));
-    _access_number = random(0,256);
+    _access_number = random(0, 256);
 }
 
 /**
  * @brief               Inits the module communications
  */
 void AllWize::begin() {
+    
     reset();
     delay(200);
-    _append_rssi = _getMemory(MEM_RSSI_MODE) == 0x01;
-    _mbus_mode = _getMemory(MEM_MBUS_MODE);
-    _data_interface = _getMemory(MEM_DATA_INTERFACE);
+    
+    // Figure out module type
+    _readModel();
+    String part_number = getPartNumber();
+    if (part_number.equals("RC1701HP-WMBUS4")) {
+        _module = MODULE_WMBUS4;
+    } else if (part_number.equals("RC1701HP-OSP")) {
+        _module = MODULE_OSP;
+    } else if (part_number.equals("RC1701HP-WIZE")) {
+        _module = MODULE_WIZE;
+    } else {
+        _module = MODULE_UNKNOWN;
+    }
+
+    _append_rssi = _getSlot(MEM_RSSI_MODE) == 0x01;
+    _mbus_mode = _getSlot(MEM_MBUS_MODE);
+    _data_interface = _getSlot(MEM_DATA_INTERFACE);
+    
 }
 
 /**
@@ -93,31 +108,34 @@ void AllWize::_reset_serial() {
     if (_hw_serial) {
 
         _hw_serial->end();
-        #if defined(ARDUINO_ARCH_ESP32)
-            if ((_rx != -1) && (_tx != -1)) {
-                pinMode(_rx, FUNCTION_4);
-                pinMode(_tx, FUNCTION_4);
-                _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
-            } else {
-                _hw_serial->begin(MODEM_BAUDRATE);
-            }
-        #else
+#if defined(ARDUINO_ARCH_ESP32)
+        if ((_rx != -1) && (_tx != -1)) {
+            pinMode(_rx, FUNCTION_4);
+            pinMode(_tx, FUNCTION_4);
+            _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
+        } else {
             _hw_serial->begin(MODEM_BAUDRATE);
-        #endif
+        }
+#else
+        _hw_serial->begin(MODEM_BAUDRATE);
+#endif
 
     } else {
 
-        #if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD)
-            // It should never hit this block
-            assert(false);
-        #else
-            _sw_serial->end();
-            _sw_serial->begin(MODEM_BAUDRATE);
-        #endif
+#if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD)
+        // It should never hit this block
+        assert(false);
+#else
+        _sw_serial->end();
+        _sw_serial->begin(MODEM_BAUDRATE);
+#endif
 
     }
 
     _flush();
+
+    // Cache memory
+    _cacheMemory();
 
 }
 
@@ -129,7 +147,7 @@ bool AllWize::reset() {
     if (GPIO_NONE == _reset_gpio) {
         _reset_serial();
         delay(100);
-        _setMemory(MEM_CONFIG_INTERFACE, 1);
+        _setSlot(MEM_CONFIG_INTERFACE, 1);
         if (_setConfig(true)) {
             _send('@');
             _send('R');
@@ -159,7 +177,7 @@ bool AllWize::reset() {
 bool AllWize::factoryReset() {
     _reset_serial();
     delay(100);
-    _setMemory(MEM_CONFIG_INTERFACE, 1);
+    _setSlot(MEM_CONFIG_INTERFACE, 1);
     if (_setConfig(true)) {
         _send('@');
         _send('R');
@@ -246,50 +264,51 @@ bool AllWize::waitForReady(uint32_t timeout) {
  * @brief               Dumps the current memory configuration to the given stream
  * @param debug         Data stream to dump the data to
  */
-void AllWize::dump(Stream & debug) {
+void AllWize::dump(Stream &debug) {
 
-    _setConfig(true);
-    _send(CMD_TEST_MODE_0);
-
-    char buffer[256];
-    if (256 == _readBytes(buffer, 256)) {
-
-        char ch[10];
-        char ascii[17] = {0};
-        ascii[16] = 0;
-
-        debug.println();
-        debug.print("       ");
-        for (uint16_t address = 0; address <= 0x0F; address++) {
-            snprintf(ch, sizeof(ch), "%02X ", address);
-            debug.print(ch);
-        }
-        debug.println();
-        debug.print("------------------------------------------------------");
-
-        for (uint16_t address = 0; address <= 255; address++) {
-            if ((address % 16) == 0) {
-                if (address > 0) debug.print(ascii);
-                snprintf(ch, sizeof(ch), "\n0x%02X:  ", address);
-                debug.print(ch);
-            }
-            if (31 < buffer[address] && buffer[address] < 127) {
-                ascii[address % 16] = (char) buffer[address];
-            } else {
-                ascii[address % 16] = ' ';
-            }
-            snprintf(ch, sizeof(ch), "%02X ", (uint8_t) buffer[address]);
-            debug.print(ch);
-        }
-
-        debug.println();
-        debug.println();
-
-    } else {
+    if (!_ready) {
         debug.println("Error doing memory dump...");
+        return;
     }
 
-    _setConfig(false);
+    char ch[10];
+    char ascii[17] = {0};
+    uint8_t address = 0;
+    ascii[16] = 0;
+
+    debug.println();
+    debug.print("       ");
+    for (address = 0; address <= 0x0F; address++) {
+        snprintf(ch, sizeof(ch), "%02X ", address);
+        debug.print(ch);
+    }
+    debug.println();
+    debug.print("------------------------------------------------------");
+
+    address = 0;
+    while (true) {
+        
+        if ((address % 16) == 0) {
+            if (address > 0)
+                debug.print(ascii);
+            snprintf(ch, sizeof(ch), "\n0x%02X:  ", address);
+            debug.print(ch);
+        }
+        if ((31 < _memory[address]) && (_memory[address] < 127)) {
+            ascii[address % 16] = (char)_memory[address];
+        } else {
+            ascii[address % 16] = ' ';
+        }
+        snprintf(ch, sizeof(ch), "%02X ", (uint8_t)_memory[address]);
+        debug.print(ch);
+        
+        if (0xFF == address) break;
+        address++;
+
+    }
+
+    debug.println();
+    debug.println();
 
 }
 
@@ -299,21 +318,52 @@ void AllWize::dump(Stream & debug) {
  * @param len           Length of the payload
  * @return              Returns true if message has been correctly sent
  */
-bool AllWize::send(uint8_t * buffer, uint8_t len) {
-
+bool AllWize::send(uint8_t *buffer, uint8_t len) {
+ 
     if (_config) return false;
     if (0 == len) return (1 == _send(0xFE));
 
+    // message length is payload length + 1 (CI) + 2 (for timestamp if wize)
+    uint8_t message_len = len + 1;
+    if (MODULE_WIZE == _module) {
+	    message_len += 2;
+        if (_wize_send_transport_layer) message_len += 6;
+    }
 
-    if (1 != _send(len+1)) return false;
-    // Encrypt
+    // max payload size is 238 bytes
+    if (message_len > 238) {
+        return false;
+    }
 
-    if (1 != _send(_ci)) return false;
+    // length
+    if (1 != _send(message_len)) return false;
 
-            
-    if (len != _send(buffer, len)) return false;
-            // Build a 16 bytes payload
-                _access_number++;
+    // CI
+    if (1 != _send(MODULE_WIZE == _module ? CONTROL_INFORMATION_WIZE : _ci)) return false;
+
+    // transport layer
+    if ((MODULE_WIZE == _module) && (_wize_send_transport_layer)) {
+        _send(_wize_control);                   // Wize Control
+        _send((_wize_operator_id >> 0) & 0xFF); // Operator ID HIGH
+        _send((_wize_operator_id >> 8) & 0xFF); // Operator ID HIGH
+        _send((_counter >> 0) & 0xFF);          // Frame counter LOW
+        _send((_counter >> 8) & 0xFF);          // Frame counter HIGH
+        _send(_wize_application);               // Wize app indicator
+    }
+
+    // application payload
+    if (len != _send(buffer, len)) {
+        return false;
+    }
+
+    // timestamp, TODO: add option to provide a timestamp
+    if (MODULE_WIZE == _module) {
+        _send(0);
+        _send(0);
+    }
+
+    _access_number++;
+    _counter++;
     return true;
 
 }
@@ -323,8 +373,8 @@ bool AllWize::send(uint8_t * buffer, uint8_t len) {
  * @param buffer        C-string with the application payload
  * @return              Returns true if message has been correctly sent
  */
-bool AllWize::send(const char * buffer) {
-    return send((uint8_t *) buffer, strlen(buffer));
+bool AllWize::send(const char *buffer) {
+    return send((uint8_t *)buffer, strlen(buffer));
 }
 
 /**
@@ -344,9 +394,9 @@ bool AllWize::available() {
             uint8_t ch = _stream->read();
             _buffer[_pointer++] = ch;
             when = millis();
-            #if defined(ARDUINO_ARCH_ESP8266)
-                yield();
-            #endif
+#if defined(ARDUINO_ARCH_ESP8266)
+            yield();
+#endif
         }
 
         // Check if message finished and decode it
@@ -367,6 +417,49 @@ bool AllWize::available() {
  */
 allwize_message_t AllWize::read() {
     return _message;
+}
+
+/**
+ * @brief               Sets the wize control field in the transpoprt layer
+ * @param uint8_t       Wize Control (defined the key to be used)
+ * @return              True is correctly set
+ */
+bool AllWize::setWizeControl(uint8_t wize_control) {
+    if (wize_control > 14) return false;
+    _wize_control = wize_control;
+    return true;
+}
+
+/**
+ * @brief               Sets the wize operator ID field in the transpoprt layer
+ * @param uint16_t      Wize Operator ID
+ */
+void AllWize::setWizeOperatorId(uint16_t wize_operator_id) {
+    _wize_operator_id = wize_operator_id;
+}
+
+/**
+ * @brief               Sets the wize applicaton field in the transpoprt layer
+ * @param uint8_t       Wize Application
+ */
+void AllWize::setWizeApplication(uint8_t wize_application) {
+    _wize_application = wize_application;
+}
+
+/**
+ * @brief               Sets the wize couonter field in the transpoprt layer
+ * @param uint16_t      Wize counter
+ */
+void AllWize::setCounter(uint16_t counter) { 
+    _counter = counter; 
+}
+
+/**
+ * @brief               Gets the current wize counter
+ * @return              Counter
+ */
+uint16_t AllWize::getCounter() { 
+    return _counter; 
 }
 
 // -----------------------------------------------------------------------------
@@ -395,8 +488,12 @@ uint8_t AllWize::getControlInformation() {
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
 void AllWize::setChannel(uint8_t channel, bool persist) {
+    if (channel > 41) return;
     if (persist) {
-        _setMemory(MEM_CHANNEL, channel);
+        _setSlot(MEM_CHANNEL, channel);
+        if (MODULE_WIZE == _module) {
+            _setSlot(MEM_CHANNEL_RX, channel);
+        }
     }
     _sendCommand(CMD_CHANNEL, channel);
 }
@@ -406,7 +503,7 @@ void AllWize::setChannel(uint8_t channel, bool persist) {
  * @return              Channel (1 byte)
  */
 uint8_t AllWize::getChannel() {
-    return _getMemory(MEM_CHANNEL);
+    return _getSlot(MEM_CHANNEL);
 }
 
 /**
@@ -417,7 +514,7 @@ uint8_t AllWize::getChannel() {
 void AllWize::setPower(uint8_t power, bool persist) {
     if (0 < power && power < 6) {
         if (persist) {
-            _setMemory(MEM_RF_POWER, power);
+            _setSlot(MEM_RF_POWER, power);
         }
         _sendCommand(CMD_RF_POWER, power);
     }
@@ -428,7 +525,7 @@ void AllWize::setPower(uint8_t power, bool persist) {
  * @return              RF power (1 byte)
  */
 uint8_t AllWize::getPower() {
-    return _getMemory(MEM_RF_POWER);
+    return _getSlot(MEM_RF_POWER);
 }
 
 /**
@@ -437,7 +534,10 @@ uint8_t AllWize::getPower() {
  */
 void AllWize::setDataRate(uint8_t dr) {
     if (0 < dr && dr < 6 && dr != 3) {
-        _setMemory(MEM_DATA_RATE, dr);
+        _setSlot(MEM_DATA_RATE, dr);
+        if (MODULE_WIZE == _module) {
+            _setSlot(MEM_DATA_RATE_RX, dr);
+        }
     }
 }
 
@@ -446,7 +546,7 @@ void AllWize::setDataRate(uint8_t dr) {
  * @return              Current data rate (1 byte)
  */
 uint8_t AllWize::getDataRate() {
-    return _getMemory(MEM_DATA_RATE);
+    return _getSlot(MEM_DATA_RATE);
 }
 
 /**
@@ -456,7 +556,7 @@ uint8_t AllWize::getDataRate() {
  */
 void AllWize::setMBusMode(uint8_t mode, bool persist) {
     if (persist) {
-        _setMemory(MEM_MBUS_MODE, mode);
+        _setSlot(MEM_MBUS_MODE, mode);
     }
     _sendCommand(CMD_MBUS_MODE, mode);
     _mbus_mode = mode;
@@ -475,7 +575,7 @@ uint8_t AllWize::getMBusMode() {
  * @param mode          One of SLEEP_MODE_*
  */
 void AllWize::setSleepMode(uint8_t mode) {
-    _setMemory(MEM_SLEEP_MODE, mode);
+    _setSlot(MEM_SLEEP_MODE, mode);
 }
 
 /**
@@ -483,7 +583,7 @@ void AllWize::setSleepMode(uint8_t mode) {
  * @return              Sleep mode (1 byte)
  */
 uint8_t AllWize::getSleepMode() {
-    return _getMemory(MEM_SLEEP_MODE);
+    return _getSlot(MEM_SLEEP_MODE);
 }
 
 /**
@@ -492,9 +592,9 @@ uint8_t AllWize::getSleepMode() {
  */
 void AllWize::setAppendRSSI(bool value) {
     if (value == 1) {
-        _setMemory(MEM_RSSI_MODE, 1);
+        _setSlot(MEM_RSSI_MODE, 1);
     } else {
-        _setMemory(MEM_RSSI_MODE, 0);
+        _setSlot(MEM_RSSI_MODE, 0);
     }
     _append_rssi = value;
 }
@@ -513,7 +613,7 @@ bool AllWize::getAppendRSSI() {
  */
 void AllWize::setPreamble(uint8_t preamble) {
     if (PREAMBLE_FORMAT_A == preamble || PREAMBLE_FORMAT_B == preamble) {
-        _setMemory(MEM_PREAMBLE_LENGTH, preamble);
+        _setSlot(MEM_PREAMBLE_LENGTH, preamble);
     }
 }
 
@@ -522,7 +622,7 @@ void AllWize::setPreamble(uint8_t preamble) {
  * @return              Preamble length format (1 byte)
  */
 uint8_t AllWize::getPreamble() {
-    return _getMemory(MEM_PREAMBLE_LENGTH);
+    return _getSlot(MEM_PREAMBLE_LENGTH);
 }
 
 /**
@@ -530,7 +630,7 @@ uint8_t AllWize::getPreamble() {
  * @param timeout       Timeout value (defaults to 1s)
  */
 void AllWize::setTimeout(uint8_t timeout) {
-    _setMemory(MEM_TIMEOUT, timeout);
+    _setSlot(MEM_TIMEOUT, timeout);
 }
 
 /**
@@ -538,7 +638,7 @@ void AllWize::setTimeout(uint8_t timeout) {
  * @return              Timeout setting
  */
 uint8_t AllWize::getTimeout() {
-    return _getMemory(MEM_TIMEOUT);
+    return _getSlot(MEM_TIMEOUT);
 }
 
 /**
@@ -546,7 +646,7 @@ uint8_t AllWize::getTimeout() {
  * @param role          Network role (NETWORK_ROLE_*)
  */
 void AllWize::setNetworkRole(uint8_t role) {
-    _setMemory(MEM_NETWORK_ROLE, role);
+    _setSlot(MEM_NETWORK_ROLE, role);
 }
 
 /**
@@ -554,7 +654,7 @@ void AllWize::setNetworkRole(uint8_t role) {
  * @return              Network role
  */
 uint8_t AllWize::getNetworkRole() {
-    return _getMemory(MEM_NETWORK_ROLE);
+    return _getSlot(MEM_NETWORK_ROLE);
 }
 
 /**
@@ -562,7 +662,8 @@ uint8_t AllWize::getNetworkRole() {
  * @param value         LED control value
  */
 void AllWize::setLEDControl(uint8_t value) {
-    _setMemory(MEM_LED_CONTROL, value);
+    if (value > 3) return;
+    _setSlot(MEM_LED_CONTROL, value);
 }
 
 /**
@@ -570,7 +671,7 @@ void AllWize::setLEDControl(uint8_t value) {
  * @return              LED control value
  */
 uint8_t AllWize::getLEDControl() {
-    return _getMemory(MEM_LED_CONTROL);
+    return _getSlot(MEM_LED_CONTROL);
 }
 
 /**
@@ -579,7 +680,7 @@ uint8_t AllWize::getLEDControl() {
  */
 void AllWize::setDataInterface(uint8_t value) {
     if (value <= 0x0C) {
-        _setMemory(MEM_DATA_INTERFACE, value);
+        _setSlot(MEM_DATA_INTERFACE, value);
         _data_interface = value;
     }
 }
@@ -599,7 +700,7 @@ uint8_t AllWize::getDataInterface() {
  */
 void AllWize::setControlField(uint8_t value, bool persist) {
     if (persist) {
-        _setMemory(MEM_CONTROL_FIELD, value);
+        _setSlot(MEM_CONTROL_FIELD, value);
     }
     _sendCommand(CMD_CONTROL_FIELD, value);
 }
@@ -609,7 +710,7 @@ void AllWize::setControlField(uint8_t value, bool persist) {
  * @return              Control field value (1 byte)
  */
 uint8_t AllWize::getControlField() {
-    return _getMemory(MEM_CONTROL_FIELD);
+    return _getSlot(MEM_CONTROL_FIELD);
 }
 
 /**
@@ -620,7 +721,7 @@ uint8_t AllWize::getControlField() {
 void AllWize::setInstallMode(uint8_t mode, bool persist) {
     if (mode <= 2) {
         if (persist) {
-            _setMemory(MEM_INSTALL_MODE, mode);
+            _setSlot(MEM_INSTALL_MODE, mode);
         }
         _sendCommand(CMD_INSTALL_MODE, mode);
     }
@@ -631,7 +732,7 @@ void AllWize::setInstallMode(uint8_t mode, bool persist) {
  * @return              Install mode value (1 byte)
  */
 uint8_t AllWize::getInstallMode() {
-    return _getMemory(MEM_INSTALL_MODE);
+    return _getSlot(MEM_INSTALL_MODE);
 }
 
 /**
@@ -640,7 +741,7 @@ uint8_t AllWize::getInstallMode() {
  */
 void AllWize::setEncryptFlag(uint8_t flag) {
     if (0 == flag || 1 == flag || 3 == flag) {
-        _setMemory(MEM_ENCRYPT_FLAG, flag);
+        _setSlot(MEM_ENCRYPT_FLAG, flag);
     }
 }
 
@@ -649,7 +750,7 @@ void AllWize::setEncryptFlag(uint8_t flag) {
  * @return              Encrypt flag
  */
 uint8_t AllWize::getEncryptFlag() {
-    return _getMemory(MEM_ENCRYPT_FLAG);
+    return _getSlot(MEM_ENCRYPT_FLAG);
 }
 
 /**
@@ -657,7 +758,7 @@ uint8_t AllWize::getEncryptFlag() {
  * @param flag          Decrypt flag
  */
 void AllWize::setDecryptFlag(uint8_t flag) {
-    _setMemory(MEM_DECRYPT_FLAG, flag);
+    _setSlot(MEM_DECRYPT_FLAG, flag);
 }
 
 /**
@@ -665,7 +766,7 @@ void AllWize::setDecryptFlag(uint8_t flag) {
  * @return              Decrypt flag
  */
 uint8_t AllWize::getDecryptFlag() {
-    return _getMemory(MEM_DECRYPT_FLAG);
+    return _getSlot(MEM_DECRYPT_FLAG);
 }
 
 /**
@@ -673,29 +774,36 @@ uint8_t AllWize::getDecryptFlag() {
  * @param reg           Register number (1-64)
  * @param key           A 16-byte encryption key as binary array
  */
-void AllWize::setKey(uint8_t reg, const uint8_t * key) {
-    if (0 < reg && reg < 65) {
-        uint8_t data[17];
-        data[0] = reg;
-        memcpy(&data[1], key, 16);
-        _sendCommand(CMD_KEY_REGISTER, data, 17);
-    }
+void AllWize::setKey(uint8_t reg, const uint8_t *key) {
+    if (reg > 128) return;
+    uint8_t data[17];
+    data[0] = reg;
+    memcpy(&data[1], key, 16);
+    _sendCommand(CMD_KEY_REGISTER, data, 17);
 }
 
 /**
  * @brief               Sets the default encryption key
  * @param key           A 16-byte encryption key as binary array
  */
-void AllWize::setDefaultKey(const uint8_t * key) {
-    _setMemory(MEM_DEFAULT_KEY, (uint8_t *) key, 16);
+void AllWize::setDefaultKey(const uint8_t *key) {
+    _setSlot(MEM_DEFAULT_KEY, (uint8_t *)key, 16);
 }
 
 /**
  * @brief               Gets the default encryption key
  * @param key           A binary buffer to store the key (16 bytes)
  */
-void AllWize::getDefaultKey(uint8_t * key) {
-    _getMemory(MEM_DEFAULT_KEY, key, 16);
+void AllWize::getDefaultKey(uint8_t *key) {
+    _getSlot(MEM_DEFAULT_KEY, key, 16);
+}
+
+/**
+ * @brief               Sets new/specific access number.
+ * @param value         New access number
+ */
+void AllWize::setAccessNumber(uint8_t value) {
+    _sendCommand(CMD_ACCESS_NUMBER, value);
 }
 
 // -----------------------------------------------------------------------------
@@ -705,13 +813,11 @@ void AllWize::getDefaultKey(uint8_t * key) {
  *                      TODO: values do not seem right and are not the same as in the packet
  * @return              RSSI in dBm
  */
-/*
 float AllWize::getRSSI() {
     uint8_t response = _sendCommand(CMD_RSSI);
-    if (response > 0) return -0.5 * _buffer[0];
+    if (response > 0) return -0.5 * (float) _buffer[0];
     return 0;
 }
-*/
 
 /**
  * @brief               Returns the internal temperature of the module
@@ -747,11 +853,22 @@ uint16_t AllWize::getVoltage() {
 }
 
 /**
- * @brief               Returns the Manufacturer ID string
- * @return              2-byte hex string with the manufacturer ID
+ * @brief               Returns the Manufacturer ID
+ * @return              Manufacturer ID
  */
 String AllWize::getMID() {
-    return _getMemoryAsHexString(MEM_MANUFACTURER_ID, 2);
+    return _getSlotAsHexString(MEM_MANUFACTURER_ID, 2);
+}
+
+/**
+ * @brief               Sets the Manufacturer ID
+ * @uint16_t mid        MID to save
+ */
+bool AllWize::setMID(uint16_t mid) {
+    uint8_t buffer[2];
+    buffer[0] = (mid >> 8) & 0xFF;
+    buffer[1] = (mid >> 0) & 0xFF;
+    return _setSlot(MEM_MANUFACTURER_ID, buffer, 2);
 }
 
 /**
@@ -759,7 +876,20 @@ String AllWize::getMID() {
  * @return              4-byte hex string with the unique ID
  */
 String AllWize::getUID() {
-    return _getMemoryAsHexString(MEM_UNIQUE_ID, 4);
+    return _getSlotAsHexString(MEM_UNIQUE_ID, 4);
+}
+
+/**
+ * @brief               Saved the UID into the module memory
+ * @uint32_t uid        UID to save
+ */
+bool AllWize::setUID(uint32_t uid) {
+    uint8_t buffer[4];
+    buffer[0] = (uid >> 24) & 0xFF;
+    buffer[1] = (uid >> 16) & 0xFF;
+    buffer[2] = (uid >>  8) & 0xFF;
+    buffer[3] = (uid >>  0) & 0xFF;
+    return _setSlot(MEM_UNIQUE_ID, buffer, 4);
 }
 
 /**
@@ -767,7 +897,7 @@ String AllWize::getUID() {
  * @return              Version
  */
 uint8_t AllWize::getVersion() {
-    return _getMemory(MEM_VERSION);
+    return _getSlot(MEM_VERSION);
 }
 
 /**
@@ -775,7 +905,7 @@ uint8_t AllWize::getVersion() {
  * @return              Device
  */
 uint8_t AllWize::getDevice() {
-    return _getMemory(MEM_DEVICE);
+    return _getSlot(MEM_DEVICE);
 }
 
 /**
@@ -783,7 +913,6 @@ uint8_t AllWize::getDevice() {
  * @return              12-byte hex string with the part number
  */
 String AllWize::getPartNumber() {
-    _readModel();
     return _model;
 }
 
@@ -792,7 +921,6 @@ String AllWize::getPartNumber() {
  * @return              4-byte hex string with the HW version
  */
 String AllWize::getHardwareVersion() {
-    _readModel();
     return _hw;
 }
 
@@ -801,7 +929,6 @@ String AllWize::getHardwareVersion() {
  * @return              4-byte hex string with the FW version
  */
 String AllWize::getFirmwareVersion() {
-    _readModel();
     return _fw;
 }
 
@@ -810,7 +937,67 @@ String AllWize::getFirmwareVersion() {
  * @return              8-byte hex string with the serial number
  */
 String AllWize::getSerialNumber() {
-    return _getMemoryAsHexString(MEM_SERIAL_NUMBER_NEW, 8);
+    return _getSlotAsHexString(MEM_SERIAL_NUMBER, 8);
+}
+
+/**
+ * @brief               Returns the module type
+ * @return              One of MODULE_UNKNOWN, MODULE_WMBUS4, MODULE_OSP and MODULE_WIZE
+ */
+uint8_t AllWize::getModuleType() {
+    return _module;
+}
+
+/**
+ * @brief               Returns the module type
+ * @return              One of MODULE_UNKNOWN, MODULE_WMBUS4, MODULE_OSP and MODULE_WIZE
+ */
+String AllWize::getModuleTypeName() {
+    switch (_module) {
+        case MODULE_WMBUS4: return String("WMBUS4");
+        case MODULE_OSP: return String("OSP");
+        case MODULE_WIZE: return String("WIZE");
+    }
+    return String("Unknown");
+}
+
+
+/**
+ * @brief               Returns the frequency for the given channel
+ * @param channel       Channel
+ * @return              Frequency (float) in MHz for the given channel
+ */
+double AllWize::getFrequency(uint8_t channel) {
+    if (channel <   7) {
+        return 169.40625 + 0.0125 * (channel - 1);
+    } else if (channel ==  7) {
+        return 169.41250;
+    } else if (channel ==  8) {
+        return 169.43750;
+    } else if (channel ==  9) {
+        return 169.46250;
+    } else if (channel == 10) {
+        return 169.43750;
+    } else if (channel <  38) {
+        return 169.48125 + 0.0125 * (channel - 11);
+    } else if (channel <  42) {
+        return 169.62500 + 0.0500 * (channel - 38);
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * @brief               Returns the speed for te given datarate
+ * @param dr            Datarate
+ * @return              Speed in bps
+ */
+uint16_t AllWize::getDataRateSpeed(uint8_t dr) {
+    if (DATARATE_2400bps == dr) return 2400;
+    if (DATARATE_4800bps == dr) return 4800;
+    if (DATARATE_19200bps == dr) return 19200;
+    if (DATARATE_6400bps == dr) return 6400;
+    return 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -847,7 +1034,7 @@ bool AllWize::_setConfig(bool value) {
  * @param len           Length of the binary data
  * @protected
  */
-int8_t AllWize::_sendCommand(uint8_t command, uint8_t * data, uint8_t len) {
+int8_t AllWize::_sendCommand(uint8_t command, uint8_t *data, uint8_t len) {
     int8_t response = -1;
     if (!_setConfig(true)) return response;
     if (_sendAndReceive(command) != -1) {
@@ -888,82 +1075,246 @@ int8_t AllWize::_sendCommand(uint8_t command) {
     return response;
 }
 
+// ------------------------------------------------------------------------------------------------
+
 /**
- * @brief               Sets non-volatile memory contents starting from given address
- * @param  address      Command key
- * @param data          Binary data to store
- * @param len           Length of the binary data
- * @return              True if the data was successfully saved
- * @protected
+ * @brief               Reads and caches the module memory
  */
-bool AllWize::_setMemory(uint8_t address, uint8_t * data, uint8_t len) {
-    uint8_t buffer[len*2+1];
-    for (uint8_t i=0; i<len; i++) {
-        buffer[i*2]   = address + i;
-        buffer[i*2+1] = data[i];
-    }
-    buffer[len*2] = CMD_EXIT_MEMORY;
-    return (_sendCommand(CMD_WRITE_MEMORY, buffer, len*2+1) != -1);
+void AllWize::_cacheMemory() {
+
+    // Read memory
+    _setConfig(true);
+    _send(CMD_TEST_MODE_0);
+    _ready = (256 == _readBytes((char *) _memory, 256));
+    _setConfig(false);
+    _flush();
+
 }
 
 /**
- * @brief               Sets non-volatile memory contents starting from given address
- * @param address       Command key
- * @param data          Single byte to store at given address
- * @return              True if the data was successfully saved
- * @protected
+ * @brief               Searches for the module model
  */
-bool AllWize::_setMemory(uint8_t address, uint8_t value) {
-    uint8_t buffer[3] = {address, value, (uint8_t) CMD_EXIT_MEMORY};
-    return (_sendCommand(CMD_WRITE_MEMORY, buffer, 3) != -1);
+void AllWize::_readModel() {
+
+    // Look for the part_number
+    bool found = false;
+    uint8_t index = 0;
+    uint8_t len = strlen(MODULE_SIGNATURE);
+    for (index=0; index<0xFF-32; index++) {
+        if (memcmp(&_memory[index], (uint8_t *) MODULE_SIGNATURE, len) == 0) {
+            found = true;
+            break;
+        }
+    }
+
+    // Parse signature
+    if (found) {
+
+        String part_number = String((char *) &_memory[index]);
+        part_number.substring(32);
+        part_number.trim();
+
+        uint8_t end = part_number.indexOf(",");
+        _model = part_number.substring(0, end);
+        uint8_t start = end + 1;
+        end = part_number.indexOf(",", start);
+        _hw = part_number.substring(start, end);
+        _fw = part_number.substring(end + 1, 32);
+        _fw.trim();
+
+    }
+
 }
 
 /**
  * @brief               Returns the contents of consecutive memory addresses
- * @param address       Address to start from
+ * @param address       Starting memory address
  * @param buffer        Buffer with at least 'len' position to store data to
  * @param len           Number of positions to read
  * @return              Number of positions actually read
  * @protected
  */
-uint8_t AllWize::_getMemory(uint8_t address, uint8_t * buffer, uint8_t len) {
-    uint8_t count = 0;
-    if (_setConfig(true)) {
-        for (uint8_t i=0; i<len; i++) {
-            if (_sendAndReceive(CMD_READ_MEMORY) == -1) break;
-            if (_sendAndReceive(address + i) != 1) break;
-            count++;
-            buffer[i] = _buffer[0];
+uint8_t AllWize::_getMemory(uint8_t address, uint8_t *buffer, uint8_t len) {
+    if (!_ready) return 0;
+    #if USE_MEMORY_CACHE
+        memcpy(buffer, &_memory[address], len);
+        return len;
+    #else
+        uint8_t count = 0;
+        if (_setConfig(true)) {
+            for (uint8_t i=0; i<len; i++) {
+                if (_sendAndReceive(CMD_READ_MEMORY) == -1) break;
+                if (_sendAndReceive(address + i) != 1) break;
+                count++;
+                buffer[i] = _buffer[0];
+            }
+            _setConfig(false);
         }
-        _setConfig(false);
-    }
-    return count;
+        return count;
+    #endif
 }
 
 /**
- * @brief               Returns the contents of single memory addresses
- * @param address       Address to start from
- * @return              Contents of the address, 0 if error
+ * @brief               Returns the contents of memory address
+ * @param address       Memory address
+ * @return              Contents
  * @protected
  */
 uint8_t AllWize::_getMemory(uint8_t address) {
-    uint8_t response = _sendCommand(CMD_READ_MEMORY, address);
-    if (response > 0) return _buffer[0];
-    return 0;
+    if (!_ready) return 0;
+    #if USE_MEMORY_CACHE
+        return _memory[address];
+    #else
+        uint8_t response = _sendCommand(CMD_READ_MEMORY, address);
+        if (response > 0) return _buffer[0];
+        return 0;
+    #endif
+}
+
+/**
+ * @brief               Sets non-volatile memory contents starting from given address
+ * @param address       Memory address
+ * @param data          Single byte to store at given address
+ * @return              True if the data was successfully saved
+ * @protected
+ */
+bool AllWize::_setMemory(uint8_t address, uint8_t data) {
+
+    // Check cached data
+    #if USE_MEMORY_CACHE
+        if (_memory[address] == data) return true;
+    #endif
+
+    // Build query buffer
+    uint8_t buffer[3] = {address, data, (uint8_t)CMD_EXIT_MEMORY};
+    
+    // Execute command
+    bool ret = (_sendCommand(CMD_WRITE_MEMORY, buffer, 3) != -1);
+
+    // Update cached memory
+    #if USE_MEMORY_CACHE
+        if (ret) _memory[address] = data;
+    #endif
+
+    return ret;
+
+}
+
+/**
+ * @brief               Sets non-volatile memory contents starting from given address
+ * @param address       Memory address
+ * @param data          Binary data to store
+ * @param len           Length of the binary data
+ * @return              True if the data was successfully saved
+ * @protected
+ */
+bool AllWize::_setMemory(uint8_t address, uint8_t *data, uint8_t len) {
+    
+    // Check cached data
+    #if USE_MEMORY_CACHE
+        if (memcmp(&_memory[address], data, len) == 0) return true;
+    #endif
+
+    // Build query buffer
+    uint8_t buffer[len * 2 + 1];
+    for (uint8_t i = 0; i < len; i++) { 
+        buffer[i * 2] = address + i;
+        buffer[i * 2 + 1] = data[i];
+    }
+    buffer[len * 2] = CMD_EXIT_MEMORY;
+    
+    // Execute command
+    bool ret = (_sendCommand(CMD_WRITE_MEMORY, buffer, len * 2 + 1) != -1);
+    
+    // Update cached memory
+    #if USE_MEMORY_CACHE
+        if (ret) memcpy(&_memory[address], data, len);
+    #endif
+
+    return ret;
+
+}
+
+// ------------------------------------------------------------------------------------------------
+
+/**
+ * @brief               Return the physical memory address for the given slot
+ * @param  slot         Memory slot
+ * @return              An address, 0xFF if not found or non existant
+ * @protected
+ */
+uint8_t AllWize::_getAddress(uint8_t slot) {
+    if ((slot >= MEM_MAX_SLOTS) || (MODULE_UNKNOWN == _module)) {
+        return 0xFF;
+    }
+    return MEM_ADDRESS[_module-1][slot];
+}
+
+/**
+ * @brief               Sets non-volatile memory contents starting from given address
+ * @param slot          Memory slot
+ * @param data          Binary data to store
+ * @param len           Length of the binary data
+ * @return              True if the data was successfully saved
+ * @protected
+ */
+bool AllWize::_setSlot(uint8_t slot, uint8_t *data, uint8_t len) {
+    uint8_t address = _getAddress(slot);
+    if (0xFF == address) return false;
+    return _setMemory(address, data, len);
+}
+
+/**
+ * @brief               Sets non-volatile memory contents starting from given address
+ * @param slot          Memory slot
+ * @param data          Single byte to store at given address
+ * @return              True if the data was successfully saved
+ * @protected
+ */
+bool AllWize::_setSlot(uint8_t slot, uint8_t data) {
+    uint8_t address = _getAddress(slot);
+    if (0xFF == address) return false;
+    return _setMemory(address, data);
+}
+
+/**
+ * @brief               Returns the contents of consecutive memory addresses
+ * @param slot          Memory slot
+ * @param buffer        Buffer with at least 'len' position to store data to
+ * @param len           Number of positions to read
+ * @return              Number of positions actually read
+ * @protected
+ */
+uint8_t AllWize::_getSlot(uint8_t slot, uint8_t *buffer, uint8_t len) {
+    uint8_t address = _getAddress(slot);
+    if (0xFF == address) return 0;
+    return _getMemory(address, buffer, len);
+}
+
+/**
+ * @brief               Returns the contents of single-byte memory slot
+ * @param slot          Memory slot
+ * @return              Contents of the slot, 0 if error
+ * @protected
+ */
+uint8_t AllWize::_getSlot(uint8_t slot) {
+    uint8_t address = _getAddress(slot);
+    if (0xFF == address) return 0;
+    return _getMemory(address);
 }
 
 /**
  * @brief               Returns the contents of the memory from a certain address as an HEX String
- * @param address       Address to start from
+ * @param slot          Memory slot
  * @param len           Number of bytes to read
  * @return              Result (empty string if error)
  * @protected
  */
-String AllWize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
+String AllWize::_getSlotAsHexString(uint8_t slot, uint8_t len) {
     uint8_t bin[len];
-    char hex[2*len+1];
+    char hex[2 * len + 1];
     hex[0] = 0;
-    if (len == _getMemory(address, bin, len)) {
+    if (len == _getSlot(slot, bin, len)) {
         _bin2hex(bin, hex, len);
     }
     return String(hex);
@@ -971,52 +1322,23 @@ String AllWize::_getMemoryAsHexString(uint8_t address, uint8_t len) {
 
 /**
  * @brief               Returns the contents of the memory from a certain address as a String object
- * @param address       Address to start from
+ * @param slot          Memory slot
  * @param len           Number of bytes to read
  * @return              Result (empty string if error)
  * @protected
  */
-String AllWize::_getMemoryAsString(uint8_t address, uint8_t len) {
+String AllWize::_getSlotAsString(uint8_t slot, uint8_t len) {
     uint8_t bin[len];
-    char hex[len+1];
+    char hex[len + 1];
     hex[0] = 0;
-    if (len == _getMemory(address, bin, len)) {
+    if (len == _getSlot(slot, bin, len)) {
         memcpy(hex, bin, len);
-        hex[len-1] = 0;
+        hex[len - 1] = 0;
     }
     return String(hex);
 }
 
-/**
- * @brief               Reads and caches the module model & version
- */
-void AllWize::_readModel() {
-
-    if (_model.length() > 0) return;
-    String line = _getMemoryAsString(MEM_PART_NUMBER_NEW, 32);
-    if (line.indexOf("RC") != 0) String line = _getMemoryAsString(MEM_PART_NUMBER_OLD, 32);
-
-    if (line.indexOf("RC") != 0) {
-        _model = String("Unknown");
-
-    } else {
-
-        uint8_t start = 0;
-        uint8_t end = line.indexOf(",", start);
-        _model = line.substring(start, end);
-
-        start = end + 1;
-        end = line.indexOf(",", start);
-        _hw = line.substring(start, end);
-
-        start = end + 1;
-        end = line.indexOf(",", start);
-        _fw = line.substring(start, end);
-        _fw.trim();
-
-    }
-
-}
+// ------------------------------------------------------------------------------------------------
 
 /**
  * @brief               Decodes the current RX buffer contents
@@ -1048,9 +1370,10 @@ bool AllWize::_decode() {
 
     #if defined(ALLWIZE_DEBUG_PORT)
     {
-        char ch[10];
-        for (uint8_t i = 0; i<_pointer; i++) {
-            snprintf(ch, sizeof(ch), "%02X ", _buffer[i]);
+        char ch[4];
+        ALLWIZE_DEBUG_PRINT("recv:");
+        for (uint8_t i = 0; i < _pointer; i++) {
+            snprintf(ch, sizeof(ch), " %02X", _buffer[i]);
             ALLWIZE_DEBUG_PRINT(ch);
         }
         ALLWIZE_DEBUG_PRINTLN();
@@ -1092,10 +1415,10 @@ bool AllWize::_decode() {
         in += 1;
 
         // Manufacturer
-        unsigned int man = (_local[in+1] << 8) + _local[in];
+        uint16_t man = (_local[in + 1] << 8) + _local[in];
         _message.man[0] = ((man >> 10) & 0x001F) + 64;
-        _message.man[1] = ((man >>  5) & 0x001F) + 64;
-        _message.man[2] = ((man >>  0) & 0x001F) + 64;
+        _message.man[1] = ((man >> 5) & 0x001F) + 64;
+        _message.man[2] = ((man >> 0) & 0x001F) + 64;
         _message.man[3] = 0;
         in += 2;
 
@@ -1124,6 +1447,29 @@ bool AllWize::_decode() {
     // Control information
     _message.ci = _buffer[in];
     in += 1;
+
+    // Wize transport layer
+    if ((MODULE_WIZE == _module) && (_message.ci == CONTROL_INFORMATION_WIZE)) {
+        
+        bytes_not_in_app += 6;
+        
+        // Wize control
+        _message.wize_control = _buffer[in];
+        in += 1;
+
+        // Wize operator ID
+        _message.wize_operator_id = (_local[in + 1] << 8) + _local[in];
+        in += 2;
+
+        // Wize counter
+        _message.wize_counter = (_local[in + 1] << 8) + _local[in];
+        in += 2;
+
+        // Wize application
+        _message.wize_application = _buffer[in];
+        in += 1;
+
+    }
 
     // Application data
     _message.len = len - bytes_not_in_app;
@@ -1161,6 +1507,7 @@ bool AllWize::_decode() {
  */
 void AllWize::_flush() {
     _stream->flush();
+    while (_stream->available()) _stream->read();
 }
 
 /**
@@ -1170,9 +1517,13 @@ void AllWize::_flush() {
  * @protected
  */
 uint8_t AllWize::_send(uint8_t ch) {
-    ALLWIZE_DEBUG_PRINT("w ");
-    ALLWIZE_DEBUG_PRINT(ch, HEX);
-    ALLWIZE_DEBUG_PRINTLN("");
+    #if defined(ALLWIZE_DEBUG_PORT)
+    {
+        char buffer[10];
+        snprintf(buffer, sizeof(buffer), "w %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+        ALLWIZE_DEBUG_PRINTLN(buffer);
+    }
+    #endif
     return _stream->write(ch);
 }
 
@@ -1183,9 +1534,9 @@ uint8_t AllWize::_send(uint8_t ch) {
  * @return              Number of bytes actually sent
  * @protected
  */
-uint8_t AllWize::_send(uint8_t * buffer, uint8_t len) {
+uint8_t AllWize::_send(uint8_t *buffer, uint8_t len) {
     uint8_t n = 0;
-    for (uint8_t i=0; i<len; i++) {
+    for (uint8_t i = 0; i < len; i++) {
         if (_send(buffer[i])) n++;
     }
     return n;
@@ -1197,7 +1548,7 @@ uint8_t AllWize::_send(uint8_t * buffer, uint8_t len) {
  * @protected
  */
 int8_t AllWize::_receive() {
-    return _readBytesUntil(END_OF_RESPONSE, (char*) _buffer, RX_BUFFER_SIZE);
+    return _readBytesUntil(END_OF_RESPONSE, (char *) _buffer, RX_BUFFER_SIZE);
 }
 
 /**
@@ -1207,7 +1558,7 @@ int8_t AllWize::_receive() {
  * @return              Number of bytes received, -1 if timed out or error sending
  * @protected
  */
-int8_t AllWize::_sendAndReceive(uint8_t * buffer, uint8_t len) {
+int8_t AllWize::_sendAndReceive(uint8_t *buffer, uint8_t len) {
     if (_send(buffer, len) != len) return -1;
     return _receive();
 }
@@ -1223,10 +1574,6 @@ int8_t AllWize::_sendAndReceive(uint8_t ch) {
     return _receive();
 }
 
-// -----------------------------------------------------------------------------
-// Utils
-// -----------------------------------------------------------------------------
-
 /**
  * @brief               Reads a byte from the stream with a timeout
  * @return              Read char or -1 if timed out
@@ -1235,56 +1582,83 @@ int8_t AllWize::_sendAndReceive(uint8_t ch) {
 int AllWize::_timedRead() {
     uint32_t _start = millis();
     while (millis() - _start < _timeout) {
+#if defined(ARDUINO_ARCH_ESP8266)
+        yield();
+#endif
         int ch = _stream->read();
         if (ch >= 0) return ch;
-        #if defined(ARDUINO_ARCH_ESP8266)
-            yield();
-        #endif
     };
     return -1;
 }
 
 /**
  * @brief               Reads the stream buffer up to a number of bytes
- * @param buffer        Buffer to store the values to
+ * @param data          Buffer to store the values to
  * @param len           Max number of bytes to read
  * @return              Number of bytes read or -1 if timed out
  * @protected
  */
-int AllWize::_readBytes(char * buffer, uint16_t len) {
+int AllWize::_readBytes(char * data, uint16_t len) {
+    
     if (len < 1) return 0;
+    
     uint16_t index = 0;
     while (index < len) {
+        
         int ch = _timedRead();
-        if (ch < 0) break;
-        *buffer++ = (char) ch;
+        if (ch < 0) return -1;
+
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+            //ALLWIZE_DEBUG_PRINTLN(buffer);
+        }
+        #endif
+
+        *data++ = (char)ch;
         index++;
+
     }
+    
     return index;
+
 }
 
 /**
  * @brief               Reads the stream buffer up to a certain char or times out
  * @param terminator    Terminating char
- * @param buffer        Buffer to store the values to
+ * @param data          Buffer to store the values to
  * @param len           Max number of bytes to read
  * @return              Number of bytes read or -1 if timed out
  * @protected
  */
-int AllWize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
+int AllWize::_readBytesUntil(char terminator, char *data, uint16_t len) {
+    
     if (len < 1) return 0;
+    
     uint16_t index = 0;
     while (index < len) {
+
         int ch = _timedRead();
-        if (ch < 0) break;
+        if (ch < 0) return -1;
+
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
+        }
+        #endif
+
         if (ch == terminator) break;
-        ALLWIZE_DEBUG_PRINT("r ");
-        ALLWIZE_DEBUG_PRINT(ch, HEX);
-        ALLWIZE_DEBUG_PRINTLN("");
-        *buffer++ = (char) ch;
+        *data++ = (char) ch;
         index++;
+
     }
+    
     return index;
+
 }
 
 /**
@@ -1294,9 +1668,9 @@ int AllWize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
  * @param len           Length of the hex c-string
  * @protected
  */
-void AllWize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
-    for (uint8_t i=0; i<len; i+=2) {
-        bin[i/2] = ((hex[i] - '0') * 16 + (hex[i+1] - '0')) & 0xFF;
+void AllWize::_hex2bin(char *hex, uint8_t *bin, uint8_t len) {
+    for (uint8_t i = 0; i < len; i += 2) {
+        bin[i / 2] = ((hex[i] - '0') * 16 + (hex[i + 1] - '0')) & 0xFF;
     }
 }
 
@@ -1307,9 +1681,9 @@ void AllWize::_hex2bin(char * hex, uint8_t * bin, uint8_t len) {
  * @param len           Length of the input buffer
  * @protected
  */
-void AllWize::_bin2hex(uint8_t * bin, char * hex, uint8_t len) {
-    for (uint8_t i=0; i<len; i++) {
-        sprintf(&hex[i*2], "%02X", bin[i]);
+void AllWize::_bin2hex(uint8_t *bin, char *hex, uint8_t len) {
+    for (uint8_t i = 0; i < len; i++) {
+        sprintf(&hex[i * 2], "%02X", bin[i]);
     }
 }
 

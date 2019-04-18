@@ -2,6 +2,22 @@
 // RC1701HP
 // -----------------------------------------------------------------------------
 
+// Module signature
+#define MODULE_SIGNATURE                "RC1701"
+
+// Module types
+enum {
+    
+    MODULE_UNKNOWN,
+    
+    MODULE_WMBUS4,
+    MODULE_OSP,
+    MODULE_WIZE,
+
+    MODULE_MAX
+
+};
+
 // Command keys
 #define CMD_AUTO_MESSAGE_FLAGS          'A'
 #define CMD_BIND                        'B'
@@ -25,39 +41,86 @@
 #define CMD_WRITE_MAILBOX               'W'
 #define CMD_READ_MEMORY                 'Y'
 #define CMD_SLEEP                       'Z'
+#define CMD_RSSI_CONTINUOUS             's'
 #define CMD_TEST_MODE_0                 '0'
 
-// Memory addresses
-#define MEM_CHANNEL                     0x00
-#define MEM_RF_POWER                    0x01
-#define MEM_DATA_RATE                   0x02
-#define MEM_MBUS_MODE                   0x03
-#define MEM_SLEEP_MODE                  0x04
-#define MEM_RSSI_MODE                   0x05
-#define MEM_PREAMBLE_LENGTH             0x0A
-#define MEM_TIMEOUT                     0x10
-#define MEM_NETWORK_ROLE                0x12
-#define MEM_MAILBOX                     0x16
-#define MEM_MANUFACTURER_ID             0x19
-#define MEM_UNIQUE_ID                   0x1B
-#define MEM_VERSION                     0x1F
-#define MEM_DEVICE                      0x20
-#define MEM_UART_BAUD_RATE              0x30
-#define MEM_UART_FLOW_CTRL              0x35
-#define MEM_DATA_INTERFACE              0x36
-#define MEM_CONFIG_INTERFACE            0x37
-#define MEM_FREQ_CAL                    0x39
-#define MEM_LED_CONTROL                 0x3A
-#define MEM_CONTROL_FIELD               0x3B
-#define MEM_RX_TIMEOUT                  0x3C
-#define MEM_INSTALL_MODE                0x3D
-#define MEM_ENCRYPT_FLAG                0x3E
-#define MEM_DECRYPT_FLAG                0x3F
-#define MEM_DEFAULT_KEY                 0x40
-#define MEM_PART_NUMBER_OLD             0x61
-#define MEM_SERIAL_NUMBER_OLD           0x71
-#define MEM_PART_NUMBER_NEW             0x89
-#define MEM_SERIAL_NUMBER_NEW           0xA9
+// Memory slots
+// These are abstract memory slots 
+// that are mapped to actual addresses in the MEM_ADDRESS array
+enum {
+    
+    MEM_CHANNEL_TX,
+    MEM_CHANNEL = MEM_CHANNEL_TX,
+    MEM_CHANNEL_RX,
+    MEM_RF_POWER,
+    MEM_DATA_RATE_TX,
+    MEM_DATA_RATE = MEM_DATA_RATE_TX,
+    MEM_DATA_RATE_RX,
+
+    MEM_MBUS_MODE,
+    MEM_SLEEP_MODE,
+    MEM_RSSI_MODE,
+    MEM_PA_TABLE_EXTENDED,
+    MEM_PREAMBLE_LENGTH,
+
+    MEM_TIMEOUT,
+    MEM_NETWORK_ROLE,
+    MEM_MAILBOX,
+    MEM_MANUFACTURER_ID,
+    MEM_UNIQUE_ID,
+
+    MEM_VERSION,
+    MEM_DEVICE,
+    MEM_UART_BAUD_RATE,
+    MEM_UART_FLOW_CTRL,
+    MEM_DATA_INTERFACE,
+
+    MEM_CONFIG_INTERFACE,
+    MEM_FREQ_CAL,
+    MEM_LED_CONTROL,
+    MEM_CONTROL_FIELD,
+    MEM_RX_TIMEOUT,
+
+    MEM_INSTALL_MODE,
+    MEM_ENCRYPT_FLAG,
+    MEM_DECRYPT_FLAG,
+    MEM_DEFAULT_KEY,
+    MEM_PART_NUMBER,
+
+    MEM_SERIAL_NUMBER,
+
+    MEM_MAX_SLOTS
+
+};
+
+// MBUS4
+static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
+    
+    /* MODULE_MBUS4 */ 
+    { 
+        0x00, 0xFF, 0x01, 0x02, 0xFF, 0x03, 0x04, 0x05, 0xFF, 0x0A,
+        0x10, 0x12, 0x16, 0x19, 0x1B, 0x1F, 0x20, 0x30, 0x35, 0x36,
+        0x37, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x61,
+        0x78
+    },
+
+    /* MODULE_OSP */ 
+    { 
+        0x00, 0xFF, 0x01, 0x02, 0xFF, 0x03, 0x04, 0x05, 0xFF, 0x0A,
+        0x10, 0x12, 0x16, 0x19, 0x1B, 0x1F, 0x20, 0x30, 0x35, 0x36,
+        0x37, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x89,
+        0xA9                                                            // Is this 0x9A?
+    },
+
+    /* MODULE_WIZE */ 
+    { 
+        0x00, 0x01, 0x04, 0x02, 0x03, 0x05, 0x06, 0x07, 0x08, 0xFF,
+        0x10, 0x12, 0x16, 0x19, 0x1B, 0x1F, 0x20, 0x30, 0x35, 0x36,
+        0x37, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x89,
+        0x9A
+    }
+
+};
 
 // Channels
 #define CHANNEL_01                      1
@@ -155,6 +218,7 @@
 #define LED_CONTROL_DISABLED            0x00
 #define LED_CONTROL_RX_TX               0x01
 #define LED_CONTROL_UART_RF_IDLE        0x02
+#define LED_CONTROL_RF_RX_TX            0x03
 
 // Encrypt/Decrypt flags
 #define ENCRYPT_DISABLED                0x00

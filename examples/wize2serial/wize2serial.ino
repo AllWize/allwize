@@ -35,13 +35,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define PC_SERIAL           Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define PC_SERIAL           SerialUSB
 #endif // ARDUINO_ARCH_SAMD
 
@@ -78,8 +78,8 @@ char buffer[256];
 void wizeSetup() {
 
     // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
+    #if defined(MODULE_SERIAL)
+        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     #else
         allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
@@ -105,16 +105,27 @@ void wizeLoop() {
         // Get the message
         allwize_message_t message = allwize->read();
 
+        if (CONTROL_INFORMATION_WIZE == message.ci) {
+            snprintf(
+                buffer, sizeof(buffer),
+                "%02X%02X%02X%02X,%d,%d,%s\n",
+                message.address[0], message.address[1],
+                message.address[2], message.address[3],
+                message.wize_counter, (int16_t) message.rssi / -2,
+                (char *) message.data
+            );
+        } else {
+            snprintf(
+                buffer, sizeof(buffer),
+                "%02X%02X%02X%02X,%d,%d,%s\n",
+                message.address[0], message.address[1],
+                message.address[2], message.address[3],
+                message.c, (int16_t) message.rssi / -2,
+                (char *) message.data
+            );
+        }
+
         // Send it to serial port
-        snprintf(
-            buffer, sizeof(buffer),
-            "%d,%02X%02X%02X%02X,%d,%d,%d,%s\n",
-            message.c,
-            message.address[0], message.address[1],
-            message.address[2], message.address[3],
-            message.type, message.ci, message.rssi,
-            (char *) message.data
-        );
         PC_SERIAL.print(buffer);
 
     }

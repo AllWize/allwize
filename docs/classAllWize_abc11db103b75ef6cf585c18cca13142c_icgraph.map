@@ -1,0 +1,4 @@
+<map id="AllWize::ready" name="AllWize::ready">
+<area shape="rect" id="node2" href="$classAllWize.html#a20b9250f67d5dc1914359ba8356b53f2" title="Wakes up the radio from sleep mode. " alt="" coords="178,5,298,32"/>
+<area shape="rect" id="node3" href="$classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086" title="Waits for timeout millis for the module to be ready. " alt="" coords="160,56,316,83"/>
+</map>
