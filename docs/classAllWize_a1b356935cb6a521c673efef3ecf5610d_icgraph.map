@@ -1,0 +1,7 @@
+<map id="AllWize::_getMemoryAsString" name="AllWize::_getMemoryAsString">
+<area shape="rect" id="node2" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Reads and caches the module model &amp; version. " alt="" coords="251,56,393,83"/>
+<area shape="rect" id="node3" href="$classAllWize.html#ac717b96d3682372b50506a1f49dc5791" title="Returns the module part number. " alt="" coords="457,5,619,32"/>
+<area shape="rect" id="node5" href="$classAllWize.html#ad48010be6a3bb025211da66d5499df6a" title="Returns the module hardware revision. " alt="" coords="441,56,635,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a764445116c012973343b12790ea70aa0" title="Returns the module firmware revision. " alt="" coords="443,107,633,133"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f" title="Inits the module communications. " alt="" coords="683,5,789,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="AllWize::getAppendRSSI" name="AllWize::getAppendRSSI">
+<area shape="rect" id="node2" href="$classAllWize.html#a496979330409adb0e7241f763e4a4b16" title="Decodes the current RX buffer contents. " alt="" coords="223,5,347,32"/>
+<area shape="rect" id="node3" href="$classAllWize.html#ae75c391473baf8107cae11f2134b7316" title="Returns true if a new message has been received and decoded This method has to be called in the main ..." alt="" coords="395,5,521,32"/>
+</map>

@@ -86,6 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL        CHANNEL_04
 #define WIZE_POWER          POWER_20dBm
 #define WIZE_DATARATE       DATARATE_2400bps
+#define WIZE_UID            0x20212223
 
 // -----------------------------------------------------------------------------
 // Globals
@@ -188,6 +189,7 @@ void wizeSetup() {
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
+    allwize->setUID(WIZE_UID);
 
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
