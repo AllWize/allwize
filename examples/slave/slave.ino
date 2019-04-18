@@ -25,23 +25,69 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MOTEINO)
     #define RESET_PIN           7
     #define RX_PIN              8
     #define TX_PIN              9
     #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_UNO
+#endif // ARDUINO_AVR_UNO || ARDUINO_AVR_MOTEINO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+    #define MODULE_SERIAL       Serial1
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN           7
-    #define HARDWARE_SERIAL     Serial1
+
+    // Common:
     #define DEBUG_SERIAL        SerialUSB
+
+    // Configuring additional hardware serials:
+    // Possible combinations:
+    //
+    // SERCOM1:
+    //    RX on 10,11,12,13
+    //    TX on 10,11
+    //    Mode PIO_SERCOM
+    //
+    // SERCOM3:
+    //    RX on 6,7,10,11,12,13
+    //    TX on 6,10,11
+    //    Mode PIO_SERCOM_ALT
+    //    6-10 and 7-12 are not compatible
+    //
+    // Pads:
+    //    6   pad 2
+    //    7   pad 3 (only RX)
+    //    10  pad 2
+    //    11  pad 0
+    //    12  pad 3 (only RX)
+    //    13  pad 1 (only RX)
+
+    #if defined(ALLWIZE_K2)
+
+        #define RX_PIN              (29ul)
+        #define TX_PIN              (26ul)
+        #define SERCOM_PORT         sercom2
+        #define SERCOM_HANDLER      SERCOM2_Handler
+        #define SERCOM_MODE         PIO_SERCOM_ALT
+        #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
+        #define SERCOM_TX_PAD       UART_TX_PAD_0
+        #include "wiring_private.h" // pinPeripheral() function
+        Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
+        void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+        #define MODULE_SERIAL       SerialWize
+        #define RESET_PIN           (30u)
+
+    #else
+
+        // Using exposed hardware serials:
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+
+    #endif
+
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
@@ -62,7 +108,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Configuration
 // -----------------------------------------------------------------------------
 
-#define WIZE_CHANNEL            CHANNEL_04
+#define WIZE_CHANNEL            CHANNEL_11
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
 #define WIZE_UID                0x20212223
@@ -76,12 +122,20 @@ AllWize * allwize;
 
 void wizeSetup() {
 
+    DEBUG_SERIAL.println("Initializing radio module");
+
+    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
+        pinPeripheral(RX_PIN, SERCOM_MODE);
+        pinPeripheral(TX_PIN, SERCOM_MODE);
+    #endif
+
     // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
+    #if defined(MODULE_SERIAL)
+        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     #else
         allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif
+    
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
@@ -90,9 +144,11 @@ void wizeSetup() {
 
     allwize->slave();
     allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
+    allwize->setPower(WIZE_POWER, true);
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setUID(WIZE_UID);
+
+    allwize->dump(DEBUG_SERIAL);
 
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
@@ -101,7 +157,7 @@ void wizeSetup() {
 void wizeSend(const char * payload) {
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "[WIZE] Sending: %s\n", payload);
+    snprintf(buffer, sizeof(buffer), "[WIZE] Sending '%s'\n", payload);
     DEBUG_SERIAL.print(buffer);
 
     if (!allwize->send(payload)) {

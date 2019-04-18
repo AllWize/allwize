@@ -4,8 +4,8 @@
 
 # PlatformIO folders
 .pio*
-docs
 
 # Project files
 credentials.h
 configuration.h
+.vscode

@@ -117,11 +117,24 @@ AllWize * allwize;
 // Tests
 // -----------------------------------------------------------------------------
 
-test(full) {
+test(factoryreset) {
+
+    // change channel
+    allwize->setChannel(CHANNEL_04, true);
+
+    // factory reset
+    assertTrue(allwize->factoryReset());
+
+    // get channel once more (factory channel is 3)
+    uint8_t value = allwize->getChannel();
+    assertEqual((uint8_t) CHANNEL_03, value);
+
+}
+
+test(setchannel) {
 
     // get original channel
     uint8_t channel1 = allwize->getChannel();
-    //assertNotEqual((uint8_t) 0, channel1);
 
     // set new channel
     uint8_t channel2 = channel1 + 1;
@@ -130,13 +143,6 @@ test(full) {
     // get channel again
     uint8_t channel3 = allwize->getChannel();
     assertEqual(channel2, channel3);
-
-    // factory reset
-    assertTrue(allwize->factoryReset());
-
-    // get channel once more (factory channel is 3)
-    uint8_t channel4 = allwize->getChannel();
-    assertEqual((uint8_t) 3, channel4);
 
 }
 
@@ -165,7 +171,9 @@ void info() {
     #endif
 
     #if USE_SOFTWARE_SERIAL
-        DEBUG_SERIAL.println("Serial: Pins 8 & 9");
+        char buffer[32];
+        snprintf(buffer, sizeof(buffer), "Serial: Pins %d & %d", RX_PIN, TX_PIN);
+        DEBUG_SERIAL.println(buffer);
     #else
         DEBUG_SERIAL.println("Serial: Pins 0 & 1");
     #endif

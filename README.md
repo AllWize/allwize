@@ -2,7 +2,7 @@
 
 Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 
-[![version](https://img.shields.io/badge/version-1.0.2-brightgreen.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-1.0.3-brightgreen.svg)](CHANGELOG.md)
 [![travis](https://travis-ci.com/AllWize/allwize.svg?branch=master)](https://travis-ci.com/AllWize/allwize)
 [![codacy](https://api.codacy.com/project/badge/Grade/5b0345d3b4994a1eb2e51f02fa9a5d22)](https://www.codacy.com/app/AllWize/allwize)
 [![license](https://img.shields.io/github/license/AllWize/allwize.svg)](LICENSE)
@@ -21,6 +21,11 @@ Compatible platforms:
 *   SAMD21 (Arduino Zero, Arduino MKR family)
 *   ESP8266
 *   ESP32
+
+## Documentation
+
+Visit the [online documentation for the AllWize Library](https://allwize.github.io/allwize/classAllWize.html).
+
 
 ## License
 

@@ -1,0 +1,5 @@
+<map id="AllWize::_reset_serial" name="AllWize::_reset_serial">
+<area shape="rect" id="node2" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="226,5,330,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba" title="Resets the module to factory settings. " alt="" coords="203,56,353,83"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f" title="Inits the module communications. " alt="" coords="401,5,508,32"/>
+</map>
