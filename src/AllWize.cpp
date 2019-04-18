@@ -1197,8 +1197,8 @@ void AllWize::_flush() {
 uint8_t AllWize::_send(uint8_t ch) {
     #if defined(ALLWIZE_DEBUG_PORT)
     {
-        char buffer[5];
-        snprintf(buffer, sizeof(buffer), "w %02X", ch);
+        char buffer[10];
+        snprintf(buffer, sizeof(buffer), "w %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
         ALLWIZE_DEBUG_PRINTLN(buffer);
     }
     #endif
@@ -1275,12 +1275,12 @@ int AllWize::_timedRead() {
 
 /**
  * @brief               Reads the stream buffer up to a number of bytes
- * @param buffer        Buffer to store the values to
+ * @param data          Buffer to store the values to
  * @param len           Max number of bytes to read
  * @return              Number of bytes read or -1 if timed out
  * @protected
  */
-int AllWize::_readBytes(char * buffer, uint16_t len) {
+int AllWize::_readBytes(char * data, uint16_t len) {
     if (len < 1) return 0;
     uint16_t index = 0;
     while (index < len) {
@@ -1289,13 +1289,13 @@ int AllWize::_readBytes(char * buffer, uint16_t len) {
 
         #if defined(ALLWIZE_DEBUG_PORT)
         {
-            char buffer[5];
-            snprintf(buffer, sizeof(buffer), "r %02X", ch);
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
             ALLWIZE_DEBUG_PRINTLN(buffer);
         }
         #endif
 
-        *buffer++ = (char) ch;
+        *data++ = (char) ch;
         index++;
     }
     return index;
@@ -1304,29 +1304,29 @@ int AllWize::_readBytes(char * buffer, uint16_t len) {
 /**
  * @brief               Reads the stream buffer up to a certain char or times out
  * @param terminator    Terminating char
- * @param buffer        Buffer to store the values to
+ * @param data          Buffer to store the values to
  * @param len           Max number of bytes to read
  * @return              Number of bytes read or -1 if timed out
  * @protected
  */
-int AllWize::_readBytesUntil(char terminator, char * buffer, uint16_t len) {
+int AllWize::_readBytesUntil(char terminator, char * data, uint16_t len) {
     if (len < 1) return 0;
     uint16_t index = 0;
     while (index < len) {
 
         int ch = _timedRead();
         if (ch < 0) break;
-        if (ch == terminator) break;
 
         #if defined(ALLWIZE_DEBUG_PORT)
         {
-            char buffer[5];
-            snprintf(buffer, sizeof(buffer), "r %02X", ch);
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
             ALLWIZE_DEBUG_PRINTLN(buffer);
         }
         #endif
 
-        *buffer++ = (char) ch;
+        if (ch == terminator) break;
+        *data++ = (char) ch;
         index++;
     }
     return index;
