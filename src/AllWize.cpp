@@ -547,12 +547,24 @@ uint8_t AllWize::getPower() {
  * @param dr            Value in [1, 2, 4, 5]
  */
 void AllWize::setDataRate(uint8_t dr) {
-    if (0 < dr && dr < 6 && dr != 3) {
-        _setSlot(MEM_DATA_RATE, dr);
-        if (MODULE_WIZE == _module) {
-            _setSlot(MEM_DATA_RATE_RX, dr);
+
+    if (_module == MODULE_WMBUS4) return;
+    if (dr < 1) return;
+    if (_module == MODULE_OSP) {
+        if (DATARATE_6400bps == dr) {
+            dr = DATARATE_6400bps_OSP;
         }
+        if (dr > 5) return;
     }
+    if (_module == MODULE_WIZE) {
+        if (dr > 3) return;
+    }
+
+    _setSlot(MEM_DATA_RATE, dr);
+    if (MODULE_WIZE == _module) {
+        _setSlot(MEM_DATA_RATE_RX, dr);
+    }
+
 }
 
 /**

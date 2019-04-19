@@ -166,10 +166,11 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define CHANNEL_41                      41
 
 // Data rates
-#define DATARATE_2400bps                0x01
-#define DATARATE_4800bps                0x02
-#define DATARATE_19200bps               0x04
-#define DATARATE_6400bps                0x05
+#define DATARATE_2400bps                0x01    // Only OSP & WIZE
+#define DATARATE_4800bps                0x02    // Only OSP & WIZE
+#define DATARATE_6400bps                0x03    // Only WIZE
+#define DATARATE_19200bps               0x04    // Only OSP
+#define DATARATE_6400bps_OSP            0x05    // Only OSP
 
 // Power modes
 #define POWER_14dBm                     0x01
