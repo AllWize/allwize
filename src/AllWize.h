@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 #include "RC1701HP.h"
+#include "OMS.h"
 #include <Stream.h>
 #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 #include <SoftwareSerial.h>
@@ -40,22 +41,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // General
 #define MODEM_BAUDRATE                  19200
 #define GPIO_NONE                       0x99
-#define CONTROL_INFORMATION_WIZE        0x20            // Wize Control Information Field for Application Protocol (Wize User Manual, page 5)
-#define CONTROL_INFORMATION_DOWN        0x5A            // MBus downlink command w/ short header
-#define CONTROL_INFORMATION_UP          0x7A            // MBus uplink response w/ short header
-#define END_OF_RESPONSE                 '>'
-#define CMD_ENTER_CONFIG                (char) 0x00
-#define CMD_EXIT_CONFIG                 (char) 0x58
-#define CMD_EXIT_MEMORY_ENABLE_RF       (char) 0xFD
-#define CMD_EXIT_MEMORY_DISABLE_RF      (char) 0xFF
-#define CMD_AWAKE                       (char) 0xFF     // Deprecated
-#define CMD_EXIT_MEMORY                 (char) 0xFF     // Deprecated
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 1000
 #define HARDWARE_SERIAL_PORT            1
-#define SIGNATURE_FIELD                 0x04            // TODO: should not be here
-#define START_BYTE                      0x68
-#define STOP_BYTE                       0x16
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
 #define USE_MEMORY_CACHE                1
 
@@ -252,7 +240,7 @@ class AllWize {
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
         
-        uint8_t _ci = CI_RESPONSE_UP_SHORT;
+        uint8_t _ci = CI_APP_RESPONSE_UP_SHORT;
         uint8_t _mbus_mode = 0xFF;
         uint8_t _data_interface = 0xFF;
         bool _append_rssi = false;
