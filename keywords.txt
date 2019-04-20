@@ -38,7 +38,7 @@ repeater KEYWORD2
 setChannel KEYWORD2
 setPower KEYWORD2
 setDataRate KEYWORD2
-setMBusMode KEYWORD2
+setMode KEYWORD2
 setSleepMode KEYWORD2
 setAppendRSSI KEYWORD2
 setPreamble KEYWORD2
@@ -58,7 +58,7 @@ setDefaultKey KEYWORD2
 getChannel KEYWORD2
 getPower KEYWORD2
 getDataRate KEYWORD2
-getMBusMode KEYWORD2
+getMode KEYWORD2
 getSleepMode KEYWORD2
 getPreamble KEYWORD2
 getDataInterface KEYWORD2

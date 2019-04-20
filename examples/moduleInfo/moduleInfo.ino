@@ -224,11 +224,12 @@ void setup() {
     DEBUG_SERIAL.println("------------------------------");
 
     format("Module type", allwize->getModuleTypeName());
+    format("UART speed", allwize->getBaudRateSpeed(allwize->getBaudRate()));
     format("Channel", allwize->getChannel());
     format("Power", allwize->getPower());
-    format("MBUS Mode", allwize->getMBusMode(), true);
+    format("MBUS Mode", allwize->getMode(), true);
     format("Sleep Mode", allwize->getSleepMode());
-    format("Data Rate", allwize->getDataRate());
+    format("Data Rate", allwize->getDataRateSpeed(allwize->getDataRate()));
     format("Preamble Length", allwize->getPreamble());
     format("Control Field", allwize->getControlField(), true);
     format("Network Role", allwize->getNetworkRole());
@@ -236,8 +237,8 @@ void setup() {
 
     format("Manufacturer ID", allwize->getMID(), true);
     format("Unique ID", allwize->getUID(), true);
-    format("Version", allwize->getVersion());
-    format("Device", allwize->getDevice());
+    format("Device Type", allwize->getDevice());
+    format("Device Version", allwize->getVersion());
     format("Part Number", allwize->getPartNumber());
     format("Firmware Version", allwize->getFirmwareVersion());
     format("Req. Hardware Version", allwize->getRequiredHardwareVersion());

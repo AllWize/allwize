@@ -14,7 +14,7 @@ var searchData=
   ['getRequiredHardwareVersion',['getRequiredHardwareVersion',['../classAllWize.html#ad48010be6a3bb025211da66d5499df6a',1,'AllWize']]],
   ['getinstallmode',['getInstallMode',['../classAllWize.html#a4bd269450531bac0e1495617990a0e56',1,'AllWize']]],
   ['getledcontrol',['getLEDControl',['../classAllWize.html#a3d723e9a6bf8417d196f3c6961b31c66',1,'AllWize']]],
-  ['getmbusmode',['getMBusMode',['../classAllWize.html#a2688b60d0b1b18007a75525e5e1f510b',1,'AllWize']]],
+  ['getMode',['getMode',['../classAllWize.html#a2688b60d0b1b18007a75525e5e1f510b',1,'AllWize']]],
   ['getmid',['getMID',['../classAllWize.html#af5845d6ca0dcab9a6b334c23315601ca',1,'AllWize']]],
   ['getnetworkrole',['getNetworkRole',['../classAllWize.html#a5ba307bbd3710c0bafdd9ae44aaf0925',1,'AllWize']]],
   ['getpartnumber',['getPartNumber',['../classAllWize.html#ac717b96d3682372b50506a1f49dc5791',1,'AllWize']]],

@@ -224,7 +224,7 @@ bool AllWize::factoryReset() {
  * @brief               Sets the module in master mode
  */
 void AllWize::master() {
-    setMBusMode(DEFAULT_MBUS_MODE, true);
+    setMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_MASTER);
     setInstallMode(INSTALL_MODE_HOST);
     setSleepMode(SLEEP_MODE_DISABLE);
@@ -239,7 +239,7 @@ void AllWize::master() {
  * @brief               Sets the module in slave mode
  */
 void AllWize::slave() {
-    setMBusMode(DEFAULT_MBUS_MODE, true);
+    setMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_SLAVE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
@@ -250,7 +250,7 @@ void AllWize::slave() {
  * @brief               Sets the module in repeater mode
  */
 void AllWize::repeater() {
-    setMBusMode(DEFAULT_MBUS_MODE, true);
+    setMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_REPEATER);
 }
 
@@ -643,19 +643,29 @@ uint8_t AllWize::getDataRate() {
  * @param mode          MBus mode (MBUS_MODE_*)
  * @param persist       Persist the changes in non-volatile memory (defaults to False)
  */
-void AllWize::setMBusMode(uint8_t mode, bool persist) {
+void AllWize::setMode(uint8_t mode, bool persist) {
+
+    // Wize FW accepts only modes 0x10 and 0x11
+    if (MODULE_WIZE == _module) {
+        if ((MBUS_MODE_N1 != mode) && (MBUS_MODE_N2 != mode)) return;
+    }
+    
+    // Only OSP FW accepts mode 0x12
+    if ((MBUS_MODE_OSP == mode) && (MODULE_OSP != _module)) return;
+
     if (persist) {
         _setSlot(MEM_MBUS_MODE, mode);
     }
     _sendCommand(CMD_MBUS_MODE, mode);
     _mbus_mode = mode;
+
 }
 
 /**
  * @brief               Gets the MBus mode stored in non-volatile memory
  * @return              MBus mode (1 byte)
  */
-uint8_t AllWize::getMBusMode() {
+uint8_t AllWize::getMode() {
     return _mbus_mode;
 }
 
@@ -917,6 +927,18 @@ uint8_t AllWize::getBaudRate() {
     return _getSlot(MEM_UART_BAUD_RATE);
 }
 
+/**
+ * @brief               Gets the UART baud rate speed in bps
+ * @param value         Baudrate code
+ * @return              UART speed
+ */
+uint32_t AllWize::getBaudRateSpeed(uint8_t value) {
+    if ((0 < value) & (value < 12)) {
+        return BAUDRATES[value-1];
+    }
+    return 0;
+}
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -1004,7 +1026,7 @@ bool AllWize::setUID(uint32_t uid) {
 }
 
 /**
- * @brief               Returns the module version from non-volatile memory
+ * @brief               Returns the device version from non-volatile memory
  * @return              Version
  */
 uint8_t AllWize::getVersion() {
@@ -1012,11 +1034,27 @@ uint8_t AllWize::getVersion() {
 }
 
 /**
- * @brief               Returns the device version from non-volatile memory
+ * @brief               Sets the device version
+ * @uint8_t version     Device version
+ */
+void AllWize::setVersion(uint8_t version) {
+    _setSlot(MEM_VERSION, version);
+}
+
+/**
+ * @brief               Returns the device type from non-volatile memory
  * @return              Device
  */
 uint8_t AllWize::getDevice() {
     return _getSlot(MEM_DEVICE);
+}
+
+/**
+ * @brief               Sets the device type
+ * @uint8_t type        Device type
+ */
+void AllWize::setDevice(uint8_t type) {
+    _setSlot(MEM_DEVICE, type);
 }
 
 /**
@@ -1104,10 +1142,10 @@ double AllWize::getFrequency(uint8_t channel) {
  * @return              Speed in bps
  */
 uint16_t AllWize::getDataRateSpeed(uint8_t dr) {
-    if (DATARATE_2400bps == dr) return 2400;
-    if (DATARATE_4800bps == dr) return 4800;
-    if (DATARATE_19200bps == dr) return 19200;
-    if (DATARATE_6400bps == dr) return 6400;
+    if (dr == DATARATE_6400bps_OSP) dr = DATARATE_6400bps;
+    if ((0 < dr) && (dr < 5)) {
+        return DATARATES[dr-1];
+    }
     return 0;
 }
 
@@ -1511,7 +1549,7 @@ bool AllWize::_decode() {
     memcpy(_local, _buffer, RX_BUFFER_SIZE);
 
     // Get current values
-    uint8_t mbus_mode = getMBusMode();
+    uint8_t mbus_mode = getMode();
     uint8_t data_interface = getDataInterface();
     bool has_start = (data_interface & 0x04) == 0x04;
     bool has_header = (mbus_mode != MBUS_MODE_OSP) & ((data_interface & 0x01) == 0x00);

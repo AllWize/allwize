@@ -19,7 +19,7 @@ var searchData=
   ['setinstallmode',['setInstallMode',['../classAllWize.html#ab4907595aa6aa98fd7144fd81ee92c71',1,'AllWize']]],
   ['setkey',['setKey',['../classAllWize.html#a451f2afd2c9a41ffa3fb3eaf8fd89023',1,'AllWize']]],
   ['setledcontrol',['setLEDControl',['../classAllWize.html#ae4a883aaf21420ea3c780dca07063ad5',1,'AllWize']]],
-  ['setmbusmode',['setMBusMode',['../classAllWize.html#a1ad16b71cc866e9f403e61b1916c451f',1,'AllWize']]],
+  ['setMode',['setMode',['../classAllWize.html#a1ad16b71cc866e9f403e61b1916c451f',1,'AllWize']]],
   ['setmid',['setMID',['../classAllWize.html#a192b6add24fdc1eb1e81eec5faafe52a',1,'AllWize']]],
   ['setnetworkrole',['setNetworkRole',['../classAllWize.html#ae6b73decc8d7282c38a9437374ff26eb',1,'AllWize']]],
   ['setpower',['setPower',['../classAllWize.html#a0982b5aa67cb6a8ef098b33cc9894004',1,'AllWize']]],

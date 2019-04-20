@@ -185,7 +185,7 @@ void wizeSetup() {
     }
 
     allwize->slave();
-    allwize->setMBusMode(MBUS_MODE_OSP);
+    allwize->setMode(MBUS_MODE_OSP);
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);

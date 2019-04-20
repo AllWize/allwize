@@ -121,7 +121,7 @@ class AllWize {
         void setChannel(uint8_t channel, bool persist = false);
         void setPower(uint8_t power, bool persist = false);
         void setDataRate(uint8_t dr);
-        void setMBusMode(uint8_t mode, bool persist = false);
+        void setMode(uint8_t mode, bool persist = false);
         void setSleepMode(uint8_t mode);
         void setAppendRSSI(bool value);
         void setPreamble(uint8_t preamble);
@@ -141,7 +141,7 @@ class AllWize {
         uint8_t getChannel();
         uint8_t getPower();
         uint8_t getDataRate();
-        uint8_t getMBusMode();
+        uint8_t getMode();
         uint8_t getSleepMode();
         uint8_t getPreamble();
         uint8_t getDataInterface();
@@ -155,6 +155,7 @@ class AllWize {
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
         uint8_t getBaudRate();
+        uint32_t getBaudRateSpeed(uint8_t value);
 
         float getRSSI();
         uint8_t getTemperature();
@@ -164,7 +165,9 @@ class AllWize {
         String getUID();
         bool setUID(uint32_t uid);
         uint8_t getVersion();
+        void setVersion(uint8_t version);
         uint8_t getDevice();
+        void setDevice(uint8_t type);
         String getPartNumber();
         String getRequiredHardwareVersion();
         String getFirmwareVersion();

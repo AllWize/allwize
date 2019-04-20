@@ -1,4 +1,4 @@
-<map id="AllWize::setMBusMode" name="AllWize::setMBusMode">
+<map id="AllWize::setMode" name="AllWize::setMode">
 <area shape="rect" id="node2" href="$classAllWize.html#a08c1705a0f66b27dc85700233a150cfb" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="212,56,359,83"/>
 <area shape="rect" id="node3" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="407,81,577,108"/>
 <area shape="rect" id="node4" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="625,56,764,83"/>

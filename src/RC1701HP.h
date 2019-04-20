@@ -188,6 +188,8 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define DATARATE_19200bps               0x04    // Only OSP
 #define DATARATE_6400bps_OSP            0x05    // Only OSP
 
+static const uint32_t DATARATES[4] = {2400, 4800, 6400, 9600};
+
 // Power modes
 #define POWER_14dBm                     0x01
 #define POWER_17dBm                     0x02
