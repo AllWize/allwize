@@ -186,6 +186,17 @@ bool AllWize::reset() {
 }
 
 /**
+ * @brief               Cleans the RX/TX line
+ */
+void AllWize::soft_reset() {
+    if (_send(CMD_ENTER_CONFIG) == 1) {
+        _flush();
+        _send(CMD_EXIT_CONFIG);
+    }
+    delay(10);
+}
+
+/**
  * @brief               Resets the module to factory settings
  * @return              Factory reset successfully issued
  */
@@ -255,6 +266,7 @@ void AllWize::sleep() {
  */
 void AllWize::wakeup() {
     _send(CMD_AWAKE);
+    delay(5);
     ready();
 }
 
@@ -344,7 +356,13 @@ void AllWize::dump(Stream &debug) {
  */
 bool AllWize::send(uint8_t *buffer, uint8_t len) {
  
+    // Check we are in IDLE mode
     if (_config) return false;
+
+    // Clean line
+    soft_reset();
+
+    // Send no response message in len is 0
     if (0 == len) return (1 == _send(0xFE));
 
     // Wize transport layer
@@ -352,10 +370,11 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
 
     // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 6 (wize transport layer if wize)
     uint8_t message_len = len + 1;
-    if (send_wize_transport_layer) message_len += 8;
+    if (MODULE_WIZE == _module) message_len += 2;
+    if (send_wize_transport_layer) message_len += 6;
 
-    // max payload size is 238 bytes
-    if (message_len > 238) return false;
+    // max payload size is 0xF6 bytes
+    if (message_len > 0xF6) return false;
 
     // length
     if (1 != _send(message_len)) return false;
@@ -377,7 +396,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     if (len != _send(buffer, len)) return false;
 
     // timestamp, TODO: add option to provide a timestamp
-    if (send_wize_transport_layer) {
+    if (MODULE_WIZE == _module) {
         _send(0);
         _send(0);
     }
@@ -398,6 +417,31 @@ bool AllWize::send(const char *buffer) {
 }
 
 /**
+ * @brief               Sends an ACK
+ * @return              Returns true if message has been correctly sent
+ */
+bool AllWize::ack() {
+    if (_config) return false;
+    setControlField(C_ACK);
+    return send("ACK");
+}
+
+/**
+ * @brief               Enables or disables RF recever
+ * @param enable        True to enable, false to disable
+ * @return              Returns true if successfully set
+ */
+bool AllWize::enableRX(bool enable) {
+    if (_config) return false;
+    if (enable) {
+        _send(CMD_IDLE_ENABLE_RF);
+    } else {
+        _send(CMD_IDLE_DISABLE_RF);
+    }
+    return true;
+}
+
+/**
  * @brief               Returns true if a new message has been received and decoded
  *                      This method has to be called in the main loop to monitor for incomming messages
  * @return              Whether a new message is available
@@ -411,12 +455,24 @@ bool AllWize::available() {
         static uint32_t when = millis();
 
         while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
+
             uint8_t ch = _stream->read();
+
+            #if defined(ALLWIZE_DEBUG_PORT)
+            {
+                char buffer[10];
+                snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+                ALLWIZE_DEBUG_PRINTLN(buffer);
+            }
+            #endif
+
             _buffer[_pointer++] = ch;
             when = millis();
+
             #if defined(ARDUINO_ARCH_ESP8266)
                 yield();
             #endif
+
         }
 
         // Check if message finished and decode it
@@ -1057,9 +1113,9 @@ bool AllWize::_setConfig(bool value) {
                 digitalWrite(_config_gpio, LOW);
             }
             _send(CMD_EXIT_CONFIG);
+            delay(5);
             _config = false;
         }
-        delay(10);
     }
     return _config;
 }
@@ -1125,7 +1181,7 @@ bool AllWize::_cacheMemory(uint8_t * buffer) {
     // Read memory
     _setConfig(true);
     _send(CMD_TEST_MODE_0);
-    bool ret = (255 == _readBytes((char *) buffer, 255));
+    bool ret = (256 == _readBytes((char *) buffer, 256));
     _setConfig(false);
     return ret;
 

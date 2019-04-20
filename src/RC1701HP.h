@@ -26,8 +26,10 @@ enum {
 // Special command keys
 #define CMD_ENTER_CONFIG                (char) 0x00
 #define CMD_EXIT_CONFIG                 (char) 0x58
-#define CMD_EXIT_MEMORY_ENABLE_RF       (char) 0xFD
-#define CMD_EXIT_MEMORY_DISABLE_RF      (char) 0xFF
+#define CMD_NO_RESPONSE                 (char) 0xFB
+#define CMD_KEY_CHALLENGE               (char) 0xFC
+#define CMD_IDLE_ENABLE_RF              (char) 0xFD
+#define CMD_IDLE_DISABLE_RF             (char) 0xFF
 #define CMD_AWAKE                       (char) 0xFF     // Deprecated
 #define CMD_EXIT_MEMORY                 (char) 0xFF     // Deprecated
 
@@ -35,6 +37,7 @@ enum {
 #define CMD_AUTO_MESSAGE_FLAGS          'A'
 #define CMD_BIND                        'B'
 #define CMD_CHANNEL                     'C'
+#define CMD_PING                        'D'
 #define CMD_ENCRYPT                     'E'
 #define CMD_CONTROL_FIELD               'F'
 #define CMD_MBUS_MODE                   'G'

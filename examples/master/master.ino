@@ -108,25 +108,23 @@ void wizeDebugMessage(allwize_message_t message) {
     if (CI_WIZE == message.ci) {
         snprintf(
             buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: { ",
-            message.c,
+            "[WIZE] C: 0x%02X, CI: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: { ",
+            message.c, message.ci, 
             message.man,
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.type, message.version,
             message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
             (int16_t) message.rssi / -2
         );
     } else {
         snprintf(
             buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: %d, DATA: { ",
-            message.c,
+            "[WIZE] C: 0x%02X, CI: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, RSSI: %d, DATA: { ",
+            message.c, message.ci, 
             message.man,
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.type, message.version,
-            message.ci, (int16_t) message.rssi / -2
+            (int16_t) message.rssi / -2
         );
     }
     DEBUG_SERIAL.print(buffer);

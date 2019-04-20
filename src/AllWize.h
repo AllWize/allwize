@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MODEM_BAUDRATE                  19200
 #define GPIO_NONE                       0x99
 #define RX_BUFFER_SIZE                  255
-#define DEFAULT_TIMEOUT                 1000
+#define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
 #define USE_MEMORY_CACHE                1
@@ -96,6 +96,7 @@ class AllWize {
 
         void begin();
         bool reset();
+        void soft_reset();
         bool factoryReset();
         void sleep();
         void wakeup();
@@ -103,9 +104,11 @@ class AllWize {
         bool waitForReady(uint32_t timeout = DEFAULT_TIMEOUT);
         void dump(Stream & debug);
 
+        bool ack();
         bool send(uint8_t * buffer, uint8_t len);
         bool send(const char * buffer);
         bool available();
+        bool enableRX(bool enable);
         allwize_message_t read();
 
         void setControlInformation(uint8_t ci);

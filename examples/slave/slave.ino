@@ -144,7 +144,7 @@ void wizeSetup() {
 
     allwize->slave();
     allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER, true);
+    allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
     allwize->setUID(WIZE_UID);
 
@@ -198,7 +198,7 @@ void loop() {
     // Increment the number (it will overflow at 255)
     count++;
 
-    // Wait 5 seconds and redo
-    delay(5000);
+    // Polling responses for 5 seconds
+   delay(5000);
 
 }
