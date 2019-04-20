@@ -350,15 +350,12 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // Wize transport layer
     bool send_wize_transport_layer = (MODULE_WIZE == _module) && (CI_WIZE == _ci);
 
-    // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 6 (if adding wize transport layer)
+    // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 6 (wize transport layer if wize)
     uint8_t message_len = len + 1;
-    if (MODULE_WIZE == _module) message_len += 2;
-    if (send_wize_transport_layer) message_len += 6;
+    if (send_wize_transport_layer) message_len += 8;
 
     // max payload size is 238 bytes
-    if (message_len > 238) {
-        return false;
-    }
+    if (message_len > 238) return false;
 
     // length
     if (1 != _send(message_len)) return false;
@@ -377,12 +374,10 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     }
 
     // application payload
-    if (len != _send(buffer, len)) {
-        return false;
-    }
+    if (len != _send(buffer, len)) return false;
 
     // timestamp, TODO: add option to provide a timestamp
-    if (MODULE_WIZE == _module) {
+    if (send_wize_transport_layer) {
         _send(0);
         _send(0);
     }
@@ -419,9 +414,9 @@ bool AllWize::available() {
             uint8_t ch = _stream->read();
             _buffer[_pointer++] = ch;
             when = millis();
-#if defined(ARDUINO_ARCH_ESP8266)
-            yield();
-#endif
+            #if defined(ARDUINO_ARCH_ESP8266)
+                yield();
+            #endif
         }
 
         // Check if message finished and decode it
@@ -1130,7 +1125,7 @@ bool AllWize::_cacheMemory(uint8_t * buffer) {
     // Read memory
     _setConfig(true);
     _send(CMD_TEST_MODE_0);
-    bool ret = (256 == _readBytes((char *) buffer, 256));
+    bool ret = (255 == _readBytes((char *) buffer, 255));
     _setConfig(false);
     return ret;
 
