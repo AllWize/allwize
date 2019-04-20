@@ -105,7 +105,7 @@ void wizeDebugMessage(allwize_message_t message) {
 
     // Code to pretty-print the message
     char buffer[512];
-    if (CONTROL_INFORMATION_WIZE == message.ci) {
+    if (CI_WIZE == message.ci) {
         snprintf(
             buffer, sizeof(buffer),
             "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: { ",

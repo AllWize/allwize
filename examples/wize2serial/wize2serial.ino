@@ -105,7 +105,7 @@ void wizeLoop() {
         // Get the message
         allwize_message_t message = allwize->read();
 
-        if (CONTROL_INFORMATION_WIZE == message.ci) {
+        if (CI_WIZE == message.ci) {
             snprintf(
                 buffer, sizeof(buffer),
                 "%02X%02X%02X%02X,%d,%d,%s\n",

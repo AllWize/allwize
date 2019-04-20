@@ -220,7 +220,7 @@ void AllWize::master() {
     setDataRate(DATARATE_2400bps);
     setDataInterface(DATA_INTERFACE_START_STOP);
     setAppendRSSI(true);
-    setControlField(C_ACK, true);
+    setControlField(C_ACK);
 }
 
 /**
@@ -231,7 +231,7 @@ void AllWize::slave() {
     setNetworkRole(NETWORK_ROLE_SLAVE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
-    setControlField(C_SND_NR, true);
+    setControlField(C_SND_NR);
 }
 
 /**
