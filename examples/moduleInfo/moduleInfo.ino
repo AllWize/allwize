@@ -248,8 +248,6 @@ void setup() {
 
     // -------------------------------------------------------------------------
 
-    delay(1000);
-
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.println("Memory dump:");

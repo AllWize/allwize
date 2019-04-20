@@ -97,6 +97,7 @@ void AllWize::begin() {
         _module = MODULE_OSP;
     } else if (part_number.equals("RC1701HP-WIZE")) {
         _module = MODULE_WIZE;
+        _ci = CI_WIZE;
     } else {
         _module = MODULE_UNKNOWN;
     }
@@ -142,7 +143,9 @@ void AllWize::_reset_serial() {
     _flush();
 
     // Cache memory
-    _cacheMemory();
+    #if USE_MEMORY_CACHE
+        _ready = _cacheMemory(_memory);
+    #endif
 
 }
 
@@ -217,6 +220,7 @@ void AllWize::master() {
     setDataRate(DATARATE_2400bps);
     setDataInterface(DATA_INTERFACE_START_STOP);
     setAppendRSSI(true);
+    setControlField(C_ACK, true);
 }
 
 /**
@@ -227,6 +231,7 @@ void AllWize::slave() {
     setNetworkRole(NETWORK_ROLE_SLAVE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
+    setControlField(C_SND_NR, true);
 }
 
 /**
@@ -279,6 +284,11 @@ bool AllWize::waitForReady(uint32_t timeout) {
  * @param debug         Data stream to dump the data to
  */
 void AllWize::dump(Stream &debug) {
+
+    #if not USE_MEMORY_CACHE
+        uint8_t _memory[0x100] = {0xFF};
+        bool _ready = _cacheMemory(_memory);
+    #endif
 
     if (!_ready) {
         debug.println("Error doing memory dump...");
@@ -337,12 +347,13 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     if (_config) return false;
     if (0 == len) return (1 == _send(0xFE));
 
-    // message length is payload length + 1 (CI) + 2 (for timestamp if wize)
+    // Wize transport layer
+    bool send_wize_transport_layer = (MODULE_WIZE == _module) && (CI_WIZE == _ci);
+
+    // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 6 (if adding wize transport layer)
     uint8_t message_len = len + 1;
-    if (MODULE_WIZE == _module) {
-	    message_len += 2;
-        if (_wize_send_transport_layer) message_len += 6;
-    }
+    if (MODULE_WIZE == _module) message_len += 2;
+    if (send_wize_transport_layer) message_len += 6;
 
     // max payload size is 238 bytes
     if (message_len > 238) {
@@ -352,11 +363,11 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // length
     if (1 != _send(message_len)) return false;
 
-    // CI
-    if (1 != _send(MODULE_WIZE == _module ? CONTROL_INFORMATION_WIZE : _ci)) return false;
+    // control information field
+    if (1 != _send(_ci)) return false;
 
     // transport layer
-    if ((MODULE_WIZE == _module) && (_wize_send_transport_layer)) {
+    if (send_wize_transport_layer) {
         _send(_wize_control);                   // Wize Control
         _send((_wize_operator_id >> 0) & 0xFF); // Operator ID HIGH
         _send((_wize_operator_id >> 8) & 0xFF); // Operator ID HIGH
@@ -544,7 +555,7 @@ uint8_t AllWize::getPower() {
 
 /**
  * @brief               Sets the data rate
- * @param dr            Value in [1, 2, 4, 5]
+ * @param dr            Value in [1, 2, 3, 4, 5]
  */
 void AllWize::setDataRate(uint8_t dr) {
 
@@ -1110,26 +1121,32 @@ int8_t AllWize::_sendCommand(uint8_t command) {
 
 /**
  * @brief               Reads and caches the module memory
+ * @param buffer        Buffer with at least 256 positions to hold memory
+ * @return              True if successfully read
+ * @protected
  */
-void AllWize::_cacheMemory() {
+bool AllWize::_cacheMemory(uint8_t * buffer) {
 
     // Read memory
     _setConfig(true);
     _send(CMD_TEST_MODE_0);
-    _ready = (256 == _readBytes((char *) _memory, 256));
-    
-    // Get tailing prompt
-    int ch = _timedRead();
-    if (ch < 0) _ready = false;
-
+    bool ret = (256 == _readBytes((char *) buffer, 256));
     _setConfig(false);
+    return ret;
 
 }
 
 /**
  * @brief               Searches for the module model
+ * @protected
  */
 void AllWize::_readModel() {
+
+    #if not USE_MEMORY_CACHE
+        uint8_t _memory[0x100] = {0xFF};
+        bool _ready = _cacheMemory(_memory);
+        if (!_ready) return;
+    #endif
 
     // Look for the part_number
     bool found = false;
@@ -1146,7 +1163,7 @@ void AllWize::_readModel() {
     if (found) {
 
         String part_number = String((char *) &_memory[index]);
-        part_number.substring(32);
+        part_number.substring(0, 31);
         part_number.trim();
 
         uint8_t end = part_number.indexOf(",");
@@ -1170,8 +1187,8 @@ void AllWize::_readModel() {
  * @protected
  */
 uint8_t AllWize::_getMemory(uint8_t address, uint8_t *buffer, uint8_t len) {
-    if (!_ready) return 0;
     #if USE_MEMORY_CACHE
+        if (!_ready) return 0;
         memcpy(buffer, &_memory[address], len);
         return len;
     #else
@@ -1196,8 +1213,8 @@ uint8_t AllWize::_getMemory(uint8_t address, uint8_t *buffer, uint8_t len) {
  * @protected
  */
 uint8_t AllWize::_getMemory(uint8_t address) {
-    if (!_ready) return 0;
     #if USE_MEMORY_CACHE
+        if (!_ready) return 0;
         return _memory[address];
     #else
         uint8_t response = _sendCommand(CMD_READ_MEMORY, address);
@@ -1484,7 +1501,7 @@ bool AllWize::_decode() {
     in += 1;
 
     // Wize transport layer
-    if ((MODULE_WIZE == _module) && (_message.ci == CONTROL_INFORMATION_WIZE)) {
+    if ((MODULE_WIZE == _module) && (_message.ci == CI_WIZE)) {
         
         bytes_not_in_app += 6;
         
@@ -1546,7 +1563,7 @@ void AllWize::_flush() {
     _stream->flush();
 
     // Flush RX line
-    //while (_stream->available()) _stream->read();
+    while (_stream->available()) _stream->read();
 
 }
 
@@ -1620,15 +1637,30 @@ int8_t AllWize::_sendAndReceive(uint8_t ch) {
  * @protected
  */
 int AllWize::_timedRead() {
+
     uint32_t _start = millis();
+    int ch = -1;
     while (millis() - _start < _timeout) {
 #if defined(ARDUINO_ARCH_ESP8266)
         yield();
 #endif
-        int ch = _stream->read();
-        if (ch >= 0) return ch;
+        ch = _stream->read();
+        if (ch >= 0) break;
     };
-    return -1;
+
+    #if defined(ALLWIZE_DEBUG_PORT)
+    {
+        if (ch < 0) {
+            ALLWIZE_DEBUG_PRINTLN("r TIMEOUT");
+        } else {
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
+        }
+    }
+    #endif
+
+    return ch;
 }
 
 /**
@@ -1644,21 +1676,10 @@ int AllWize::_readBytes(char * data, uint16_t len) {
     
     uint16_t index = 0;
     while (index < len) {
-        
         int ch = _timedRead();
         if (ch < 0) return -1;
-
-        #if defined(ALLWIZE_DEBUG_PORT)
-        {
-            char buffer[10];
-            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
-            //ALLWIZE_DEBUG_PRINTLN(buffer);
-        }
-        #endif
-
         *data++ = (char)ch;
         index++;
-
     }
     
     return index;
@@ -1679,22 +1700,11 @@ int AllWize::_readBytesUntil(char terminator, char *data, uint16_t len) {
     
     uint16_t index = 0;
     while (index < len) {
-
         int ch = _timedRead();
         if (ch < 0) return -1;
-
-        #if defined(ALLWIZE_DEBUG_PORT)
-        {
-            char buffer[10];
-            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
-            ALLWIZE_DEBUG_PRINTLN(buffer);
-        }
-        #endif
-
         if (ch == terminator) break;
         *data++ = (char) ch;
         index++;
-
     }
     
     return index;
