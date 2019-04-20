@@ -146,6 +146,32 @@ test(setchannel) {
 
 }
 
+test(setbaudrate) {
+
+    // get current channel
+    uint8_t channel1 = allwize->getChannel();
+
+    // change baudrate and reset
+    allwize->setBaudRate(BAUDRATE_115200);
+    assertEqual(BAUDRATE_115200, allwize->getBaudRate());
+    allwize->reset();
+
+    // query baudrate
+    assertEqual(BAUDRATE_115200, allwize->getBaudRate());
+
+    // query channel again
+    uint8_t channel2 = allwize->getChannel();
+    assertEqual(channel1, channel2);
+
+    // change baudrate again
+    allwize->setBaudRate(MODEM_DEFAULT_BAUDRATE);
+    allwize->reset();
+
+    // query baudrate
+    assertEqual(MODEM_DEFAULT_BAUDRATE, allwize->getBaudRate());
+
+}
+
 // -----------------------------------------------------------------------------
 // Main
 // -----------------------------------------------------------------------------

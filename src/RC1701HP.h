@@ -224,13 +224,6 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define NETWORK_ROLE_MASTER             0x01
 #define NETWORK_ROLE_REPEATER           0x02
 
-// Timeouts
-#define TIMEOUT_32MS                    0x01
-#define TIMEOUT_48MS                    0x02
-#define TIMEOUT_64MS                    0x03
-#define TIMEOUT_2S                      0x7C
-#define TIMEOUT_4S                      0xF9
-
 // LED Control
 #define LED_CONTROL_DISABLED            0x00
 #define LED_CONTROL_RX_TX               0x01
@@ -253,3 +246,18 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 // Preamble Length
 #define PREAMBLE_FORMAT_A               0x00
 #define PREAMBLE_FORMAT_B               0x02
+
+// Baud rates
+#define BAUDRATE_2400                   0x01
+#define BAUDRATE_4800                   0x02
+#define BAUDRATE_9600                   0x03
+#define BAUDRATE_14400                  0x04
+#define BAUDRATE_19200                  0x05
+#define BAUDRATE_28800                  0x06
+#define BAUDRATE_38400                  0x07
+#define BAUDRATE_57600                  0x08
+#define BAUDRATE_76800                  0x09
+#define BAUDRATE_115200                 0x0A
+#define BAUDRATE_230400                 0x0B
+
+static const uint32_t BAUDRATES[11] = {2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76800, 115200, 230400};

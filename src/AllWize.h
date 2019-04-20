@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 // General
-#define MODEM_BAUDRATE                  19200
+#define MODEM_DEFAULT_BAUDRATE          BAUDRATE_19200
 #define GPIO_NONE                       0x99
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 100
@@ -94,7 +94,7 @@ class AllWize {
         #endif
         AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE);
 
-        void begin();
+        void begin(uint8_t baudrate = MODEM_DEFAULT_BAUDRATE);
         bool reset();
         void soft_reset();
         bool factoryReset();
@@ -125,7 +125,7 @@ class AllWize {
         void setSleepMode(uint8_t mode);
         void setAppendRSSI(bool value);
         void setPreamble(uint8_t preamble);
-        void setTimeout(uint8_t timeout);
+        void setTimeout(uint16_t ms);
         void setNetworkRole(uint8_t role);
         void setLEDControl(uint8_t value);
         void setDataInterface(uint8_t value);
@@ -136,6 +136,7 @@ class AllWize {
         void setKey(uint8_t reg, const uint8_t * key);
         void setDefaultKey(const uint8_t * key);
         void setAccessNumber(uint8_t value);
+        void setBaudRate(uint8_t baudrate);
 
         uint8_t getChannel();
         uint8_t getPower();
@@ -146,13 +147,14 @@ class AllWize {
         uint8_t getDataInterface();
         uint8_t getControlField();
         bool getAppendRSSI();
-        uint8_t getTimeout();
+        uint16_t getTimeout();
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
         uint8_t getInstallMode();
         uint8_t getEncryptFlag();
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
+        uint8_t getBaudRate();
 
         float getRSSI();
         uint8_t getTemperature();
@@ -242,6 +244,7 @@ class AllWize {
         uint8_t _config_gpio = GPIO_NONE;
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
+        uint32_t _baudrate = 19200;
         
         uint8_t _ci = CI_APP_RESPONSE_UP_SHORT;
         uint8_t _mbus_mode = 0xFF;

@@ -83,8 +83,9 @@ void AllWize::_init() {
 /**
  * @brief               Inits the module communications
  */
-void AllWize::begin() {
+void AllWize::begin(uint8_t baudrate) {
     
+    _baudrate = BAUDRATES[baudrate-1];
     reset();
     delay(200);
     
@@ -120,12 +121,12 @@ void AllWize::_reset_serial() {
         if ((_rx != -1) && (_tx != -1)) {
             pinMode(_rx, FUNCTION_4);
             pinMode(_tx, FUNCTION_4);
-            _hw_serial->begin(MODEM_BAUDRATE, SERIAL_8N1, _rx, _tx);
+            _hw_serial->begin(_baudrate, SERIAL_8N1, _rx, _tx);
         } else {
-            _hw_serial->begin(MODEM_BAUDRATE);
+            _hw_serial->begin(_baudrate);
         }
 #else
-        _hw_serial->begin(MODEM_BAUDRATE);
+        _hw_serial->begin(_baudrate);
 #endif
 
     } else {
@@ -135,7 +136,7 @@ void AllWize::_reset_serial() {
         assert(false);
 #else
         _sw_serial->end();
-        _sw_serial->begin(MODEM_BAUDRATE);
+        _sw_serial->begin(_baudrate);
 #endif
 
     }
@@ -714,19 +715,22 @@ uint8_t AllWize::getPreamble() {
 }
 
 /**
- * @brief               Sets the timeout for auto sleep modes
- * @param timeout       Timeout value (defaults to 1s)
+ * @brief               Sets the buffer timeout (also used for auto sleep modes)
+ * @param timeout       Timeout value in milliseconds
  */
-void AllWize::setTimeout(uint8_t timeout) {
+void AllWize::setTimeout(uint16_t ms) {
+    if (ms > 4080) return;
+    uint8_t timeout = (ms / 16) - 1;
     _setSlot(MEM_TIMEOUT, timeout);
 }
 
 /**
- * @brief               Gets the current timeout for auto sleep modes
- * @return              Timeout setting
+ * @brief               Gets the current buffer timeout (also used for auto sleep modes)
+ * @return              Timeout setting in millis
  */
-uint8_t AllWize::getTimeout() {
-    return _getSlot(MEM_TIMEOUT);
+uint16_t AllWize::getTimeout() {
+    uint8_t timeout = _getSlot(MEM_TIMEOUT);
+    return 16 * (uint16_t) (timeout + 1);
 }
 
 /**
@@ -892,6 +896,25 @@ void AllWize::getDefaultKey(uint8_t *key) {
  */
 void AllWize::setAccessNumber(uint8_t value) {
     _sendCommand(CMD_ACCESS_NUMBER, value);
+}
+
+/**
+ * @brief               Sets the UART baud rate, requires reset to take effect
+ * @param value         Value from 1 to 11
+ */
+void AllWize::setBaudRate(uint8_t value) {
+    if ((0 < value) & (value < 12)) {
+        if (ready()) _setSlot(MEM_UART_BAUD_RATE, value);
+        _baudrate = BAUDRATES[value-1];
+    }
+}
+
+/**
+ * @brief               Gets the UART baud rate
+ * @return              Value (1 byte)
+ */
+uint8_t AllWize::getBaudRate() {
+    return _getSlot(MEM_UART_BAUD_RATE);
 }
 
 // -----------------------------------------------------------------------------
