@@ -11,7 +11,7 @@ var searchData=
   ['getdevice',['getDevice',['../classAllWize.html#ac47dd707240ab13ad5e84c6dc924e204',1,'AllWize']]],
   ['getencryptflag',['getEncryptFlag',['../classAllWize.html#aaac3f5de0bdf7f61b3d547cd99282c21',1,'AllWize']]],
   ['getfirmwareversion',['getFirmwareVersion',['../classAllWize.html#a764445116c012973343b12790ea70aa0',1,'AllWize']]],
-  ['gethardwareversion',['getHardwareVersion',['../classAllWize.html#ad48010be6a3bb025211da66d5499df6a',1,'AllWize']]],
+  ['getRequiredHardwareVersion',['getRequiredHardwareVersion',['../classAllWize.html#ad48010be6a3bb025211da66d5499df6a',1,'AllWize']]],
   ['getinstallmode',['getInstallMode',['../classAllWize.html#a4bd269450531bac0e1495617990a0e56',1,'AllWize']]],
   ['getledcontrol',['getLEDControl',['../classAllWize.html#a3d723e9a6bf8417d196f3c6961b31c66',1,'AllWize']]],
   ['getmbusmode',['getMBusMode',['../classAllWize.html#a2688b60d0b1b18007a75525e5e1f510b',1,'AllWize']]],

@@ -141,7 +141,7 @@ AllWize * allwize;
 // Utils
 // -----------------------------------------------------------------------------
 
-#define COLUMN_PAD  20
+#define COLUMN_PAD  25
 
 void format(const char * name, const char * value, bool isHex = false) {
     DEBUG_SERIAL.print(name);
@@ -239,8 +239,8 @@ void setup() {
     format("Version", allwize->getVersion());
     format("Device", allwize->getDevice());
     format("Part Number", allwize->getPartNumber());
-    format("Hardware Version", allwize->getHardwareVersion());
     format("Firmware Version", allwize->getFirmwareVersion());
+    format("Req. Hardware Version", allwize->getRequiredHardwareVersion());
     format("Serial Number", allwize->getSerialNumber(), true);
 
     format("Temperature (C)", allwize->getTemperature());

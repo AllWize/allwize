@@ -79,7 +79,7 @@ getUID KEYWORD2
 getVersion KEYWORD2
 getDevice KEYWORD2
 getPartNumber KEYWORD2
-getHardwareVersion KEYWORD2
+getRequiredHardwareVersion KEYWORD2
 getFirmwareVersion KEYWORD2
 getSerialNumber KEYWORD2
 

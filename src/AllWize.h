@@ -166,7 +166,7 @@ class AllWize {
         uint8_t getVersion();
         uint8_t getDevice();
         String getPartNumber();
-        String getHardwareVersion();
+        String getRequiredHardwareVersion();
         String getFirmwareVersion();
         String getSerialNumber();
         double getFrequency(uint8_t channel);

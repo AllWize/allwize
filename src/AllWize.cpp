@@ -1028,10 +1028,10 @@ String AllWize::getPartNumber() {
 }
 
 /**
- * @brief               Returns the module hardware revision
+ * @brief               Returns the minimum required hardware version to run the current firmware
  * @return              4-byte hex string with the HW version
  */
-String AllWize::getHardwareVersion() {
+String AllWize::getRequiredHardwareVersion() {
     return _hw;
 }
 

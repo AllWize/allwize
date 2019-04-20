@@ -1,4 +1,4 @@
-<map id="AllWize::getHardwareVersion" name="AllWize::getHardwareVersion">
+<map id="AllWize::getRequiredHardwareVersion" name="AllWize::getRequiredHardwareVersion">
 <area shape="rect" id="node2" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Reads and caches the module model &amp; version. " alt="" coords="247,81,389,108"/>
 <area shape="rect" id="node3" href="$classAllWize.html#a1b356935cb6a521c673efef3ecf5610d" title="Returns the contents of the memory from a certain address as a String object. " alt="" coords="437,81,635,108"/>
 <area shape="rect" id="node4" href="$classAllWize.html#a02b15aea0053d11c206973706df9f4a0" title="Returns the contents of consecutive memory addresses. " alt="" coords="683,81,829,108"/>
