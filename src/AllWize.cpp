@@ -328,7 +328,7 @@ bool AllWize::send(const char * buffer) {
 
 /**
  * @brief               Returns true if a new message has been received and decoded
- *                      This method has to be called in the main loop to monitor for incomming messages
+ *                      This method has to be called in the main loop to monitor for incoming messages
  * @return              Whether a new message is available
  */
 bool AllWize::available() {
@@ -1221,7 +1221,7 @@ uint8_t AllWize::_send(uint8_t * buffer, uint8_t len) {
 }
 
 /**
- * @brief               Listens to incomming data from the module until timeout or END_OF_RESPONSE.
+ * @brief               Listens to incoming data from the module until timeout or END_OF_RESPONSE.
  * @return              Number of bytes received and stored in the internal _buffer.
  * @protected
  */
