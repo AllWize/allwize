@@ -8,7 +8,7 @@ allwize_message_t	KEYWORD1
 # Classes (KEYWORD1)
 #######################################
 
-JustWifi	AllWize
+JustWifi	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
