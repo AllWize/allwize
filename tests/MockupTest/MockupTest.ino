@@ -119,7 +119,7 @@ testF(CustomTest, get_mbus_mode) {
 }
 
 testF(CustomTest, set_install) {
-    uint8_t mode = INSTALL_MODE_NORMAL;
+    uint8_t mode = INSTALL_MODE_FILTER;
     allwize->setInstallMode(mode);
     uint8_t expected[] = {0x00, 'I', mode, 0x58};
     compare(sizeof(expected), expected);

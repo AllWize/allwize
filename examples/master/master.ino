@@ -88,12 +88,15 @@ void wizeSetup() {
         while (true);
     }
 
+    if (BAUDRATE_115200 != allwize->getBaudRate()) {
+        allwize->setBaudRate(BAUDRATE_115200);
+        allwize->reset();
+    }
+
     allwize->master();
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
-
-    //allwize->dump(DEBUG_SERIAL);
 
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize->getChannel(), allwize->getDataRate());
@@ -149,6 +152,8 @@ void wizeLoop() {
 
         // Show it to console
         wizeDebugMessage(message);
+
+        allwize->ack();
 
     }
 

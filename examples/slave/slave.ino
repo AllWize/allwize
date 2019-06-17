@@ -111,7 +111,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
-#define WIZE_UID                0x20212223
+#define WIZE_MID                0x2020
+#define WIZE_UID                0x20202020
 
 // -----------------------------------------------------------------------------
 // AllWize
@@ -122,7 +123,7 @@ AllWize * allwize;
 
 void wizeSetup() {
 
-    DEBUG_SERIAL.println("Initializing radio module");
+    DEBUG_SERIAL.println("[WIZE] Initializing radio module");
 
     #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
         pinPeripheral(RX_PIN, SERCOM_MODE);
@@ -140,12 +141,19 @@ void wizeSetup() {
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
+    } else {
+        DEBUG_SERIAL.print("[WIZE] Module found, speed: ");
+        DEBUG_SERIAL.println(allwize->getBaudRateSpeed(allwize->getBaudRate()));
     }
 
     allwize->slave();
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
+    allwize->setBaudRate(BAUDRATE_19200);
+    allwize->setControlField(C_SND_NR);
+    
+    allwize->setMID(WIZE_MID);
     allwize->setUID(WIZE_UID);
 
     allwize->dump(DEBUG_SERIAL);
@@ -163,6 +171,45 @@ void wizeSend(const char * payload) {
     if (!allwize->send(payload)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
+
+}
+
+void wizeDebugMessage(allwize_message_t message) {
+
+    // Code to pretty-print the message
+    char buffer[512];
+    if (CI_WIZE == message.ci) {
+        snprintf(
+            buffer, sizeof(buffer),
+            "[WIZE] C: 0x%02X, CI: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: { ",
+            message.c, message.ci, 
+            message.man,
+            message.address[0], message.address[1],
+            message.address[2], message.address[3],
+            message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
+            (int16_t) message.rssi / -2
+        );
+    } else {
+        snprintf(
+            buffer, sizeof(buffer),
+            "[WIZE] C: 0x%02X, CI: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, RSSI: %d, DATA: { ",
+            message.c, message.ci, 
+            message.man,
+            message.address[0], message.address[1],
+            message.address[2], message.address[3],
+            (int16_t) message.rssi / -2
+        );
+    }
+    DEBUG_SERIAL.print(buffer);
+
+    for (uint8_t i=0; i<message.len; i++) {
+        char ch = message.data[i];
+        snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
+        DEBUG_SERIAL.print(buffer);
+    }
+    DEBUG_SERIAL.print("}, STR: \"");
+    DEBUG_SERIAL.print((char *) message.data);
+    DEBUG_SERIAL.println("\"");
 
 }
 
@@ -199,6 +246,14 @@ void loop() {
     count++;
 
     // Polling responses for 5 seconds
-   delay(5000);
+    allwize->enableRX(true);
+    unsigned long start = millis();
+    while (millis() - start < 5000) {
+        if (allwize->available()) {
+            allwize_message_t message = allwize->read();
+            wizeDebugMessage(message);
+        }
+    }
+    //delay(5000);
 
 }

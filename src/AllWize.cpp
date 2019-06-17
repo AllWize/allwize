@@ -85,7 +85,13 @@ void AllWize::_init() {
  */
 void AllWize::begin(uint8_t baudrate) {
     
-    _baudrate = BAUDRATES[baudrate-1];
+    // Set baudrate manually or auto
+    if (baudrate > 0) {
+        _baudrate = BAUDRATES[baudrate-1];
+    } else {
+        sync();
+    }
+
     reset();
     delay(200);
     
@@ -143,11 +149,23 @@ void AllWize::_reset_serial() {
 
     _flush();
 
-    // Cache memory
-    #if USE_MEMORY_CACHE
-        _ready = _cacheMemory(_memory);
-    #endif
+}
 
+/**
+ * @brief               Syncs the module uart speed
+ * @return              One of BAUDRATE_*
+ */
+uint8_t AllWize::sync() {
+    uint8_t copy = _baudrate;
+    for (uint8_t i = 1; i < 12; i++) {
+        _baudrate = BAUDRATES[i-1];
+        _reset_serial();
+        delay(10);
+        if (ready()) return i;
+    }
+    _baudrate = copy;
+    _reset_serial();
+    return 0;
 }
 
 /**
@@ -155,6 +173,9 @@ void AllWize::_reset_serial() {
  * @return              Reset successfully issued
  */
 bool AllWize::reset() {
+
+    bool ret = false;
+
     if (GPIO_NONE == _reset_gpio) {
         _reset_serial();
         delay(100);
@@ -169,7 +190,7 @@ bool AllWize::reset() {
             }
             _config = false;
             _reset_serial();
-            return true;
+            ret = true;
         }
     } else {
         digitalWrite(_reset_gpio, LOW);
@@ -181,20 +202,23 @@ bool AllWize::reset() {
         }
         _config = false;
         _reset_serial();
-        return true;
+        ret =  true;
     }
-    return false;
+    
+    // Cache memory
+    #if USE_MEMORY_CACHE
+        _ready = _cacheMemory(_memory);
+    #endif
+    
+    return ret;
+
 }
 
 /**
- * @brief               Cleans the RX/TX line
+ * @brief               Forces module to IDLE
  */
 void AllWize::soft_reset() {
-    if (_send(CMD_ENTER_CONFIG) == 1) {
-        _flush();
-        _send(CMD_EXIT_CONFIG);
-    }
-    delay(10);
+    if (_setConfig(true)) _setConfig(false);
 }
 
 /**
@@ -202,6 +226,9 @@ void AllWize::soft_reset() {
  * @return              Factory reset successfully issued
  */
 bool AllWize::factoryReset() {
+
+    bool ret = false;
+
     _reset_serial();
     delay(100);
     _setSlot(MEM_CONFIG_INTERFACE, 1);
@@ -215,24 +242,47 @@ bool AllWize::factoryReset() {
         }
         _config = false;
         _reset_serial();
-        return true;
+        ret = true;
     }
-    return false;
+
+    // Cache memory
+    #if USE_MEMORY_CACHE
+        _ready = _cacheMemory(_memory);
+    #endif
+    
+    return ret;
+
 }
 
 /**
  * @brief               Sets the module in master mode
  */
 void AllWize::master() {
+
     setMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_MASTER);
     setInstallMode(INSTALL_MODE_HOST);
     setSleepMode(SLEEP_MODE_DISABLE);
-    setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
     setDataInterface(DATA_INTERFACE_START_STOP);
+    setControlField(C_ACK_MUC);
+    setControlInformation(CI_TRANSPORT_DOWN_LONG);
     setAppendRSSI(true);
-    setControlField(C_ACK);
+    
+    /*
+    _setSlot(MEM_MAILBOX, 0x00);
+    {
+        uint8_t data[] = { 0x01, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x01, 0x00 };   // Also 0x0000 or 0x4000
+        _sendCommand(CMD_BIND, data, sizeof(data));
+    }
+    {
+        uint8_t data[] = { 0x01, 0x20, 0x00 };   // Also 0x0000 or 0x4000
+        _sendCommand(CMD_BIND, data, sizeof(data));
+    }
+    setInstallMode(INSTALL_MODE_HOST);
+    */
+    
+
 }
 
 /**
@@ -402,6 +452,9 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
         _send(0);
     }
 
+    delay(200);
+    _flush();
+
     _access_number++;
     _counter++;
     return true;
@@ -423,8 +476,7 @@ bool AllWize::send(const char *buffer) {
  */
 bool AllWize::ack() {
     if (_config) return false;
-    setControlField(C_ACK);
-    return send("ACK");
+    return send("0");
 }
 
 /**
@@ -1613,7 +1665,7 @@ bool AllWize::_decode() {
     in += 1;
 
     // Wize transport layer
-    if ((MODULE_WIZE == _module) && (_message.ci == CI_WIZE)) {
+    if ((MODULE_WIZE == _module) && (CI_WIZE == _message.ci)) {
         
         bytes_not_in_app += 6;
         

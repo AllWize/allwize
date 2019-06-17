@@ -210,7 +210,7 @@ static const uint32_t DATARATES[4] = {2400, 4800, 6400, 9600};
 #define MBUS_MODE_OSP                   0x12
 
 // Operation modes
-#define INSTALL_MODE_NORMAL             0x00
+#define INSTALL_MODE_FILTER             0x00
 #define INSTALL_MODE_INSTALL            0x01
 #define INSTALL_MODE_HOST               0x02
 
@@ -263,3 +263,11 @@ static const uint32_t DATARATES[4] = {2400, 4800, 6400, 9600};
 #define BAUDRATE_230400                 0x0B
 
 static const uint32_t BAUDRATES[11] = {2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76800, 115200, 230400};
+
+// Mailbox register
+#define MAILBOX_ACC                     0x01
+#define MAILBOX_DFC                     0x02
+#define MAILBOX_MBSM                    0x04
+#define MAILBOX_ACMB                    0x08
+#define MAILBOX_ACSM                    0x10
+#define MAILBOX_TLAN                    0x20

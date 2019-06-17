@@ -39,12 +39,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 // General
-#define MODEM_DEFAULT_BAUDRATE          BAUDRATE_19200
+#define DEFAULT_BAUDRATE                19200
 #define GPIO_NONE                       0x99
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
-#define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define DEFAULT_MBUS_MODE               MBUS_MODE_N2
 #define USE_MEMORY_CACHE                1
 
 typedef struct {
@@ -94,8 +94,9 @@ class AllWize {
         #endif
         AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE);
 
-        void begin(uint8_t baudrate = MODEM_DEFAULT_BAUDRATE);
+        void begin(uint8_t baudrate = 0);
         bool reset();
+        uint8_t sync();
         void soft_reset();
         bool factoryReset();
         void sleep();
@@ -247,7 +248,7 @@ class AllWize {
         uint8_t _config_gpio = GPIO_NONE;
         bool _config = false;
         uint32_t _timeout = DEFAULT_TIMEOUT;
-        uint32_t _baudrate = 19200;
+        uint32_t _baudrate = DEFAULT_BAUDRATE;
         
         uint8_t _ci = CI_APP_RESPONSE_UP_SHORT;
         uint8_t _mbus_mode = 0xFF;
