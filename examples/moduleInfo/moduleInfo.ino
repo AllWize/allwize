@@ -54,8 +54,8 @@ AllWize * allwize;
     #define MODULE_SERIAL       Serial1
 
     // Using Software serial:
-    //#define RX_PIN              8
-    //#define TX_PIN              9
+    //#define RX_PIN              10
+    //#define TX_PIN              11
     //SoftwareSerial SerialWize(RX_PIN, TX_PIN);
     //#define MODULE_SERIAL       SerialWize
 
@@ -101,6 +101,8 @@ AllWize * allwize;
         #include "wiring_private.h" // pinPeripheral() function
         Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
         void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+
+
         #define MODULE_SERIAL       SerialWize
 
     #else
