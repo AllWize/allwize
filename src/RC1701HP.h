@@ -10,7 +10,7 @@ enum {
     
     MODULE_UNKNOWN,
     
-    MODULE_WMBUS4,
+    MODULE_MBUS4,
     MODULE_OSP,
     MODULE_WIZE,
 

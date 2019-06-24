@@ -92,8 +92,8 @@ void AllWize::begin(uint8_t baudrate) {
     // Figure out module type
     _readModel();
     String part_number = getPartNumber();
-    if (part_number.equals("RC1701HP-WMBUS4")) {
-        _module = MODULE_WMBUS4;
+    if (part_number.equals("RC1701HP-MBUS4")) {
+        _module = MODULE_MBUS4;
     } else if (part_number.equals("RC1701HP-OSP")) {
         _module = MODULE_OSP;
     } else if (part_number.equals("RC1701HP-WIZE")) {
@@ -611,7 +611,7 @@ uint8_t AllWize::getPower() {
  */
 void AllWize::setDataRate(uint8_t dr) {
 
-    if (_module == MODULE_WMBUS4) return;
+    if (_module == MODULE_MBUS4) return;
     if (dr < 1) return;
     if (_module == MODULE_OSP) {
         if (DATARATE_6400bps == dr) {
@@ -1091,7 +1091,7 @@ String AllWize::getSerialNumber() {
 
 /**
  * @brief               Returns the module type
- * @return              One of MODULE_UNKNOWN, MODULE_WMBUS4, MODULE_OSP and MODULE_WIZE
+ * @return              One of MODULE_UNKNOWN, MODULE_MBUS4, MODULE_OSP and MODULE_WIZE
  */
 uint8_t AllWize::getModuleType() {
     return _module;
@@ -1099,11 +1099,11 @@ uint8_t AllWize::getModuleType() {
 
 /**
  * @brief               Returns the module type
- * @return              One of MODULE_UNKNOWN, MODULE_WMBUS4, MODULE_OSP and MODULE_WIZE
+ * @return              One of MODULE_UNKNOWN, MODULE_MBUS4, MODULE_OSP and MODULE_WIZE
  */
 String AllWize::getModuleTypeName() {
     switch (_module) {
-        case MODULE_WMBUS4: return String("WMBUS4");
+        case MODULE_MBUS4: return String("MBUS4");
         case MODULE_OSP: return String("OSP");
         case MODULE_WIZE: return String("WIZE");
     }

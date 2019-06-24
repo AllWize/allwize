@@ -90,10 +90,11 @@ AllWize * allwize;
 
     #if defined(ALLWIZE_K2)
 
+        #define RESET_PIN           (30ul)
         #define RX_PIN              (29ul)
         #define TX_PIN              (26ul)
-        #define SERCOM_PORT         sercom2
-        #define SERCOM_HANDLER      SERCOM2_Handler
+        #define SERCOM_PORT         sercom4
+        #define SERCOM_HANDLER      SERCOM4_Handler
         #define SERCOM_MODE         PIO_SERCOM_ALT
         #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
         #define SERCOM_TX_PAD       UART_TX_PAD_0
@@ -101,7 +102,6 @@ AllWize * allwize;
         Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
         void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
         #define MODULE_SERIAL       SerialWize
-        #define RESET_PIN           (30u)
 
     #else
 
