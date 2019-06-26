@@ -75,7 +75,7 @@ You will need two thrid party libraries (both available in the Arduino Library M
 
 ## License
 
-Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
+Copyright (C) 2018-2019 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

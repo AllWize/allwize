@@ -3,7 +3,7 @@
 AllWize - Vineyard Case
 Using an analog higrometer and a SI7021 temp & hum sensor
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

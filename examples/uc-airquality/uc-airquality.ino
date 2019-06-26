@@ -5,7 +5,7 @@ AllWize - Air Quality Use Case
 MH-Z16 CO2 Sensor
 BME-280 Temperature, Humidity & Pressure Sensor
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

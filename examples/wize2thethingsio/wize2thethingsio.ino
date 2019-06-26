@@ -6,7 +6,7 @@ Listens to messages on the same channel, data rate and CF and
 forwards them to TheThings.io.
 This example is meant to run on a Wemos D1 board (ESP8266).
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

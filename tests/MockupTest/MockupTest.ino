@@ -5,7 +5,7 @@ AllWize - Mockup Test suite
 This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
 and RC1701XX_Mockup class that mocks up the RC1701XX radio module
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

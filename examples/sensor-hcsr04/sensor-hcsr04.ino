@@ -4,7 +4,7 @@ AllWize - Ultrasonic HC-SR04 Slave Example
 
 Shows how to use an ultrasonic HC-SR04 to send data about distance to a target.
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
