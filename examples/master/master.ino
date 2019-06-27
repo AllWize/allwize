@@ -47,8 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if defined(ARDUINO_ARCH_ESP8266)
     #define RESET_PIN           14
-    #define RX_PIN              12
-    #define TX_PIN              13
+    #define RX_PIN              5
+    #define TX_PIN              4
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP8266
 

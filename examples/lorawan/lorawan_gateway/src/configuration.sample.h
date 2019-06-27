@@ -25,8 +25,8 @@ Configuration file
 //------------------------------------------------------------------------------
 
 #define RESET_PIN               14                          // GPIO for the reset pad in the RC1701HP module
-#define RX_PIN                  12                          // GPIO connected to the TX pad in the RC1701HP module
-#define TX_PIN                  13                          // GPIO connected to the RX pad in the RC1701HP module
+#define RX_PIN                  5                           // GPIO connected to the TX pad in the RC1701HP module
+#define TX_PIN                  4                           // GPIO connected to the RX pad in the RC1701HP module
 
 //------------------------------------------------------------------------------
 // Wize configuration

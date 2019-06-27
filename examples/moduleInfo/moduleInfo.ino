@@ -117,11 +117,12 @@ AllWize * allwize;
 
 #if defined(ARDUINO_ARCH_ESP8266)
 
-/*-----------------------------------------------------
+/*
+----------------------------------------------------------
 Wemos D1 R2 v2.1 pins:
--------------------------------------------------------
-K1      Wemos   Function                        GPIO
--------------------------------------------------------
+----------------------------------------------------------
+K1      Wemos   Function                        GPIO    S 
+----------------------------------------------------------
 RX<-0   RX 	    RXD 	                        RXD     *
 TX->1   TX 	    TXD 	                        TXD     *
 2       D0 	    I/O 	                        GPIO16  *
@@ -146,14 +147,16 @@ GND     GND 	Ground 	                        GND
 5V      5V 	    5V 	                            
 3.3V    3V3 	3.3V 	                        3.3V
 RESET   RST 	Reset 	                        RST
--------------------------------------------------------*/
+----------------------------------------------------------
+*/
+
     // Common:
     #define RESET_PIN           14
     #define DEBUG_SERIAL        Serial
 
     // Using Software serial:
-    #define RX_PIN              12
-    #define TX_PIN              13
+    #define RX_PIN              5
+    #define TX_PIN              4
 
 #endif // ARDUINO_ARCH_ESP8266
 
