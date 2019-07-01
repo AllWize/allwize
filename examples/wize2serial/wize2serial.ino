@@ -40,9 +40,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
-    #define PC_SERIAL           SerialUSB
+
+    // Common:
+    #define DEBUG_SERIAL        SerialUSB
+
+    // Configuring additional hardware serials:
+    // Possible combinations:
+    //
+    // SERCOM1:
+    //    RX on 10,11,12,13
+    //    TX on 10,11
+    //    Mode PIO_SERCOM
+    //
+    // SERCOM3:
+    //    RX on 6,7,10,11,12,13
+    //    TX on 6,10,11
+    //    Mode PIO_SERCOM_ALT
+    //    6-10 and 7-12 are not compatible
+    //
+    // Pads:
+    //    6   pad 2
+    //    7   pad 3 (only RX)
+    //    10  pad 2
+    //    11  pad 0
+    //    12  pad 3 (only RX)
+    //    13  pad 1 (only RX)
+
+    #if defined(ALLWIZE_K2)
+
+        #define RESET_PIN           (30ul)
+        #define RX_PIN              (29ul)
+        #define TX_PIN              (26ul)
+        #define SERCOM_PORT         sercom4
+        #define SERCOM_HANDLER      SERCOM4_Handler
+        #define SERCOM_MODE         PIO_SERCOM_ALT
+        #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
+        #define SERCOM_TX_PAD       UART_TX_PAD_0
+        #include "wiring_private.h" // pinPeripheral() function
+        Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
+        void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+
+
+        #define MODULE_SERIAL       SerialWize
+
+    #else
+
+        // Using exposed hardware serials:
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+
+    #endif
+
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)

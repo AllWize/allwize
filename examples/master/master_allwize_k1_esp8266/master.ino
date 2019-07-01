@@ -1,9 +1,9 @@
 /*
 
-AllWize - Simple Master example
+AllWize K1 + ESP8266
 
-Listens to messages on the same channel, data rate and CF and
-prints them out via the serial monitor.
+Listens to messages on the same channel and data rate
+and prints them out via the serial monitor.
 
 Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
@@ -22,66 +22,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_AVR_UNO)
-    #define RESET_PIN           7
-    #define RX_PIN              8
-    #define TX_PIN              9
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_UNO
-
-#if defined(ARDUINO_AVR_LEONARDO)
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_AVR_LEONARDO
-
-#if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
-    #define DEBUG_SERIAL        SerialUSB
-#endif // ARDUINO_ARCH_SAMD
-
-#if defined(ARDUINO_ARCH_ESP8266)
-    #define RESET_PIN           14
-    #define RX_PIN              5
-    #define TX_PIN              4
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_ARCH_ESP8266
-
-#if defined(ARDUINO_ARCH_ESP32)
-    #define RESET_PIN           14
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #define DEBUG_SERIAL        Serial
-#endif // ARDUINO_ARCH_ESP32
+#define RESET_PIN           14
+#define RX_PIN              5
+#define TX_PIN              4
+#define DEBUG_SERIAL        Serial
 
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
 
 #define WIZE_CHANNEL            CHANNEL_04
-#define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
 
 // -----------------------------------------------------------------------------
 // Wize
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
 AllWize * allwize;
 
 void wizeSetup() {
 
     // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
+    allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
@@ -90,7 +58,6 @@ void wizeSetup() {
 
     allwize->master();
     allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
 
     //allwize->dump(DEBUG_SERIAL);

@@ -1,4 +1,4 @@
-# AllWize - AllWize - Simple Slave Example
+# AllWize - Simple Slave Example
 
 Simple slave that sends an auto-increment number every 5 seconds.
 
