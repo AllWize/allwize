@@ -22,13 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // -----------------------------------------------------------------------------
-// Config & globals
-// -----------------------------------------------------------------------------
-
-#include "AllWize.h"
-AllWize * allwize;
-
-// -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
 
@@ -115,6 +108,39 @@ AllWize * allwize;
     #define RESET_PIN           14
     #define DEBUG_SERIAL        Serial
 
+    /*
+    ----------------------------------------------------------
+    Wemos D1 R2 v2.1 pins:
+    ----------------------------------------------------------
+    K1      Wemos   Function                        GPIO    S 
+    ----------------------------------------------------------
+    RX<-0   RX 	    RXD 	                        RXD     *
+    TX->1   TX 	    TXD 	                        TXD     *
+    2       D0 	    I/O 	                        GPIO16  *
+    3       D1 	    I/O, SCL 	                    GPIO5   *
+    4       D2 	    I/O, SDA 	                    GPIO4   *
+    5       D3 	    I/O, 10k pull-up 	            GPIO0
+    6       D4 	    I/O, 10k pull-up, BUILTIN_LED 	GPIO2
+    7       D5 	    I/O, SCK 	                    GPIO14
+    8       D6 	    I/O, MISO 	                    GPIO12
+    9       D7 	    I/O, MOSI 	                    GPIO13
+    10      D8 	    I/O, 10k pull-down, SS 	        GPIO15  *
+    11      D7      I/O, MOSI 	                    GPIO13  *
+    12      D6      I/O, MISO 	                    GPIO12
+    13      D5      I/O, SCK 	                    GPIO14
+    A0      A0 	    Analog input 	                A0
+    A1              Analog input
+    A2              Analog input
+    A3              Analog input
+    A4              Analog input
+    A5              Analog input
+    GND     GND 	Ground 	                        GND
+    5V      5V 	    5V 	                            
+    3.3V    3V3 	3.3V 	                        3.3V
+    RESET   RST 	Reset 	                        RST
+    ----------------------------------------------------------
+    */
+
     // Using Software serial:
     #define RX_PIN              5
     #define TX_PIN              4
@@ -132,6 +158,13 @@ AllWize * allwize;
     #define TX_PIN              13
 
 #endif // ARDUINO_ARCH_ESP32
+
+// -----------------------------------------------------------------------------
+// Config & globals
+// -----------------------------------------------------------------------------
+
+#include "AllWize.h"
+AllWize * allwize;
 
 // -----------------------------------------------------------------------------
 // Utils
