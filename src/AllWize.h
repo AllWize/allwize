@@ -45,7 +45,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+
+#ifndef USE_MEMORY_CACHE
 #define USE_MEMORY_CACHE                1
+#endif
 
 typedef struct {
     uint8_t c;
