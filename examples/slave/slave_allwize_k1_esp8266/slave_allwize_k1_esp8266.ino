@@ -93,7 +93,7 @@ void wizeSetup() {
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
-        while (true);
+        while (true) delay(1);
     }
 
     allwize->slave();
