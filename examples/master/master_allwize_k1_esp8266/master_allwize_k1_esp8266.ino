@@ -28,10 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Board definitions
 // -----------------------------------------------------------------------------
 
-#define RESET_PIN           14
-#define RX_PIN              5
-#define TX_PIN              4
-#define DEBUG_SERIAL        Serial
+#define RESET_PIN               14
+#define RX_PIN                  5
+#define TX_PIN                  4
+#define DEBUG_SERIAL            Serial
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -53,12 +53,13 @@ void wizeSetup() {
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
-        while (true);
+        while (true) delay(1);
     }
 
     allwize->master();
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setDataRate(WIZE_DATARATE);
+    allwize->soft_reset();
 
     //allwize->dump(DEBUG_SERIAL);
 

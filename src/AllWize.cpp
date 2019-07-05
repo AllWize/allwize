@@ -190,11 +190,14 @@ bool AllWize::reset() {
  * @brief               Cleans the RX/TX line
  */
 void AllWize::soft_reset() {
+    if (_setConfig(true)) _setConfig(false);
+    /*
     if (_send(CMD_ENTER_CONFIG) == 1) {
         _flush();
         _send(CMD_EXIT_CONFIG);
     }
     delay(10);
+    */
 }
 
 /**
@@ -451,36 +454,37 @@ bool AllWize::available() {
 
     bool response = false;
 
-    if (!_config) {
+    static uint32_t when = millis();
 
-        static uint32_t when = millis();
+    while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
 
-        while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
+        uint8_t ch = _stream->read();
 
-            uint8_t ch = _stream->read();
-
-            #if defined(ALLWIZE_DEBUG_PORT)
-            {
-                char buffer[10];
-                snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
-                ALLWIZE_DEBUG_PRINTLN(buffer);
-            }
-            #endif
-
-            _buffer[_pointer++] = ch;
-            when = millis();
-
-            #if defined(ARDUINO_ARCH_ESP8266)
-                yield();
-            #endif
-
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
         }
+        #endif
 
-        // Check if message finished and decode it
-        if ((_pointer > 0) && (millis() - when > 100)) {
-            response = _decode();
-            _pointer = 0;
-        }
+        _buffer[_pointer++] = ch;
+        when = millis();
+
+        #if defined(ARDUINO_ARCH_ESP8266)
+            yield();
+        #endif
+
+    }
+
+    // Check if message finished and decode it
+    if ((_pointer > 0) && (millis() - when > 100)) {
+        
+        response = _decode();
+        _pointer = 0;
+        
+        // If we don't soft-reset the line the RX channel gets stalled
+        soft_reset();
 
     }
 
@@ -1761,6 +1765,7 @@ int AllWize::_timedRead() {
     };
 
     #if defined(ALLWIZE_DEBUG_PORT)
+    /*
     {
         if (ch < 0) {
             ALLWIZE_DEBUG_PRINTLN("r TIMEOUT");
@@ -1770,6 +1775,7 @@ int AllWize::_timedRead() {
             ALLWIZE_DEBUG_PRINTLN(buffer);
         }
     }
+    */
     #endif
 
     return ch;
