@@ -3,6 +3,19 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.1] 1019-07-05
+### Fixed
+- Avoid reset if wiring problems in ESP8266 boards
+- Reset line after reception
+
+### Added
+- Allow overriding USE_MEMORY_CACHE setting
+- Define monitor_speed in platformio.ino files
+
+### Changed
+- ESP8266 examples pinout change
+- Refactor examples
+
 ## [1.1.0] 2019-06-26
 ### Fixed
 - Fixed variable collision when debug enabled
