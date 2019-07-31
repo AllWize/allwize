@@ -15,10 +15,6 @@
         {
             "name": "SoftwareSerial",
             "platforms": "atmelavr"
-        },
-        {
-            "name": "EspSoftwareSerial",
-            "platforms": "espressif8266"
         }
     ],
     "authors": [
