@@ -103,10 +103,13 @@ void AllWize::begin(uint8_t baudrate) {
         _module = MODULE_UNKNOWN;
     }
 
-    _append_rssi = _getSlot(MEM_RSSI_MODE) == 0x01;
     _mbus_mode = _getSlot(MEM_MBUS_MODE);
-    _data_interface = _getSlot(MEM_DATA_INTERFACE);
-    
+
+    // Allways 
+    _setSlot(MEM_DATA_INTERFACE, DEFAULT_DATA_INTERFACE);
+    _setSlot(MEM_RSSI_MODE, 1);
+
+   
 }
 
 /**
@@ -233,8 +236,6 @@ void AllWize::master() {
     setSleepMode(SLEEP_MODE_DISABLE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);
-    setDataInterface(DATA_INTERFACE_START_STOP);
-    setAppendRSSI(true);
     setControlField(C_ACK);
 }
 
@@ -448,6 +449,7 @@ bool AllWize::enableRX(bool enable) {
 /**
  * @brief               Returns true if a new message has been received and decoded
  *                      This method has to be called in the main loop to monitor for incomming messages
+ *                      This method assumes DATA_INTERFACE_CRC_START_STOP (!!)
  * @return              Whether a new message is available
  */
 bool AllWize::available() {
@@ -456,9 +458,10 @@ bool AllWize::available() {
 
     static uint32_t when = millis();
 
-    while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
+    while (_stream->available()) {
 
         uint8_t ch = _stream->read();
+        when = millis();
 
         #if defined(ALLWIZE_DEBUG_PORT)
         {
@@ -468,24 +471,61 @@ bool AllWize::available() {
         }
         #endif
 
-        _buffer[_pointer++] = ch;
-        when = millis();
+        // Start receiving whith START_BYTE
+        if (!_receiving) {
+            if (START_BYTE == ch) {
+                _receiving = true;
+            }
+        }
 
-        #if defined(ARDUINO_ARCH_ESP8266)
+        if (_receiving) {
+
+            // Get message length
+            if (1 == _pointer) {
+                _message_len = ch + 3; // plus the len byte itself and START+STOP
+            }
+            
+            // Overflow
+            if (_pointer == RX_BUFFER_SIZE) { 
+                // Reset counters
+                _pointer = 0;
+                _message_len = 0;
+                _receiving = false;
+                return false;
+            }
+
+            // Store byte
+            _buffer[_pointer++] = ch;
+            
+            // Check length
+            if (_message_len == _pointer) {
+
+                // Check end byte
+                if (STOP_BYTE == ch) {
+                    response = _decode();
+                    soft_reset();
+                }
+                
+                // Reset counters
+                _pointer = 0;
+                _message_len = 0;
+                _receiving = false;
+
+            }
+
+        }
+
+        #if defined(ARDUINO_ARCH_ESP8266) 
             yield();
         #endif
 
     }
 
-    // Check if message finished and decode it
-    if ((_pointer > 0) && (millis() - when > 100)) {
-        
-        response = _decode();
+    // Manage timeout
+    if ((_pointer > 0) && (millis() - when > _timeout)) {
         _pointer = 0;
-        
-        // If we don't soft-reset the line the RX channel gets stalled
-        soft_reset();
-
+        _message_len = 0;
+        _receiving = false;
     }
 
     return response;
@@ -690,27 +730,6 @@ uint8_t AllWize::getSleepMode() {
 }
 
 /**
- * @brief               Sets the RSSI mode value
- * @param value         Set to true to append RSSI value to received data
- */
-void AllWize::setAppendRSSI(bool value) {
-    if (value == 1) {
-        _setSlot(MEM_RSSI_MODE, 1);
-    } else {
-        _setSlot(MEM_RSSI_MODE, 0);
-    }
-    _append_rssi = value;
-}
-
-/**
- * @brief               Gets the current RSSI mode value
- * @return              True if RSSI value will be appended to received data
- */
-bool AllWize::getAppendRSSI() {
-    return _append_rssi;
-}
-
-/**
  * @brief               Sets the preamble length frame format
  * @param preamble      0 or 2
  */
@@ -778,25 +797,6 @@ void AllWize::setLEDControl(uint8_t value) {
  */
 uint8_t AllWize::getLEDControl() {
     return _getSlot(MEM_LED_CONTROL);
-}
-
-/**
- * @brief               Sets the data interface for receiving packets
- * @param               Value from 0x00 to 0x0C
- */
-void AllWize::setDataInterface(uint8_t value) {
-    if (value <= 0x0C) {
-        _setSlot(MEM_DATA_INTERFACE, value);
-        _data_interface = value;
-    }
-}
-
-/**
- * @brief               Gets the data interface for receiving packets
- * @return              Value (1 byte)
- */
-uint8_t AllWize::getDataInterface() {
-    return _data_interface;
 }
 
 /**
@@ -1554,11 +1554,10 @@ bool AllWize::_decode() {
 
     // Get current values
     uint8_t mbus_mode = getMode();
-    uint8_t data_interface = getDataInterface();
-    bool has_start = (data_interface & 0x04) == 0x04;
-    bool has_header = (mbus_mode != MBUS_MODE_OSP) & ((data_interface & 0x01) == 0x00);
-    bool has_rssi = getAppendRSSI();
-    bool has_crc = (data_interface & 0x08) == 0x08;
+    bool has_start = (DEFAULT_DATA_INTERFACE & 0x04) == 0x04;
+    bool has_header = (mbus_mode != MBUS_MODE_OSP) & ((DEFAULT_DATA_INTERFACE & 0x01) == 0x00);
+    bool has_rssi = true;
+    bool has_crc = (DEFAULT_DATA_INTERFACE & 0x08) == 0x08;
     uint8_t bytes_not_in_len = has_start ? 3 : 1;
     uint8_t bytes_not_in_app = (has_header ? 9 : 0) + 1 + (has_rssi ? 1 : 0) + (has_crc ? 2 : 0);
 
@@ -1653,7 +1652,9 @@ bool AllWize::_decode() {
         _message.rssi = 0xFF;
     }
 
-    // CRC
+    // CRC-16/EN-13757
+    // TODO: check (requires a 256x 2-bytes matrix)
+    // Check https://crccalc.com/
     if (has_crc) {
         in += 2;
     }

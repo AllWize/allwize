@@ -42,9 +42,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MODEM_DEFAULT_BAUDRATE          BAUDRATE_19200
 #define GPIO_NONE                       0x99
 #define RX_BUFFER_SIZE                  255
-#define DEFAULT_TIMEOUT                 100
+#define DEFAULT_TIMEOUT                 10
 #define HARDWARE_SERIAL_PORT            1
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define DEFAULT_DATA_INTERFACE          DATA_INTERFACE_CRC_START_STOP
 
 #ifndef USE_MEMORY_CACHE
 #define USE_MEMORY_CACHE                1
@@ -126,7 +127,6 @@ class AllWize {
         void setDataRate(uint8_t dr);
         void setMode(uint8_t mode, bool persist = false);
         void setSleepMode(uint8_t mode);
-        void setAppendRSSI(bool value);
         void setPreamble(uint8_t preamble);
         void setTimeout(uint16_t ms);
         void setNetworkRole(uint8_t role);
@@ -149,7 +149,6 @@ class AllWize {
         uint8_t getPreamble();
         uint8_t getDataInterface();
         uint8_t getControlField();
-        bool getAppendRSSI();
         uint16_t getTimeout();
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
@@ -254,8 +253,6 @@ class AllWize {
         
         uint8_t _ci = CI_APP_RESPONSE_UP_SHORT;
         uint8_t _mbus_mode = 0xFF;
-        uint8_t _data_interface = 0xFF;
-        bool _append_rssi = false;
         uint8_t _access_number = 0;
         uint8_t _module = MODULE_UNKNOWN;
 
@@ -279,6 +276,8 @@ class AllWize {
         allwize_message_t _message;
         uint8_t _buffer[RX_BUFFER_SIZE];
         uint8_t _pointer;
+        uint8_t _receiving = false;
+        uint8_t _message_len = 0;
 
 };
 
