@@ -3,7 +3,18 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.1] 1019-07-05
+## [1.1.2] Unreleased
+### Fixed
+- Removed dependency on ESPSoftwareSerial for ESP8266 since it's already in SDK
+- Fixed keywords.txt file (thanks to @per1234)
+
+### Added
+- Board info to ESP8266 examples
+
+### Changed
+- Moved soft_reset to softReset to fit standards
+
+## [1.1.1] 2019-07-05
 ### Fixed
 - Avoid reset if wiring problems in ESP8266 boards
 - Reset line after reception
