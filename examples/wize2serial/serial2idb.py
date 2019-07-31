@@ -44,7 +44,7 @@ def parse(data):
         index = index + 1
         data = "%s,field%d=%s" % (data, index, f)
     print("[IDB] Inserting %s" % data)
-    r = requests.post(url = IDB_ENDPOINT, data = data)
+    requests.post(url = IDB_ENDPOINT, data = data)
 
 # connect to device
 ser = serial.Serial(SERIAL_PORT, SERIAL_BAUD, timeout=0.5)

@@ -114,7 +114,7 @@ void wizeSend(const char * payload) {
 // Sensor
 // -----------------------------------------------------------------------------
 
-uint16_t getDistance() {
+unsigned long getDistance() {
 
     digitalWrite(TRIGGER_PIN, LOW);
     delayMicroseconds(2);
@@ -122,7 +122,7 @@ uint16_t getDistance() {
     delayMicroseconds(10);
     digitalWrite(TRIGGER_PIN, LOW);
 
-    uint32_t duration = pulseIn(ECHO_PIN, HIGH);
+    unsigned long duration = pulseIn(ECHO_PIN, HIGH);
     return (duration / 2) * 0.34; // in millimeters
 
 }
@@ -150,11 +150,11 @@ void setup() {
 
 void loop() {
 
-    uint32_t distance = getDistance();
+    unsigned long distance = getDistance();
 
     if (distance < 2000) {
         char payload[20];
-        snprintf(payload, sizeof(payload), "%ul", (int) distance);
+        snprintf(payload, sizeof(payload), "%lu", distance);
         wizeSend(payload);
     }
 
