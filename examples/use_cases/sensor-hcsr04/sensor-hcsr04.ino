@@ -154,7 +154,7 @@ void loop() {
 
     if (distance < 2000) {
         char payload[20];
-        snprintf(payload, sizeof(payload), "%u", distance);
+        snprintf(payload, sizeof(payload), "%ul", (int) distance);
         wizeSend(payload);
     }
 

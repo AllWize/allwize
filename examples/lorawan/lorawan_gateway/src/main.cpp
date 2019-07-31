@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wifi.h"
 #include "wize.h"
 #include "ntp.h"
-#include "lorawan.h"
+#include "forwarder.h"
 
 // -----------------------------------------------------------------------------
 // Main
@@ -49,8 +49,8 @@ void setup() {
     // Setup NTP client
     ntpSetup();
 
-    // Init LoRaWAN
-    lorawanSetup();
+    // Init Packet Forwarder
+    forwarderSetup();
 
     // Connect to wifi
     wifiSetup();

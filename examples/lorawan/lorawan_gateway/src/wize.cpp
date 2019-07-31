@@ -6,7 +6,7 @@ WIZE MODULE
 
 #include "wize.h"
 #include "debug.h"
-#include "lorawan.h"
+#include "forwarder.h"
 #include "configuration.h"
 
 #include "AllWize.h"
@@ -75,7 +75,7 @@ void wizeLoop() {
         wizeDebugMessage(message);
 
         // Forward it
-        lorawanMessage(message);
+        forwarderMessage(message);
 
     }
 

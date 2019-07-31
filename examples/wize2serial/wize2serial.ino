@@ -30,13 +30,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define RESET_PIN           7
     #define RX_PIN              8
     #define TX_PIN              9
-    #define PC_SERIAL           Serial
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_UNO
 
 #if defined(ARDUINO_AVR_LEONARDO)
     #define RESET_PIN           7
     #define MODULE_SERIAL       Serial1
-    #define PC_SERIAL           Serial
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
@@ -97,14 +97,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define RESET_PIN           14
     #define RX_PIN              5
     #define TX_PIN              4
-    #define PC_SERIAL           Serial
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP8266
 
 #if defined(ARDUINO_ARCH_ESP32)
     #define RESET_PIN           14
     #define RX_PIN              12
     #define TX_PIN              13
-    #define PC_SERIAL           Serial
+    #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP32
 
 //------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "AllWize.h"
 AllWize * allwize;
-char buffer[256];
+char buffer[300];
 
 void wizeSetup() {
 
@@ -133,7 +133,7 @@ void wizeSetup() {
     #endif
     allwize->begin();
     if (!allwize->waitForReady()) {
-        PC_SERIAL.println("# Error connecting to the module, check your wiring!");
+        DEBUG_SERIAL.println("# Error connecting to the module, check your wiring!");
         while (true);
     }
 
@@ -142,7 +142,7 @@ void wizeSetup() {
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
 
-    PC_SERIAL.println("# Listening...");
+    DEBUG_SERIAL.println("# Listening...");
 
 }
 
@@ -174,7 +174,7 @@ void wizeLoop() {
         }
 
         // Send it to serial port
-        PC_SERIAL.print(buffer);
+        DEBUG_SERIAL.print(buffer);
 
     }
 
@@ -186,10 +186,10 @@ void wizeLoop() {
 
 void setup() {
 
-    // Setup serial PC_SERIAL
-    PC_SERIAL.begin(115200);
-    while (!PC_SERIAL && millis() < 5000);
-    PC_SERIAL.println("# Wize 2 Serial bridge");
+    // Setup serial DEBUG_SERIAL
+    DEBUG_SERIAL.begin(115200);
+    while (!DEBUG_SERIAL && millis() < 5000);
+    DEBUG_SERIAL.println("# Wize 2 Serial bridge");
 
     wizeSetup();
 

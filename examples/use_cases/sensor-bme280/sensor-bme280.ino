@@ -51,8 +51,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     // AllWize K2
     #define RX_PIN              (29ul)
     #define TX_PIN              (26ul)
-    #define SERCOM_PORT         sercom2
-    #define SERCOM_HANDLER      SERCOM2_Handler
+    #define SERCOM_PORT         sercom4
+    #define SERCOM_HANDLER      SERCOM4_Handler
     #define SERCOM_MODE         PIO_SERCOM_ALT
     #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
     #define SERCOM_TX_PAD       UART_TX_PAD_0

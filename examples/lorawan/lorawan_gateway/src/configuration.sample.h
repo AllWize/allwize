@@ -39,14 +39,14 @@ Configuration file
 // LoRaWAN server configuration
 //------------------------------------------------------------------------------
 
-#define LORAWAN_SERVER          IPAddress(52,169,76,203)    // LoRaWAN server (The Things Network EU server)
-#define LORAWAN_PORT            1700                        // UDP port
-#define LORAWAN_LATITUDE        0.00000000                  // Gateway latitude (degrees, north positive)
-#define LORAWAN_LONGITUDE       0.00000000                  // Gateway longitude (degrees, east positive)
-#define LORAWAN_ALTITUDE        0                           // Gateway altitude (meters)
-#define LORAWAN_GATEWAY_TYPE    "..."                       // Gateway type
-#define LORAWAN_EMAIL           "..."                       // Administrator email
-#define LORAWAN_DESCRIPTION     "..."                       // Gateway description
+#define FORWARDER_SERVER        IPAddress(52,169,76,203)    // LoRaWAN server (The Things Network EU server)
+#define FORWARDER_PORT          1700                        // UDP port
+#define FORWARDER_LATITUDE      0.00000000                  // Gateway latitude (degrees, north positive)
+#define FORWARDER_LONGITUDE     0.00000000                  // Gateway longitude (degrees, east positive)
+#define FORWARDER_ALTITUDE      0                           // Gateway altitude (meters)
+#define FORWARDER_GATEWAY_TYPE  "..."                       // Gateway type
+#define FORWARDER_EMAIL         "..."                       // Administrator email
+#define FORWARDER_DESCRIPTION   "..."                       // Gateway description
 
 //------------------------------------------------------------------------------
 // NTP configuration
