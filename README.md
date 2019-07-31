@@ -2,9 +2,9 @@
 
 Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 
-[![version](https://img.shields.io/badge/version-1.0.3-brightgreen.svg)](CHANGELOG.md)
-[![travis](https://travis-ci.com/AllWize/allwize.svg?branch=master)](https://travis-ci.com/AllWize/allwize)
-[![codacy](https://api.codacy.com/project/badge/Grade/5b0345d3b4994a1eb2e51f02fa9a5d22)](https://www.codacy.com/app/AllWize/allwize)
+[![version](https://img.shields.io/badge/version-1.1.1-brightgreen.svg)](CHANGELOG.md)
+[![travis](https://travis-ci.org/Allwize/allwize.svg?branch=dev)](https://travis-ci.org/Allwize/allwize)
+[![codacy](https://img.shields.io/codacy/grade/5b0345d3b4994a1eb2e51f02fa9a5d22/dev.svg)](https://www.codacy.com/app/Allwize/allwize/dashboard)
 [![license](https://img.shields.io/github/license/AllWize/allwize.svg)](LICENSE)
 
 [![web](https://img.shields.io/badge/web-http%3A%2F%2Fallwize.io-yellowgreen.svg)](http://allwize.io)
@@ -18,7 +18,7 @@ Compatible radios:
 Compatible platforms:
 
 *   AVR (Arduino Uno, Arduino Leonardo)
-*   SAMD21 (Arduino Zero, Arduino MKR family)
+*   SAMD21 (Arduino Zero, Arduino MKR family, AllWize K2)
 *   ESP8266
 *   ESP32
 
