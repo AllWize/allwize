@@ -99,7 +99,7 @@ class AllWize {
 
         void begin(uint8_t baudrate = MODEM_DEFAULT_BAUDRATE);
         bool reset();
-        void soft_reset();
+        void softReset();
         bool factoryReset();
         void sleep();
         void wakeup();

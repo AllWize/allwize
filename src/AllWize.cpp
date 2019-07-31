@@ -189,7 +189,7 @@ bool AllWize::reset() {
 /**
  * @brief               Cleans the RX/TX line
  */
-void AllWize::soft_reset() {
+void AllWize::softReset() {
     if (_setConfig(true)) _setConfig(false);
     /*
     if (_send(CMD_ENTER_CONFIG) == 1) {
@@ -364,7 +364,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     if (_config) return false;
 
     // Clean line
-    soft_reset();
+    softReset();
 
     // Send no response message in len is 0
     if (0 == len) return (1 == _send(0xFE));
@@ -484,7 +484,7 @@ bool AllWize::available() {
         _pointer = 0;
         
         // If we don't soft-reset the line the RX channel gets stalled
-        soft_reset();
+        softReset();
 
     }
 
