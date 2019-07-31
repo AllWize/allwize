@@ -23,9 +23,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-import glob
 import serial
 import requests
 
@@ -36,7 +33,7 @@ IDB_ENDPOINT = "http://localhost:8086/write?db=bridge"
 
 # parse message
 def parse(data):
-    
+
     parts = data.rstrip().split(",")
     uid = parts[0]
     rssi = parts[2]
@@ -47,7 +44,7 @@ def parse(data):
         index = index + 1
         data = "%s,field%d=%s" % (data, index, f)
     print("[IDB] Inserting %s" % data)
-    r = requests.post(url = IDB_ENDPOINT, data = data) 
+    r = requests.post(url = IDB_ENDPOINT, data = data)
 
 # connect to device
 ser = serial.Serial(SERIAL_PORT, SERIAL_BAUD, timeout=0.5)

@@ -278,7 +278,7 @@ class AllWize {
         // Message buffers
         allwize_message_t _message;
         uint8_t _buffer[RX_BUFFER_SIZE];
-        uint8_t _pointer;
+        uint8_t _pointer = 0;
 
 };
 

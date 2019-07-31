@@ -237,8 +237,8 @@ void setup() {
 void loop() {
 
     double t_n = sensor.readTemperature();
-    uint8_t h_n = sensor.readHumidity();
-    uint32_t p_n = sensor.readPressure();
+    unsigned char h_n = sensor.readHumidity();
+    unsigned long p_n = sensor.readPressure();
 
     char t_s[7];
     snfloat(t_s, sizeof(t_s), 1, t_n);
