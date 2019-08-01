@@ -12,10 +12,6 @@
     "frameworks": "arduino",
     "platforms": ["atmelavr", "atmelsam", "espressif8266", "espressif32"],
     "dependencies": [        
-        {
-            "name": "SoftwareSerial",
-            "platforms": "atmelavr"
-        }
     ],
     "authors": [
         {
