@@ -1,0 +1,11 @@
+<map id="AllWize_LoRaWAN::send" name="AllWize_LoRaWAN::send">
+<area shape="rect" id="node2" href="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d" title="Sends a byte array. " alt="" coords="227,127,329,153"/>
+<area shape="rect" id="node3" href="$classAllWize.html#aa22cb94ed64656f3ba3aef64c566e708" title="Cleans the RX/TX line. " alt="" coords="377,95,509,121"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="980,107,1091,133"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="557,81,696,108"/>
+<area shape="rect" id="node5" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="779,56,890,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="744,5,925,32"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="973,5,1097,32"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="1145,5,1313,32"/>
+<area shape="rect" id="node10" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1361,5,1507,32"/>
+</map>

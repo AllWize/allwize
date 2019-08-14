@@ -26,26 +26,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wiring_private.h"
 
 // -----------------------------------------------------------------------------
-// Board definitions
+// Board configuration
 // -----------------------------------------------------------------------------
 
-#if not defined(ARDUINO_ARCH_SAMD)
-    #error "This example is meant to run on an Arduino SAMD board!"
+// Check http://wiki.allwize.io/index.php?title=Allwize_K2#Arduino_IDE
+// to add support to Allwize K2 board in Arduino IDE
+#if not defined(ARDUINO_ALLWIZE_K2)
+    #error "This example is meant to run on an AllWize K2 board!"
 #endif
-
-// Select MKRZERO as target board in your Arduino IDE
-
-#define RX_PIN                  (29ul)
-#define TX_PIN                  (26ul)
-#define RESET_PIN               (30ul)
-
-Uart SerialWize(&sercom4, RX_PIN, TX_PIN, SERCOM_RX_PAD_3, UART_TX_PAD_0);
-void SERCOM4_Handler() { 
-    SerialWize.IrqHandler(); 
-}
 
 #define MODULE_SERIAL           SerialWize
 #define DEBUG_SERIAL            SerialUSB
+#define RESET_PIN               PIN_WIZE_RESET
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -63,10 +55,7 @@ AllWize * allwize;
 void wizeSetup() {
 
     // Create and init AllWize object
-    pinPeripheral(RX_PIN, PIO_SERCOM_ALT);
-    pinPeripheral(TX_PIN, PIO_SERCOM_ALT);
     allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");

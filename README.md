@@ -13,7 +13,7 @@ Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 Compatible radios:
 
 *   RadioCrafts RC1701HP-OSP (Ondeo version)
-*   RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
+*   RadioCrafts RC1701HP-WIZE (Wize version)
 
 Compatible platforms:
 
@@ -22,10 +22,28 @@ Compatible platforms:
 *   ESP8266
 *   ESP32
 
+## AllWize K2 support
+
+The AllWize K2 is a SAMD21-based board with an RC1701HP-WIZE radio module.
+
+### Arduino IDE
+
+To add support for it in the Arduino IDE you must install a custom board. 
+Full instrucations can be found at the [AllWize Wiki](http://wiki.allwize.io/index.php?title=Allwize_K2#Arduino_IDE), but a summary is:
+
+* Install the current upstream Arduino IDE at the 1.8.7 level or later. The current version is on the Arduino website.
+* Start Arduino and open the Preferences window.
+* Enter https://raw.githubusercontent.com/AllWize/allwize-boards/master/package_allwize_boards_index.json into the Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.
+* Open Boards Manager from Tools > Board menu and install "Allwize SAMD Boards (32-bits ARM Cortex-M0+)"
+* Don't forget to select your AllWize board from Tools > Board menu after installation.
+
+### PlatformIO
+
+The AllWize K2 is not yet supported officially in PlatformIO, still you can configure it manually. Check the [AllWize Wiki](http://wiki.allwize.io/index.php?title=Allwize_K2#Platform_IO) for further instructions.
+
 ## Documentation
 
 Visit the [online documentation for the AllWize Library](https://allwize.github.io/allwize/classAllWize.html).
-
 
 ## License
 

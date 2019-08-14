@@ -1,6 +1,7 @@
-// -----------------------------------------------------------------------------
-// Open Metering System Specification
-// -----------------------------------------------------------------------------
+/**
+ * @file OMS.h
+ * Open Metering System Specification header file
+ */
 
 // C-Field values
 #define C_SND_NKE                       0x40    // Master, link reset after communication

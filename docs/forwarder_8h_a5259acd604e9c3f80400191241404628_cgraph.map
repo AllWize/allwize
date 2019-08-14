@@ -1,0 +1,10 @@
+<map id="forwarderMessage" name="forwarderMessage">
+<area shape="rect" id="node2" href="$wifi_8cpp.html#ab541d765a7171f3f51309fd02fb8d8af" title="wifiConnected" alt="" coords="201,5,307,32"/>
+<area shape="rect" id="node3" href="$ntp_8cpp.html#a38176e018674e131012199be52193c4d" title="ntpSynced" alt="" coords="212,56,296,83"/>
+<area shape="rect" id="node4" href="$ntp_8cpp.html#a10568245db35b122c3f432a867af3a1d" title="ntpDateTime" alt="" coords="205,107,303,133"/>
+<area shape="rect" id="node5" href="$wize_8cpp.html#a253b90fdb1262250343adfe88e32779b" title="wizeFrequency" alt="" coords="199,157,309,184"/>
+<area shape="rect" id="node7" href="$wize_8cpp.html#a3d81c9b3c3b6c358bbb8fbe3359d7299" title="wizeDataRateSpeed" alt="" coords="183,208,325,235"/>
+<area shape="rect" id="node9" href="$forwarder_8cpp.html#a4663d8490737595a72f0c5cfd24e0f89" title="forwarderSend" alt="" coords="201,259,307,285"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a2ac627fdb89f324641d741bbfcbab8ac" title="Returns the frequency for the given channel. " alt="" coords="389,157,544,184"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a4f53faaa5c99e32da82166e60346ff97" title="Returns the speed for te given datarate. " alt="" coords="373,208,560,235"/>
+</map>

@@ -74,6 +74,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;Arduino.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="RC1701HP_8h_source.html">RC1701HP.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="OMS_8h_source.html">OMS.h</a>&quot;</code><br />
 <code>#include &lt;Stream.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for AllWize.h:</div>
@@ -81,6 +82,7 @@ Include dependency graph for AllWize.h:</div>
 <div class="center"><img src="AllWize_8h__incl.png" border="0" usemap="#src_2AllWize_8h" alt=""/></div>
 <map name="src_2AllWize_8h" id="src_2AllWize_8h">
 <area shape="rect" id="node3" href="RC1701HP_8h.html" title="RC1701HP.h" alt="" coords="106,80,206,107"/>
+<area shape="rect" id="node4" href="OMS_8h.html" title="OMS.h" alt="" coords="230,80,293,107"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -88,7 +90,14 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="AllWize_8h__dep__incl.png" border="0" usemap="#src_2AllWize_8hdep" alt=""/></div>
 <map name="src_2AllWize_8hdep" id="src_2AllWize_8hdep">
-<area shape="rect" id="node2" href="AllWize_8cpp.html" title="src/AllWize.cpp" alt="" coords="5,80,120,107"/>
+<area shape="rect" id="node2" href="forwarder_8h.html" title="examples/lorawan/lorawan\l_gateway/src/forwarder.h" alt="" coords="111,80,287,121"/>
+<area shape="rect" id="node3" href="forwarder_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/forwarder.cpp" alt="" coords="5,169,188,211"/>
+<area shape="rect" id="node5" href="wize_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/wize.cpp" alt="" coords="413,169,589,211"/>
+<area shape="rect" id="node6" href="wize_8h.html" title="examples/lorawan/lorawan\l_gateway/src/wize.h" alt="" coords="311,80,487,121"/>
+<area shape="rect" id="node7" href="AllWize_8cpp.html" title="src/AllWize.cpp" alt="" coords="562,87,677,114"/>
+<area shape="rect" id="node8" href="AllWize__LoRaWAN_8h.html" title="src/AllWize_LoRaWAN.h" alt="" coords="701,87,871,114"/>
+<area shape="rect" id="node4" href="main_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/main.cpp" alt="" coords="213,169,389,211"/>
+<area shape="rect" id="node9" href="AllWize__LoRaWAN_8cpp.html" title="src/AllWize_LoRaWAN.cpp" alt="" coords="694,177,878,203"/>
 </map>
 </div>
 </div>
@@ -103,48 +112,30 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a8ea417f7720444e7bcf0f378f5ee81da"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a8ea417f7720444e7bcf0f378f5ee81da">MODEM_BAUDRATE</a>&#160;&#160;&#160;19200</td></tr>
-<tr class="separator:a8ea417f7720444e7bcf0f378f5ee81da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a635887cb55f0cfb18cc3fc11d8be18a5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a635887cb55f0cfb18cc3fc11d8be18a5">MODEM_DEFAULT_BAUDRATE</a>&#160;&#160;&#160;<a class="el" href="RC1701HP_8h.html#ab94a89ecf1976f304764aec119e215e7">BAUDRATE_19200</a></td></tr>
+<tr class="separator:a635887cb55f0cfb18cc3fc11d8be18a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a464dbc915e98de4ee4519bbb376a1bc8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a464dbc915e98de4ee4519bbb376a1bc8">GPIO_NONE</a>&#160;&#160;&#160;0x99</td></tr>
 <tr class="separator:a464dbc915e98de4ee4519bbb376a1bc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d6103d07e8a01903584395f440169b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a0d6103d07e8a01903584395f440169b4">CONTROL_INFORMATION_WIZE</a>&#160;&#160;&#160;0x20</td></tr>
-<tr class="separator:a0d6103d07e8a01903584395f440169b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76bbcb5cee3574196033c5d750e2d1f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a76bbcb5cee3574196033c5d750e2d1f3">CONTROL_INFORMATION</a>&#160;&#160;&#160;0x67</td></tr>
-<tr class="separator:a76bbcb5cee3574196033c5d750e2d1f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af88b46792606c68964edf45e5dc728d4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#af88b46792606c68964edf45e5dc728d4">END_OF_RESPONSE</a>&#160;&#160;&#160;'&gt;'</td></tr>
-<tr class="separator:af88b46792606c68964edf45e5dc728d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e364886a53f95a27bea5831661e437e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a5e364886a53f95a27bea5831661e437e">CMD_ENTER_CONFIG</a>&#160;&#160;&#160;(char) 0x00</td></tr>
-<tr class="separator:a5e364886a53f95a27bea5831661e437e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae45f530c81a7029fac5185d097140377"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#ae45f530c81a7029fac5185d097140377">CMD_EXIT_CONFIG</a>&#160;&#160;&#160;(char) 0x58</td></tr>
-<tr class="separator:ae45f530c81a7029fac5185d097140377"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae53840a21ca6840a91ac17ce935cc2f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#ae53840a21ca6840a91ac17ce935cc2f2">CMD_EXIT_MEMORY_ENABLE_RF</a>&#160;&#160;&#160;(char) 0xFD</td></tr>
-<tr class="separator:ae53840a21ca6840a91ac17ce935cc2f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7d132e5acf503560f06918105001e0e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#ab7d132e5acf503560f06918105001e0e">CMD_EXIT_MEMORY_DISABLE_RF</a>&#160;&#160;&#160;(char) 0xFF</td></tr>
-<tr class="separator:ab7d132e5acf503560f06918105001e0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae21ab40374289ff4e6598de682c9cbbd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#ae21ab40374289ff4e6598de682c9cbbd">CMD_AWAKE</a>&#160;&#160;&#160;(char) 0xFF</td></tr>
-<tr class="separator:ae21ab40374289ff4e6598de682c9cbbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cba75ee81bccbf5e6e5cb6f69804974"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a5cba75ee81bccbf5e6e5cb6f69804974">CMD_EXIT_MEMORY</a>&#160;&#160;&#160;(char) 0xFF</td></tr>
-<tr class="separator:a5cba75ee81bccbf5e6e5cb6f69804974"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a739a2a1a0047c98ac1b18ecd25dac092"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a739a2a1a0047c98ac1b18ecd25dac092">RX_BUFFER_SIZE</a>&#160;&#160;&#160;255</td></tr>
 <tr class="separator:a739a2a1a0047c98ac1b18ecd25dac092"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad2dd72565852b91c809cd4685833b17"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#aad2dd72565852b91c809cd4685833b17">DEFAULT_TIMEOUT</a>&#160;&#160;&#160;1000</td></tr>
+<tr class="memitem:aad2dd72565852b91c809cd4685833b17"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#aad2dd72565852b91c809cd4685833b17">DEFAULT_TIMEOUT</a>&#160;&#160;&#160;100</td></tr>
 <tr class="separator:aad2dd72565852b91c809cd4685833b17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a477c6378d8643c0a81d13f6e98fc6aac"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a477c6378d8643c0a81d13f6e98fc6aac">HARDWARE_SERIAL_PORT</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:a477c6378d8643c0a81d13f6e98fc6aac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a283d077608e503172da931701cf37bdd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a283d077608e503172da931701cf37bdd">SIGNATURE_FIELD</a>&#160;&#160;&#160;0x04</td></tr>
-<tr class="separator:a283d077608e503172da931701cf37bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30d2043ca397843e08c43ade3aaee5b2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a30d2043ca397843e08c43ade3aaee5b2">START_BYTE</a>&#160;&#160;&#160;0x68</td></tr>
-<tr class="separator:a30d2043ca397843e08c43ade3aaee5b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20beefa908dbb42160470953b330e2ae"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a20beefa908dbb42160470953b330e2ae">STOP_BYTE</a>&#160;&#160;&#160;0x16</td></tr>
-<tr class="separator:a20beefa908dbb42160470953b330e2ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa310aad8e197ed41ca4f0f5d547bdfcf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#aa310aad8e197ed41ca4f0f5d547bdfcf">DEFAULT_MBUS_MODE</a>&#160;&#160;&#160;<a class="el" href="RC1701HP_8h.html#ab2b6cdb15b9c8b906707e2ea9dd53f3b">MBUS_MODE_N1</a></td></tr>
 <tr class="separator:aa310aad8e197ed41ca4f0f5d547bdfcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea37a4c30e840d6e2bc8b1b041408ba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a4ea37a4c30e840d6e2bc8b1b041408ba">USE_MEMORY_CACHE</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:a4ea37a4c30e840d6e2bc8b1b041408ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a643fbd7f3bc884425f4182f064f9b99a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#a643fbd7f3bc884425f4182f064f9b99a">ALLWIZE_DEBUG_PRINT</a>(...)</td></tr>
 <tr class="separator:a643fbd7f3bc884425f4182f064f9b99a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab41b8df1e62748b26710510c1bd9379c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="AllWize_8h.html#ab41b8df1e62748b26710510c1bd9379c">ALLWIZE_DEBUG_PRINTLN</a>(...)</td></tr>
 <tr class="separator:ab41b8df1e62748b26710510c1bd9379c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p class=""><a class="el" href="classAllWize.html">AllWize</a> library header file </p>
+
+<p class="definition">Definition in file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a643fbd7f3bc884425f4182f064f9b99a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a643fbd7f3bc884425f4182f064f9b99a">&#9670;&nbsp;</a></span>ALLWIZE_DEBUG_PRINT</h2>
 
@@ -161,7 +152,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00085">85</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00083">83</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
@@ -181,135 +172,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00086">86</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="ae21ab40374289ff4e6598de682c9cbbd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae21ab40374289ff4e6598de682c9cbbd">&#9670;&nbsp;</a></span>CMD_AWAKE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CMD_AWAKE&#160;&#160;&#160;(char) 0xFF</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00050">50</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="a5e364886a53f95a27bea5831661e437e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e364886a53f95a27bea5831661e437e">&#9670;&nbsp;</a></span>CMD_ENTER_CONFIG</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CMD_ENTER_CONFIG&#160;&#160;&#160;(char) 0x00</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00046">46</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="ae45f530c81a7029fac5185d097140377"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae45f530c81a7029fac5185d097140377">&#9670;&nbsp;</a></span>CMD_EXIT_CONFIG</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CMD_EXIT_CONFIG&#160;&#160;&#160;(char) 0x58</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00047">47</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="a5cba75ee81bccbf5e6e5cb6f69804974"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5cba75ee81bccbf5e6e5cb6f69804974">&#9670;&nbsp;</a></span>CMD_EXIT_MEMORY</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CMD_EXIT_MEMORY&#160;&#160;&#160;(char) 0xFF</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00051">51</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="ab7d132e5acf503560f06918105001e0e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7d132e5acf503560f06918105001e0e">&#9670;&nbsp;</a></span>CMD_EXIT_MEMORY_DISABLE_RF</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CMD_EXIT_MEMORY_DISABLE_RF&#160;&#160;&#160;(char) 0xFF</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00049">49</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="ae53840a21ca6840a91ac17ce935cc2f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae53840a21ca6840a91ac17ce935cc2f2">&#9670;&nbsp;</a></span>CMD_EXIT_MEMORY_ENABLE_RF</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CMD_EXIT_MEMORY_ENABLE_RF&#160;&#160;&#160;(char) 0xFD</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00048">48</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="a76bbcb5cee3574196033c5d750e2d1f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76bbcb5cee3574196033c5d750e2d1f3">&#9670;&nbsp;</a></span>CONTROL_INFORMATION</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CONTROL_INFORMATION&#160;&#160;&#160;0x67</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00044">44</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="a0d6103d07e8a01903584395f440169b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d6103d07e8a01903584395f440169b4">&#9670;&nbsp;</a></span>CONTROL_INFORMATION_WIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CONTROL_INFORMATION_WIZE&#160;&#160;&#160;0x20</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00043">43</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00084">84</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
@@ -325,7 +188,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00058">58</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00048">48</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
@@ -336,28 +199,12 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define DEFAULT_TIMEOUT&#160;&#160;&#160;1000</td>
+          <td class="memname">#define DEFAULT_TIMEOUT&#160;&#160;&#160;100</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00053">53</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="af88b46792606c68964edf45e5dc728d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af88b46792606c68964edf45e5dc728d4">&#9670;&nbsp;</a></span>END_OF_RESPONSE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define END_OF_RESPONSE&#160;&#160;&#160;'&gt;'</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00045">45</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00046">46</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
@@ -373,7 +220,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00042">42</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00044">44</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
@@ -389,23 +236,23 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00054">54</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00047">47</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
-<a id="a8ea417f7720444e7bcf0f378f5ee81da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ea417f7720444e7bcf0f378f5ee81da">&#9670;&nbsp;</a></span>MODEM_BAUDRATE</h2>
+<a id="a635887cb55f0cfb18cc3fc11d8be18a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a635887cb55f0cfb18cc3fc11d8be18a5">&#9670;&nbsp;</a></span>MODEM_DEFAULT_BAUDRATE</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MODEM_BAUDRATE&#160;&#160;&#160;19200</td>
+          <td class="memname">#define MODEM_DEFAULT_BAUDRATE&#160;&#160;&#160;<a class="el" href="RC1701HP_8h.html#ab94a89ecf1976f304764aec119e215e7">BAUDRATE_19200</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00041">41</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00043">43</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
@@ -421,55 +268,23 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00052">52</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00045">45</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>
-<a id="a283d077608e503172da931701cf37bdd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a283d077608e503172da931701cf37bdd">&#9670;&nbsp;</a></span>SIGNATURE_FIELD</h2>
+<a id="a4ea37a4c30e840d6e2bc8b1b041408ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ea37a4c30e840d6e2bc8b1b041408ba">&#9670;&nbsp;</a></span>USE_MEMORY_CACHE</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SIGNATURE_FIELD&#160;&#160;&#160;0x04</td>
+          <td class="memname">#define USE_MEMORY_CACHE&#160;&#160;&#160;1</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00055">55</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="a30d2043ca397843e08c43ade3aaee5b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a30d2043ca397843e08c43ade3aaee5b2">&#9670;&nbsp;</a></span>START_BYTE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define START_BYTE&#160;&#160;&#160;0x68</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00056">56</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
-
-</div>
-</div>
-<a id="a20beefa908dbb42160470953b330e2ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20beefa908dbb42160470953b330e2ae">&#9670;&nbsp;</a></span>STOP_BYTE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define STOP_BYTE&#160;&#160;&#160;0x16</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00057">57</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AllWize_8h_source.html#l00051">51</a> of file <a class="el" href="AllWize_8h_source.html">AllWize.h</a>.</p>
 
 </div>
 </div>

@@ -12,9 +12,11 @@ Check that the yellow cable goes to the center pin of the pot.
 
 To calibrate the sensor change the following settings to proper values:
 
+```
 #define VALUE_FOR_0_DEG     526     // value of the pot when the lever is completely horizontal
 #define VALUE_FOR_90_DEG    175     // value of the pot when the lever is completely vertical
 #define ANGLE_THRESHOLD     22      // angle at which the lever lies flat over an empty toilet roll
+```
 
 Always remember to connect the antenna before powering the board!
 

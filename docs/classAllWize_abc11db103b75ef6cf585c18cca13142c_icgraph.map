@@ -1,4 +1,7 @@
 <map id="AllWize::ready" name="AllWize::ready">
 <area shape="rect" id="node2" href="$classAllWize.html#a20b9250f67d5dc1914359ba8356b53f2" title="Wakes up the radio from sleep mode. " alt="" coords="178,5,298,32"/>
 <area shape="rect" id="node3" href="$classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086" title="Waits for timeout millis for the module to be ready. " alt="" coords="160,56,316,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#aed088a11b03ac4ffd99036dec2591dfe" title="Sets the UART baud rate, requires reset to take effect. " alt="" coords="163,107,313,133"/>
+<area shape="rect" id="node4" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="364,56,447,83"/>
+<area shape="rect" id="node5" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="495,56,549,83"/>
 </map>
