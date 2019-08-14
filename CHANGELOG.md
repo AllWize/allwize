@@ -3,7 +3,18 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.2] Unreleased
+## [1.1.3] 2019-08-14
+### Fixed
+- Fix documentation issues preventing correct checkout (#9)
+
+### Added
+- Added missing documentation to some methods
+- Added support for [AllWize K2 board definition](https://github.com/AllWize/allwize-boards)
+
+### Changed
+- Removed dependency on SoftwareSerial for Atmel AVR platform
+
+## [1.1.2] 2019-07-31
 ### Fixed
 - Removed dependency on ESPSoftwareSerial for ESP8266 since it's already in SDK
 - Fixed keywords.txt file (thanks to @per1234)
