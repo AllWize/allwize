@@ -19,6 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+/**
+ * @file AllWize.cpp
+ * AllWize library code file
+ */
+
 #include "AllWize.h"
 #include <assert.h>
 
@@ -28,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @brief               AllWize object constructor
- * @param stream        HardwareSerial object to communicate with the module
+ * @param serial        HardwareSerial object to communicate with the module
  * @param reset_gpio    GPIO connected to the module RESET pin
  * @param config_gpio   GPIO connected to the module CONFIG pin
  */
@@ -36,13 +41,13 @@ AllWize::AllWize(HardwareSerial *serial, uint8_t reset_gpio, uint8_t config_gpio
     _init();
 }
 
+#if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 /**
  * @brief               AllWize object constructor
- * @param stream        SoftwareSerial object to communicate with the module
+ * @param serial        SoftwareSerial object to communicate with the module
  * @param reset_gpio    GPIO connected to the module RESET pin
  * @param config_gpio   GPIO connected to the module CONFIG pin
  */
-#if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio, uint8_t config_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio), _config_gpio(config_gpio) {
     _init();
 }
@@ -502,7 +507,7 @@ allwize_message_t AllWize::read() {
 
 /**
  * @brief               Sets the wize control field in the transpoprt layer
- * @param uint8_t       Wize Control (defined the key to be used)
+ * @param wize_control  Wize Control (defined the key to be used)
  * @return              True is correctly set
  */
 bool AllWize::setWizeControl(uint8_t wize_control) {
@@ -512,16 +517,16 @@ bool AllWize::setWizeControl(uint8_t wize_control) {
 }
 
 /**
- * @brief               Sets the wize operator ID field in the transpoprt layer
- * @param uint16_t      Wize Operator ID
+ * @brief                   Sets the wize operator ID field in the transpoprt layer
+ * @param wize_operator_id  Wize Operator ID
  */
 void AllWize::setWizeOperatorId(uint16_t wize_operator_id) {
     _wize_operator_id = wize_operator_id;
 }
 
 /**
- * @brief               Sets the wize applicaton field in the transpoprt layer
- * @param uint8_t       Wize Application
+ * @brief                   Sets the wize applicaton field in the transpoprt layer
+ * @param wize_application  Wize Application
  */
 void AllWize::setWizeApplication(uint8_t wize_application) {
     _wize_application = wize_application;
@@ -529,7 +534,7 @@ void AllWize::setWizeApplication(uint8_t wize_application) {
 
 /**
  * @brief               Sets the wize couonter field in the transpoprt layer
- * @param uint16_t      Wize counter
+ * @param counter       Wize counter
  */
 void AllWize::setCounter(uint16_t counter) { 
     _counter = counter; 
@@ -730,7 +735,7 @@ uint8_t AllWize::getPreamble() {
 
 /**
  * @brief               Sets the buffer timeout (also used for auto sleep modes)
- * @param timeout       Timeout value in milliseconds
+ * @param ms            Timeout value in milliseconds
  */
 void AllWize::setTimeout(uint16_t ms) {
     if (ms > 4080) return;
@@ -782,7 +787,7 @@ uint8_t AllWize::getLEDControl() {
 
 /**
  * @brief               Sets the data interface for receiving packets
- * @param               Value from 0x00 to 0x0C
+ * @param value         Value from 0x00 to 0x0C
  */
 void AllWize::setDataInterface(uint8_t value) {
     if (value <= 0x0C) {
@@ -999,7 +1004,7 @@ String AllWize::getMID() {
 
 /**
  * @brief               Sets the Manufacturer ID
- * @uint16_t mid        MID to save
+ * @param mid           MID to save
  */
 bool AllWize::setMID(uint16_t mid) {
     uint8_t buffer[2];
@@ -1018,7 +1023,7 @@ String AllWize::getUID() {
 
 /**
  * @brief               Saved the UID into the module memory
- * @uint32_t uid        UID to save
+ * @param uid           UID to save
  */
 bool AllWize::setUID(uint32_t uid) {
     uint8_t buffer[4];
@@ -1039,7 +1044,7 @@ uint8_t AllWize::getVersion() {
 
 /**
  * @brief               Sets the device version
- * @uint8_t version     Device version
+ * @param version       Device version
  */
 void AllWize::setVersion(uint8_t version) {
     _setSlot(MEM_VERSION, version);
@@ -1055,7 +1060,7 @@ uint8_t AllWize::getDevice() {
 
 /**
  * @brief               Sets the device type
- * @uint8_t type        Device type
+ * @param type          Device type
  */
 void AllWize::setDevice(uint8_t type) {
     _setSlot(MEM_DEVICE, type);

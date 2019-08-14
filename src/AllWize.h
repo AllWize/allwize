@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file AllWize library header file
+ * @file AllWize.h
+ * AllWize library header file
  */
 
 #ifndef ALLWIZE_H

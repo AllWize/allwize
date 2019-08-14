@@ -18,10 +18,10 @@
 <area shape="rect" id="node25" href="$classAllWize.html#a8168552661cf74214e50d960d33c0308" title="Sets the decrypt flag setting. " alt="" coords="180,816,344,843"/>
 <area shape="rect" id="node26" href="$classAllWize.html#a972d9db80929b234f8eb63b5093b2d1d" title="Sets the default encryption key. " alt="" coords="183,867,341,893"/>
 <area shape="rect" id="node27" href="$classAllWize.html#aed088a11b03ac4ffd99036dec2591dfe" title="Sets the UART baud rate, requires reset to take effect. " alt="" coords="187,917,337,944"/>
-<area shape="rect" id="node28" href="$classAllWize.html#a192b6add24fdc1eb1e81eec5faafe52a" title="Sets the Manufacturer ID &#160;mid MID to save. " alt="" coords="203,968,321,995"/>
-<area shape="rect" id="node29" href="$classAllWize.html#a085442c11746e6a49eedf5d600636bae" title="Saved the UID into the module memory &#160;uid UID to save. " alt="" coords="203,1019,321,1045"/>
-<area shape="rect" id="node30" href="$classAllWize.html#aff7a296180b8c288c9b2c954c5c95fc7" title="Sets the device version &#160;version Device version. " alt="" coords="193,1069,331,1096"/>
-<area shape="rect" id="node31" href="$classAllWize.html#a51b6701b1cbe130f0ca8b11d7d564d80" title="Sets the device type &#160;type Device type. " alt="" coords="195,1120,329,1147"/>
+<area shape="rect" id="node28" href="$classAllWize.html#a192b6add24fdc1eb1e81eec5faafe52a" title="Sets the Manufacturer ID. " alt="" coords="203,968,321,995"/>
+<area shape="rect" id="node29" href="$classAllWize.html#a085442c11746e6a49eedf5d600636bae" title="Saved the UID into the module memory. " alt="" coords="203,1019,321,1045"/>
+<area shape="rect" id="node30" href="$classAllWize.html#aff7a296180b8c288c9b2c954c5c95fc7" title="Sets the device version. " alt="" coords="193,1069,331,1096"/>
+<area shape="rect" id="node31" href="$classAllWize.html#a51b6701b1cbe130f0ca8b11d7d564d80" title="Sets the device type. " alt="" coords="195,1120,329,1147"/>
 <area shape="rect" id="node3" href="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa" title="Inits the module communications. " alt="" coords="413,12,520,39"/>
 <area shape="rect" id="node4" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="585,113,668,140"/>
 <area shape="rect" id="node5" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="716,113,771,140"/>
