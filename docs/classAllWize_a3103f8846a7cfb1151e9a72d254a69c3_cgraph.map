@@ -1,3 +1,11 @@
 <map id="AllWize::_reset_serial" name="AllWize::_reset_serial">
-<area shape="rect" id="node2" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="203,5,313,32"/>
+<area shape="rect" id="node2" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="637,88,747,114"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e" title="Reads and caches the module memory. " alt="" coords="203,37,367,64"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="415,138,553,165"/>
+<area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="837,138,948,165"/>
+<area shape="rect" id="node10" href="$classAllWize.html#abe54eebd9c81044246d6657c0686f859" title="Reads the stream buffer up to a number of bytes. " alt="" coords="1016,25,1157,52"/>
+<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="601,189,783,216"/>
+<area shape="rect" id="node7" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="831,189,955,216"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="1003,113,1171,140"/>
+<area shape="rect" id="node9" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1219,69,1364,96"/>
 </map>

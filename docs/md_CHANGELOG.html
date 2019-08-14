@@ -66,6 +66,59 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p class="">The format is based on <a href="http://keepachangelog.com/">Keep a Changelog</a> and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>.</p>
+<h2>[1.1.2] Unreleased</h2>
+<h3>Fixed</h3>
+<ul>
+<li>Removed dependency on ESPSoftwareSerial for ESP8266 since it's already in SDK</li>
+<li>Fixed keywords.txt file (thanks to )</li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li>Board info to ESP8266 examples</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Moved soft_reset to softReset to fit standards</li>
+</ul>
+<h2>[1.1.1] 2019-07-05</h2>
+<h3>Fixed</h3>
+<ul>
+<li>Avoid reset if wiring problems in ESP8266 boards</li>
+<li>Reset line after reception</li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li>Allow overriding USE_MEMORY_CACHE setting</li>
+<li>Define monitor_speed in platformio.ino files</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>ESP8266 examples pinout change</li>
+<li>Refactor examples</li>
+</ul>
+<h2>[1.1.0] 2019-06-26</h2>
+<h3>Fixed</h3>
+<ul>
+<li>Fixed variable collision when debug enabled</li>
+<li>Removed unneeded flushes</li>
+<li>Check datarates depending on module type</li>
+<li>Fix WIZE module returning only 255 bytes on TEST0</li>
+<li>Define C and CI fields as per standard</li>
+<li>MBUS4 support fixed</li>
+<li>Fixed sercom definition for <a class="el" href="classAllWize.html">AllWize</a> K2</li>
+</ul>
+<p class=""><br />
+</p><h3>Added</h3>
+<ul>
+<li>Support for physical config pin</li>
+<li>UID examples</li>
+<li>Online docs</li>
+<li>Methods to change timeout and baudrate</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Moved OMS and RC1701HP definitions to their own files</li>
+</ul>
 <h2>[1.0.3] 2019-04-05</h2>
 <h3>Added</h3>
 <ul>

@@ -3,7 +3,7 @@
 Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 
 [![version](https://img.shields.io/badge/version-1.1.2-brightgreen.svg)](CHANGELOG.md)
-[![travis](https://travis-ci.org/Allwize/allwize.svg?branch=dev)](https://travis-ci.org/Allwize/allwize)
+[![travis](https://travis-ci.com/Allwize/allwize.svg?branch=dev)](https://travis-ci.com/Allwize/allwize)
 [![codacy](https://img.shields.io/codacy/grade/5b0345d3b4994a1eb2e51f02fa9a5d22/dev.svg)](https://www.codacy.com/app/Allwize/allwize/dashboard)
 [![license](https://img.shields.io/github/license/AllWize/allwize.svg)](LICENSE)
 
@@ -13,7 +13,7 @@ Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 Compatible radios:
 
 *   RadioCrafts RC1701HP-OSP (Ondeo version)
-*   RadioCrafts RC1701xx-WIZE (Wize version, unreleased)
+*   RadioCrafts RC1701HP-WIZE (Wize version)
 
 Compatible platforms:
 

@@ -1,0 +1,7 @@
+<map id="AllWize::setMode" name="AllWize::setMode">
+<area shape="rect" id="node2" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="183,5,297,32"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="187,56,293,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a5c455d5592a76becb86dc80ecc60e318" title="Sets the module in repeater mode. " alt="" coords="179,107,301,133"/>
+<area shape="rect" id="node3" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="349,5,432,32"/>
+<area shape="rect" id="node4" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="480,5,535,32"/>
+</map>

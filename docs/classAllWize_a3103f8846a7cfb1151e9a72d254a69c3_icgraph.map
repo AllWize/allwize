@@ -1,5 +1,7 @@
 <map id="AllWize::_reset_serial" name="AllWize::_reset_serial">
 <area shape="rect" id="node2" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="226,5,330,32"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba" title="Resets the module to factory settings. " alt="" coords="203,56,353,83"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f" title="Inits the module communications. " alt="" coords="401,5,508,32"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba" title="Resets the module to factory settings. " alt="" coords="203,56,353,83"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa" title="Inits the module communications. " alt="" coords="401,5,508,32"/>
+<area shape="rect" id="node4" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="556,5,639,32"/>
+<area shape="rect" id="node5" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="687,5,741,32"/>
 </map>

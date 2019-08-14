@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['ser',['ser',['../namespaceserial2mqtt.html#a9f404f76229f1e71bd606a6eabce5b33',1,'serial2mqtt']]],
-  ['serial_5fbaud',['SERIAL_BAUD',['../namespaceserial2mqtt.html#ac943b5552508e0d85f309842b78fe5bf',1,'serial2mqtt']]],
-  ['serial_5fport',['SERIAL_PORT',['../namespaceserial2mqtt.html#a079420ddf76c201645a042bf34c0ee9b',1,'serial2mqtt']]]
+  ['rssi',['rssi',['../structallwize__message__t.html#aa71722219c73eb89976a6d2d59100ec0',1,'allwize_message_t']]],
+  ['rxfw',['rxfw',['../forwarder_8cpp.html#abf1be6a9c1dc3983c4c7b4ea7f688773',1,'forwarder.cpp']]],
+  ['rxnb',['rxnb',['../forwarder_8cpp.html#a327c9389c66b751b7226ac433913b668',1,'forwarder.cpp']]],
+  ['rxok',['rxok',['../forwarder_8cpp.html#a82d70186b173dd1014916305a8d35417',1,'forwarder.cpp']]]
 ];
