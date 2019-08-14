@@ -46,8 +46,8 @@ class AllWize_LoRaWAN: public AllWize {
 
         bool joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkSKey);
         bool send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Port = 0x01);
-        uint16_t getFrameCounter() { return _frame_counter; }
-        void setFrameCounter(uint16_t value) { _frame_counter = value; }
+        uint16_t getFrameCounter();
+        void setFrameCounter(uint16_t value);
 
     private:
 
