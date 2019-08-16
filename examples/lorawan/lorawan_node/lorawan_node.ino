@@ -2,7 +2,11 @@
 
 AllWize - LoRaWAN Node example
 
-Simple slave that sends an auto-increment number every 5 seconds.
+Simple slave that sends dummy data every 20s.
+The example uses CayenneLPP library to encode the data.
+You can enable the Cayenne LPP payload format decoder in your application server to get decoded data.
+If using TTN it is under your application "Payload Formats" tab.
+If using LoRaServer configure it in your Device Profile.
 
 Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
@@ -20,6 +24,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+#include "AllWize_LoRaWAN.h"
+#include "CayenneLPP.h"
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -39,9 +46,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
-    #define DEBUG_SERIAL        SerialUSB
+    
+    #if defined(ARDUINO_ALLWIZE_K2)
+        #define RESET_PIN           PIN_WIZE_RESET
+        #define MODULE_SERIAL       SerialWize
+        #define DEBUG_SERIAL        SerialUSB
+    #else
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+        #define DEBUG_SERIAL        SerialUSB
+    #endif
+
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
@@ -69,15 +84,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define LORAWAN_PORT            1
 
-uint8_t DEVADDR[4] = { 0x26, 0x01, 0x11, 0xF4 };
-uint8_t NWKSKEY[16] = { 0x52, 0x08, 0x08, 0x50, 0xA8, 0xC0, 0xD9, 0x9A, 0xD1, 0x99, 0x53, 0xF0, 0x5F, 0xBC, 0xF6, 0xC1 };
-uint8_t APPSKEY[16] = { 0x4F, 0x0E, 0x26, 0x90, 0x2B, 0x0E, 0x2A, 0x54, 0x77, 0xB9, 0xA6, 0x30, 0x93, 0x54, 0xC1, 0x62 };
+uint8_t DEVADDR[4] = { 0x26, 0x01, 0x13, 0x3D };
+uint8_t NWKSKEY[16] = { 0xF6, 0x59, 0x13, 0x16, 0x99, 0x35, 0x0E, 0xBF, 0x41, 0xE5, 0xEA, 0xA6, 0x95, 0xFE, 0x64, 0x27 };
+uint8_t APPSKEY[16] = { 0xA2, 0x40, 0xE9, 0xF6, 0xB1, 0xB1, 0x3B, 0x53, 0xB1, 0xE2, 0x0A, 0x0D, 0x3D, 0x50, 0x74, 0xCB };
+
+// -----------------------------------------------------------------------------
+// Dummy sensors
+// -----------------------------------------------------------------------------
+
+CayenneLPP lpp(16);
+
+void sensorSetup() {
+    randomSeed(analogRead(A0));
+}
+
+float getTemperature() {
+    return (float) random(100, 300) / 10.0;
+}
+
+unsigned char getHumidity() {
+    return random(30, 90);
+}
+
+float getPressure() {
+    return (float) random(98000, 103000) / 100.0;
+}
 
 // -----------------------------------------------------------------------------
 // AllWize
 // -----------------------------------------------------------------------------
 
-#include "AllWize_LoRaWAN.h"
 AllWize_LoRaWAN * allwize;
 
 void wizeSetup() {
@@ -98,7 +134,13 @@ void wizeSetup() {
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
-    allwize->setControlInformation(WIZE_NODE_ID);
+
+    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.print("Module Type     : "); DEBUG_SERIAL.println(allwize->getModuleTypeName());
+    DEBUG_SERIAL.print("Unique ID       : "); DEBUG_SERIAL.println(allwize->getUID());
+    DEBUG_SERIAL.print("Firmware Version: "); DEBUG_SERIAL.println(allwize->getFirmwareVersion());
+    DEBUG_SERIAL.print("Serial Number   : "); DEBUG_SERIAL.println(allwize->getSerialNumber());
+    DEBUG_SERIAL.println();
 
     // LoRaWan settings
     allwize->joinABP(DEVADDR, APPSKEY, NWKSKEY);
@@ -143,21 +185,21 @@ void setup() {
     // Init radio
     wizeSetup();
 
+    // Init (dummy) sensor
+    sensorSetup();
+
 }
 
 void loop() {
 
-    // This static variables will hold the number as int and char string
-    static uint8_t count = 0;
-
     // Payload
-    uint8_t payload[1] = { count };
+    lpp.reset();
+    lpp.addTemperature(1, getTemperature());
+    lpp.addRelativeHumidity(2, getHumidity());
+    lpp.addBarometricPressure(3, getPressure());
 
-    // Send the string as payload
-    wizeSend(payload, 1);
-
-    // Increment the number (it will overflow at 255)
-    count++;
+    // Send the payload
+    wizeSend(lpp.getBuffer(), lpp.getSize());
 
     // Wait 20 seconds and redo
     delay(20000);

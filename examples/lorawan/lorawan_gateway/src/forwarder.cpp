@@ -100,10 +100,10 @@ void forwarderMessage(allwize_message_t message) {
     char buffer[512];
     snprintf_P(
         buffer, sizeof(buffer), 
-        PSTR("{\"rxpk\":[{\"tmst\":%lu,\"time\":\"%s.00000Z\",\"chan\":%d,\"rfch\":%d,\"freq\":%.5f,\"stat\":%d,\"modu\":\"FSK\",\"datr\":%d,\"codr\":\"WIZE/DR%d\",\"rssi\":%d,\"lsnr\":0.0,\"size\":%d,\"data\":\"%s\"}]}"),
+        PSTR("{\"rxpk\":[{\"tmst\":%lu,\"time\":\"%s.00000Z\",\"chan\":%d,\"rfch\":%d,\"freq\":%.5f,\"stat\":%d,\"modu\":\"FSK\",\"datr\":%d,\"codr\":\"wize\",\"rssi\":%d,\"lsnr\":0.0,\"size\":%d,\"data\":\"%s\"}]}"),
         now(), timestamp.c_str(), 
         WIZE_CHANNEL, 0, wizeFrequency(WIZE_CHANNEL), 1,
-        wizeDataRateSpeed(WIZE_DATARATE), WIZE_DATARATE,
+        wizeDataRateSpeed(WIZE_DATARATE),
         (int16_t) message.rssi / -2, message.len, data.c_str()
     );
 
