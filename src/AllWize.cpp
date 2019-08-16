@@ -1562,26 +1562,24 @@ bool AllWize::_decode() {
     bool has_crc = (data_interface & 0x08) == 0x08;
     uint8_t bytes_not_in_len = has_start ? 3 : 1;
     uint8_t bytes_not_in_app = (has_header ? 9 : 0) + 1 + (has_rssi ? 1 : 0) + (has_crc ? 2 : 0);
+    uint8_t bytes_not_in_msg = 0;
 
     // This variable will contain the pointer to the current reading position
     uint8_t in = 0;
 
     // Start byte
     if (has_start) {
-        if (START_BYTE != _buffer[in]) return false;
-        in += 1;
+        if (START_BYTE != _buffer[in++]) return false;
     };
 
     // Get and check buffer length
-    uint8_t len = _buffer[in];
+    uint8_t len = _buffer[in++];
     if (_pointer != len + bytes_not_in_len) return false;
-    in += 1;
 
     if (has_header) {
 
         // C-field
-        _message.c = _buffer[in];
-        in += 1;
+        _message.c = _buffer[in++];
 
         // Manufacturer
         uint16_t man = (_buffer[in + 1] << 8) + _buffer[in];
@@ -1596,14 +1594,13 @@ bool AllWize::_decode() {
         _message.address[1] = _buffer[in + 2];
         _message.address[2] = _buffer[in + 1];
         _message.address[3] = _buffer[in + 0];
-
-        // Type
-        _message.type = _buffer[in + 5];
+        in += 4;
 
         // Version
-        _message.version = _buffer[in + 4];
+        _message.version = _buffer[in++];
 
-        in += 6;
+        // Type
+        _message.type = _buffer[in++];
 
     } else {
         _message.c = 0xFF;
@@ -1614,42 +1611,47 @@ bool AllWize::_decode() {
     }
 
     // Control information
-    _message.ci = _buffer[in];
-    in += 1;
+    _message.ci = _buffer[in++];
 
     // Wize transport layer
-    if ((MODULE_WIZE == _module) && (_message.ci == CI_WIZE)) {
+    if (MODULE_WIZE == _module) {
         
-        bytes_not_in_app += 6;
+        if (CI_WIZE == _message.ci) {
         
-        // Wize control
-        _message.wize_control = _buffer[in];
-        in += 1;
+            bytes_not_in_app += 6;
+            
+            // Wize control
+            _message.wize_control = _buffer[in++];
 
-        // Wize operator ID
-        _message.wize_operator_id = (_buffer[in + 1] << 8) + _buffer[in];
-        in += 2;
+            // Wize operator ID
+            _message.wize_operator_id = (_buffer[in + 1] << 8) + _buffer[in];
+            in += 2;
 
-        // Wize counter
-        _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
-        in += 2;
+            // Wize counter
+            _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
+            in += 2;
 
-        // Wize application
-        _message.wize_application = _buffer[in];
-        in += 1;
+            // Wize application
+            _message.wize_application = _buffer[in++];
 
+        } else {
+            
+            // Undocumented hack 
+            bytes_not_in_msg = 8;
+        
+        }
+    
     }
 
     // Application data
-    _message.len = len - bytes_not_in_app;
+    _message.len = len - bytes_not_in_app - bytes_not_in_msg;
     memcpy(_message.data, &_buffer[in], _message.len);
     _message.data[_message.len] = 0;
-    in += _message.len;
+    in += (_message.len + bytes_not_in_msg);
 
     // RSSI
     if (has_rssi) {
-        _message.rssi = _buffer[in];
-        in += 1;
+        _message.rssi = _buffer[in++];
     } else {
         _message.rssi = 0xFF;
     }
