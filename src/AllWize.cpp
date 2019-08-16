@@ -1553,10 +1553,6 @@ bool AllWize::_decode() {
     }
     #endif
 
-    // Local copy of the buffer
-    uint8_t _local[RX_BUFFER_SIZE];
-    memcpy(_local, _buffer, RX_BUFFER_SIZE);
-
     // Get current values
     uint8_t mbus_mode = getMode();
     uint8_t data_interface = getDataInterface();
@@ -1572,23 +1568,23 @@ bool AllWize::_decode() {
 
     // Start byte
     if (has_start) {
-        if (START_BYTE != _local[in]) return false;
+        if (START_BYTE != _buffer[in]) return false;
         in += 1;
     };
 
     // Get and check buffer length
-    uint8_t len = _local[in];
+    uint8_t len = _buffer[in];
     if (_pointer != len + bytes_not_in_len) return false;
     in += 1;
 
     if (has_header) {
 
         // C-field
-        _message.c = _local[in];
+        _message.c = _buffer[in];
         in += 1;
 
         // Manufacturer
-        uint16_t man = (_local[in + 1] << 8) + _local[in];
+        uint16_t man = (_buffer[in + 1] << 8) + _buffer[in];
         _message.man[0] = ((man >> 10) & 0x001F) + 64;
         _message.man[1] = ((man >> 5) & 0x001F) + 64;
         _message.man[2] = ((man >> 0) & 0x001F) + 64;
@@ -1596,16 +1592,16 @@ bool AllWize::_decode() {
         in += 2;
 
         // Address
-        _message.address[0] = _local[in + 3];
-        _message.address[1] = _local[in + 2];
-        _message.address[2] = _local[in + 1];
-        _message.address[3] = _local[in + 0];
+        _message.address[0] = _buffer[in + 3];
+        _message.address[1] = _buffer[in + 2];
+        _message.address[2] = _buffer[in + 1];
+        _message.address[3] = _buffer[in + 0];
 
         // Type
-        _message.type = _local[in + 5];
+        _message.type = _buffer[in + 5];
 
         // Version
-        _message.version = _local[in + 4];
+        _message.version = _buffer[in + 4];
 
         in += 6;
 
@@ -1631,11 +1627,11 @@ bool AllWize::_decode() {
         in += 1;
 
         // Wize operator ID
-        _message.wize_operator_id = (_local[in + 1] << 8) + _local[in];
+        _message.wize_operator_id = (_buffer[in + 1] << 8) + _buffer[in];
         in += 2;
 
         // Wize counter
-        _message.wize_counter = (_local[in + 1] << 8) + _local[in];
+        _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
         in += 2;
 
         // Wize application
@@ -1646,13 +1642,13 @@ bool AllWize::_decode() {
 
     // Application data
     _message.len = len - bytes_not_in_app;
-    memcpy(_message.data, &_local[in], _message.len);
+    memcpy(_message.data, &_buffer[in], _message.len);
     _message.data[_message.len] = 0;
     in += _message.len;
 
     // RSSI
     if (has_rssi) {
-        _message.rssi = _local[in];
+        _message.rssi = _buffer[in];
         in += 1;
     } else {
         _message.rssi = 0xFF;
@@ -1665,7 +1661,7 @@ bool AllWize::_decode() {
 
     // Stop byte
     if (has_start) {
-        if (STOP_BYTE != _local[in]) return false;
+        if (STOP_BYTE != _buffer[in]) return false;
     }
 
     return true;
