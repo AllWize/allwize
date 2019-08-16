@@ -37,11 +37,11 @@ class AllWize_LoRaWAN: public AllWize {
 
     public:
         
-        AllWize_LoRaWAN(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE): AllWize(serial, reset_gpio) {}
+        AllWize_LoRaWAN(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(serial, reset_gpio, config_gpio) {}
         #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-        AllWize_LoRaWAN(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE): AllWize(serial, reset_gpio) {}
+        AllWize_LoRaWAN(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(serial, reset_gpio, config_gpio) {}
         #endif
-        AllWize_LoRaWAN(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE): AllWize(rx, tx, reset_gpio) {}
+        AllWize_LoRaWAN(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(rx, tx, reset_gpio, config_gpio) {}
 
 
         bool joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkSKey);
