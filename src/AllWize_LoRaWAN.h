@@ -33,6 +33,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Arduino.h>
 #include "AllWize.h"
 
+// Setting ALLWIZE_LORAWAN_REDUCE_SIZE to 1 reduced the payload by 9 bytes 
+// by merging the LoRaWAN MAC header and payload and WIZE headers
+// The message is then sent using special C-Field 0x40
+#ifndef ALLWIZE_LORAWAN_REDUCE_SIZE
+#define ALLWIZE_LORAWAN_REDUCE_SIZE 1
+#endif
+
 class AllWize_LoRaWAN: public AllWize {
 
     public:
@@ -43,7 +50,7 @@ class AllWize_LoRaWAN: public AllWize {
         #endif
         AllWize_LoRaWAN(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(rx, tx, reset_gpio, config_gpio) {}
 
-
+        allwize_message_t read();
         bool joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkSKey);
         bool send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Port = 0x01);
         uint16_t getFrameCounter();

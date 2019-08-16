@@ -38,10 +38,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return          Allways true since ABP joins never fail
  */
 bool AllWize_LoRaWAN::joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkSKey) {
+    
     memcpy(_devaddr, DevAddr, 4);
     memcpy(_appskey, AppSKey, 16);
     memcpy(_nwkskey, NwkSKey, 16);
+    
+    #if ALLWIZE_LORAWAN_REDUCE_SIZE    
+        setControlField(C_LORAWAN_UPLINK_UNCNF);
+    #endif
+
+    uint32_t uid = 0;
+    for (uint8_t i=0; i<4; i++) {
+        uid = (uid << 8) + DevAddr[i];
+    }
+    setUID(uid);
+
     return true;
+
+}
+
+/**
+ * @brief               Returns latest received message (rebuilds LoRaWan header if necessary)
+ * @return              New message
+ */
+allwize_message_t AllWize_LoRaWAN::read() {
+    
+    allwize_message_t raw = AllWize::read();
+
+    // Rebuilds LoRaWAN MAC header and payload from
+    // Wize header info if C-Field is 0x40
+    if (C_LORAWAN_UPLINK_UNCNF == raw.c) {
+        uint8_t tmp[RX_BUFFER_SIZE];
+        tmp[0] = raw.c;
+        tmp[1] = raw.address[3];
+        tmp[2] = raw.address[2];
+        tmp[3] = raw.address[1];
+        tmp[4] = raw.address[0];
+        tmp[5] = raw.wize_control;
+        tmp[6] = raw.wize_counter & 0xFF;
+        tmp[7] = raw.wize_counter >> 8;
+        tmp[8] = raw.wize_application;
+        memcpy(&tmp[9], raw.data, raw.len);
+        raw.len += 9;
+        memcpy(raw.data, tmp, raw.len);
+    }
+
+    return raw;
+
 }
 
 /**
@@ -128,11 +171,20 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
         ALLWIZE_DEBUG_PORT.println();
     #endif
 
+    #if ALLWIZE_LORAWAN_REDUCE_SIZE    
+        setCounter(_frame_counter);
+        setWizeApplication(Frame_Port);
+        setWizeControl(Frame_Control);
+        #define ALLWIZE_LORAWAN_SKIP_BYTES 9
+    #else 
+        #define ALLWIZE_LORAWAN_SKIP_BYTES 0
+    #endif
+
     // Update frame counter
     ++_frame_counter;
 
     // Send Package
-    return AllWize::send(LoRaWAN_Data, LoRaWAN_Data_Length);
+    return AllWize::send(&LoRaWAN_Data[ALLWIZE_LORAWAN_SKIP_BYTES], LoRaWAN_Data_Length - ALLWIZE_LORAWAN_SKIP_BYTES);
 
 }
 

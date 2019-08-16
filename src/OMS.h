@@ -18,6 +18,9 @@
 #define C_NACK                          0x01    // Slave, response in case of error
 #define C_RSPUD                         0x08    // Slave, response of app data after a request from master
 
+// Custom C-Fields
+#define C_LORAWAN_UPLINK_UNCNF          0x40    // Slave, LoRaWAN unconfirmed uplink
+
 // CI-Field values
 #define CI_WIZE                         0x20
 #define CI_COMMAND_DOWN_NONE            0x51

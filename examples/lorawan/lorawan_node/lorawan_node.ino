@@ -130,10 +130,14 @@ void wizeSetup() {
         while (true);
     }
 
+    // WIZE radio settings
     allwize->slave();
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setPower(WIZE_POWER);
     allwize->setDataRate(WIZE_DATARATE);
+
+    // LoRaWan settings
+    allwize->joinABP(DEVADDR, APPSKEY, NWKSKEY);
 
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.print("Module Type     : "); DEBUG_SERIAL.println(allwize->getModuleTypeName());
@@ -141,11 +145,8 @@ void wizeSetup() {
     DEBUG_SERIAL.print("Firmware Version: "); DEBUG_SERIAL.println(allwize->getFirmwareVersion());
     DEBUG_SERIAL.print("Serial Number   : "); DEBUG_SERIAL.println(allwize->getSerialNumber());
     DEBUG_SERIAL.println();
-
-    // LoRaWan settings
-    allwize->joinABP(DEVADDR, APPSKEY, NWKSKEY);
-
     DEBUG_SERIAL.println("[WIZE] Ready...");
+    DEBUG_SERIAL.println();
 
 }
 

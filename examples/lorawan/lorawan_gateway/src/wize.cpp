@@ -9,9 +9,9 @@ WIZE MODULE
 #include "forwarder.h"
 #include "configuration.h"
 
-#include "AllWize.h"
+#include "AllWize_LoRaWAN.h"
 
-AllWize * allwize;
+AllWize_LoRaWAN * allwize;
 
 double wizeFrequency(uint8_t channel) {
     return allwize->getFrequency(channel);
@@ -24,7 +24,7 @@ uint16_t wizeDataRateSpeed(uint8_t dr) {
 void wizeSetup() {
 
     // Create and init AllWize object
-    allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
+    allwize = new AllWize_LoRaWAN(RX_PIN, TX_PIN, RESET_PIN);
     allwize->begin();
     if (!allwize->waitForReady()) {
         DEBUG_MSG("[WIZE] Error connecting to the module, check your wiring!");
