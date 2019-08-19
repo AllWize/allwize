@@ -1,9 +1,17 @@
 /*
 
 AllWize - WIZE 2 MQTT Bridge
+Supports CSV, MBUSPayload and CayenneLPP payload frames
 
 Listens to messages on the same channel, data rate and CF and
 forwards them to an MQTT broker.
+
+It supports different application frame formats:
+* CSV: comma separated list of values, each field will be named as field_#
+* MBUSPayload: https://github.com/AllWize/mbus-payload
+* CayenneLPP: https://github.com/ElectronicCats/CayenneLPP
+
+Sends one MQTT message per field.
 This example is meant to run on a Wemos D1 board (ESP8266).
 
 Copyright (C) 2018-2019 by AllWize <github@allwize.io>
@@ -38,6 +46,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Ticker.h>
 #include "configuration.h"
 
+#ifdef PAYLOAD_MBUS
+#include "MBUSPayload.h"
+#include "ArduinoJson.h"
+#endif
+
+#ifdef PAYLOAD_LPP
+#include "CayenneLPP.h"
+#include "ArduinoJson.h"
+#endif
+
 // -----------------------------------------------------------------------------
 // Globals
 // -----------------------------------------------------------------------------
@@ -50,6 +68,29 @@ WiFiEventHandler wifiDisconnectHandler;
 Ticker wifiTimer;
 
 AllWize * allwize;
+
+// -----------------------------------------------------------------------------
+// Formatting
+// -----------------------------------------------------------------------------
+
+char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
+
+    bool negative = value < 0;
+    if (negative) value = -value;
+
+    uint32_t mul = 1;
+    for (uint8_t i=0; i<decimals; i++) mul *= 10;
+
+    uint32_t value_int = int(value);
+    uint32_t value_dec = int(mul * (value - value_int));
+
+    char format[20];
+    snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
+    snprintf(buffer, len, format, value_int, value_dec);
+
+    return buffer;
+
+}
 
 // -----------------------------------------------------------------------------
 // MQTT
@@ -123,7 +164,7 @@ void wizeDebugMessage(allwize_message_t message) {
     char buffer[128];
     snprintf(
         buffer, sizeof(buffer),
-        "[WIZE] ADDR: 0x%02X%02X%02X%02X, RSSI: %d, DATA: { ",
+        "[WIZE] ADDR: 0x%02X%02X%02X%02X, RSSI: %d, DATA: ",
         message.address[0], message.address[1],
         message.address[2], message.address[3],
         (int16_t) message.rssi / -2
@@ -132,12 +173,114 @@ void wizeDebugMessage(allwize_message_t message) {
 
     for (uint8_t i=0; i<message.len; i++) {
         char ch = message.data[i];
-        snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
+        snprintf(buffer, sizeof(buffer), "%02X", ch);
         DEBUG_SERIAL.print(buffer);
     }
-    DEBUG_SERIAL.print("}, STR: \"");
-    DEBUG_SERIAL.print((char *) message.data);
-    DEBUG_SERIAL.println("\"");
+    DEBUG_SERIAL.println();
+
+}
+
+void wizeMQTTParse(allwize_message_t message) {
+
+    char uid[10];
+    snprintf(
+        uid, sizeof(uid), "%02X%02X%02X%02X",
+        message.address[0], message.address[1],
+        message.address[2], message.address[3]
+    );
+
+    // RSSI
+    char topic[32];
+    snprintf(topic, sizeof(topic), "/device/%s/rssi", uid);
+    mqttSend(topic, String(message.rssi / -2).c_str());
+
+    #ifdef PAYLOAD_CSV
+
+        // Parse a comma-separated payload
+        uint8_t field = 1;
+        char * payload;
+        payload = strtok((char *) message.data, ",");
+
+        // While there is a field
+        while (NULL != payload) {
+
+            // Publish message
+            snprintf(topic, sizeof(topic), "/device/%s/field_%d", uid, field);
+            mqttSend(topic, payload);
+
+            // Get new token and update field counter
+            payload = strtok (NULL, ",");
+            field++;
+
+        }
+
+    #endif // PAYLOAD_CSV
+
+    #ifdef PAYLOAD_MBUS
+
+        // Parse payload
+        MBUSPayload payload;
+        DynamicJsonDocument jsonBuffer(512);
+        JsonArray root = jsonBuffer.createNestedArray();
+        payload.decode(message.data, message.len, root);
+
+        // Walk JsonArray
+        for (uint8_t i = 0; i<root.size(); i++) {
+            
+            snprintf(topic, sizeof(topic), "/device/%s/%06X", uid, (uint32_t) root[i]["vif"]);
+            
+            char value[12];
+            uint8_t decimals = ((int32_t) root[i]["scalar"] > 0) ? 0 : - ((int32_t) root[i]["scalar"]);
+            if (decimals == 0) {
+                snprintf(value, sizeof(value), "%u", (uint32_t) root[i]["value_scaled"]);
+                mqttSend(topic, value);
+            } else {
+                dtostrf(root[i]["value_scaled"], sizeof(value)-1, decimals, value);
+                uint8_t start = 0;
+                while (value[start] == ' ') start++;
+                mqttSend(topic, &value[start]);
+            }
+
+
+        }
+
+    #endif // PAYLOAD_MBUS
+
+    #ifdef PAYLOAD_LPP
+
+        // Parse payload
+        CayenneLPP payload(1);
+        DynamicJsonDocument jsonBuffer(512);
+        JsonArray root = jsonBuffer.createNestedArray();
+        payload.decode(message.data, message.len, root);
+
+        char value[16];
+        
+        // Walk JsonArray
+        for (JsonObject element: root) {
+            JsonVariant v = element["value"];
+            if (v.is<JsonObject>()) {
+                for (JsonPair kv : v.as<JsonObject>()) {
+
+                    const char * name = kv.key().c_str();
+                    dtostrf(kv.value().as<float>(), sizeof(value)-1, 4, value);
+                    uint8_t start = 0; while (value[start] == ' ') start++;
+                    snprintf(topic, sizeof(topic), "/device/%s/%s", uid, name);
+                    mqttSend(topic, &value[start]);
+
+                }
+            } else {
+
+                const char * name = element["name"].as<char*>();
+                dtostrf(element["value"].as<float>(), sizeof(value)-1, 2, value);
+                uint8_t start = 0; while (value[start] == ' ') start++;
+                snprintf(topic, sizeof(topic), "/device/%s/%s", uid, name);
+                mqttSend(topic, &value[start]);
+
+            }
+        }
+
+    #endif // PAYLOAD_LPP
 
 }
 
@@ -151,43 +294,8 @@ void wizeLoop() {
         // Show it to console
         wizeDebugMessage(message);
 
-        // Sending message via MQTT
-        if (mqtt.connected()) {
-
-            char uid[10];
-            snprintf(
-                uid, sizeof(uid), "%02X%02X%02X%02X",
-                message.address[0], message.address[1],
-                message.address[2], message.address[3]
-            );
-
-            // Init field counter
-            uint8_t field = 1;
-            char buffer[64];
-
-            // Parse a comma-separated payload
-            char * payload;
-            payload = strtok((char *) message.data, ",");
-
-            // While there is a field
-            while (NULL != payload) {
-
-                // Build topic string with CI and field number
-                char topic[32];
-                snprintf(topic, sizeof(topic), MQTT_TOPIC, uid, field);
-
-                // Publish message
-                snprintf(buffer, sizeof(buffer), "[WIZE] MQTT message: %s => %s\n", topic, payload);
-                DEBUG_SERIAL.print(buffer);
-                mqtt.publish(topic, MQTT_QOS, MQTT_RETAIN, payload);
-
-                // Get new token and update field counter
-                payload = strtok (NULL, ",");
-                field++;
-
-            }
-
-        }
+        // Parse and send via MQTT
+	    if (mqtt.connected()) wizeMQTTParse(message);
 
     }
 

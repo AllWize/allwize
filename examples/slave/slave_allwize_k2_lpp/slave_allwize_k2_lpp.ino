@@ -2,7 +2,7 @@
 
 AllWize - Simple Slave Example - AllWize K2
 
-Simple slave that sends faked data using MBUS frame format.
+Simple slave that sends faked data using CayenneLPP frame format.
 
 Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
@@ -97,8 +97,8 @@ void wizeSend(uint8_t * payload, size_t len) {
 // Dummy sensors
 // -----------------------------------------------------------------------------
 
-#include "MBUSPayload.h"
-MBUSPayload payload(32);
+#include "CayenneLPP.h"
+CayenneLPP payload(32);
 
 void sensorSetup() {
     randomSeed(analogRead(A0));
@@ -108,8 +108,12 @@ float getTemperature() {
     return (float) random(100, 300) / 10.0;
 }
 
+float getHumidity() {
+    return (float) random(30, 90);
+}
+
 float getPressure() {
-    return (float) random(980, 1030) * 1000;
+    return (float) random(9800, 10300) / 10.0;
 }
 
 // -----------------------------------------------------------------------------
@@ -136,9 +140,11 @@ void loop() {
 
     // Build payload
     payload.reset();
-    payload.addField(MBUS_CODE_ACCESS_NUMBER, count++);
-    payload.addField(MBUS_CODE_FLOW_TEMPERATURE_C, getTemperature());
-    payload.addField(MBUS_CODE_PRESSURE_BAR, getPressure());
+    payload.addGenericSensor(1, count++); // this is not LPP standard
+    payload.addTemperature(2, getTemperature());
+    payload.addRelativeHumidity(3, getHumidity());
+    payload.addBarometricPressure(4, getPressure());
+    payload.addGPS(5, 41.42, 2.13, 10);
 
     // Send the string as payload
     wizeSend(payload.getBuffer(), payload.getSize());
