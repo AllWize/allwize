@@ -70,29 +70,6 @@ Ticker wifiTimer;
 AllWize * allwize;
 
 // -----------------------------------------------------------------------------
-// Formatting
-// -----------------------------------------------------------------------------
-
-char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
-
-    bool negative = value < 0;
-    if (negative) value = -value;
-
-    uint32_t mul = 1;
-    for (uint8_t i=0; i<decimals; i++) mul *= 10;
-
-    uint32_t value_int = int(value);
-    uint32_t value_dec = int(mul * (value - value_int));
-
-    char format[20];
-    snprintf(format, sizeof(format), "%s%%lu.%%0%ulu", negative ? "-" : "", decimals);
-    snprintf(buffer, len, format, value_int, value_dec);
-
-    return buffer;
-
-}
-
-// -----------------------------------------------------------------------------
 // MQTT
 // -----------------------------------------------------------------------------
 
@@ -224,23 +201,26 @@ void wizeMQTTParse(allwize_message_t message) {
         JsonArray root = jsonBuffer.createNestedArray();
         payload.decode(message.data, message.len, root);
 
-        // Walk JsonArray
-        for (uint8_t i = 0; i<root.size(); i++) {
-            
-            snprintf(topic, sizeof(topic), "/device/%s/%06X", uid, (uint32_t) root[i]["vif"]);
-            
-            char value[12];
-            uint8_t decimals = ((int32_t) root[i]["scalar"] > 0) ? 0 : - ((int32_t) root[i]["scalar"]);
-            if (decimals == 0) {
-                snprintf(value, sizeof(value), "%u", (uint32_t) root[i]["value_scaled"]);
-                mqttSend(topic, value);
-            } else {
-                dtostrf(root[i]["value_scaled"], sizeof(value)-1, decimals, value);
-                uint8_t start = 0;
-                while (value[start] == ' ') start++;
-                mqttSend(topic, &value[start]);
-            }
+        char format[10];
+        char value[16];
 
+        // Walk JsonArray
+        for (JsonObject element: root) {
+
+            uint32_t vif = element["vif"].as<uint32_t>();
+            int8_t scalar = element["scalar"].as<int>();
+            float value_scaled = element["value_scaled"].as<float>();
+
+            snprintf(topic, sizeof(topic), "/device/%s/%06X", uid, vif);
+            
+            uint8_t decimals = (scalar > 0) ? 0 : -scalar;
+            if (decimals == 0) {
+                snprintf(value, sizeof(value), "%u", (int) value_scaled);
+            } else {
+                snprintf(format, sizeof(format), "%%.%df", decimals);
+                snprintf(value, sizeof(value), format, value_scaled);
+            }
+            mqttSend(topic, value);
 
         }
 
@@ -262,20 +242,16 @@ void wizeMQTTParse(allwize_message_t message) {
             if (v.is<JsonObject>()) {
                 for (JsonPair kv : v.as<JsonObject>()) {
 
-                    const char * name = kv.key().c_str();
-                    dtostrf(kv.value().as<float>(), sizeof(value)-1, 4, value);
-                    uint8_t start = 0; while (value[start] == ' ') start++;
-                    snprintf(topic, sizeof(topic), "/device/%s/%s", uid, name);
-                    mqttSend(topic, &value[start]);
+                    snprintf(topic, sizeof(topic), "/device/%s/%s", uid, kv.key().c_str());
+                    snprintf(value, sizeof(value), "%.4f", kv.value().as<float>());
+                    mqttSend(topic, value);
 
                 }
             } else {
 
-                const char * name = element["name"].as<char*>();
-                dtostrf(element["value"].as<float>(), sizeof(value)-1, 2, value);
-                uint8_t start = 0; while (value[start] == ' ') start++;
-                snprintf(topic, sizeof(topic), "/device/%s/%s", uid, name);
-                mqttSend(topic, &value[start]);
+                snprintf(topic, sizeof(topic), "/device/%s/%s", uid, element["name"].as<char*>());
+                snprintf(value, sizeof(value), "%.2f", element["value"].as<float>());
+                mqttSend(topic, value);
 
             }
         }

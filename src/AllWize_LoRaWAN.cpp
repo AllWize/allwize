@@ -44,7 +44,7 @@ bool AllWize_LoRaWAN::joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkS
     memcpy(_nwkskey, NwkSKey, 16);
     
     #if ALLWIZE_LORAWAN_REDUCE_SIZE    
-        setControlField(C_LORAWAN_UPLINK_UNCNF);
+        setControlField(LORAWAN_C_FIELD_MASK | (LORAWAN_MAC_HEADER >> 4));
     #endif
 
     uint32_t uid = 0;
@@ -66,15 +66,15 @@ allwize_message_t AllWize_LoRaWAN::read() {
     allwize_message_t raw = AllWize::read();
 
     // Rebuilds LoRaWAN MAC header and payload from
-    // Wize header info if C-Field is 0x40
-    if (C_LORAWAN_UPLINK_UNCNF == raw.c) {
+    // Wize header info if C-Field matches LORAWAN_C_FIELD_MASK mask
+    if ((raw.c & LORAWAN_C_FIELD_MASK) == LORAWAN_C_FIELD_MASK) {
         uint8_t tmp[RX_BUFFER_SIZE];
-        tmp[0] = raw.c;
+        tmp[0] = (raw.c & 0x0F) << 4;
         tmp[1] = raw.address[3];
         tmp[2] = raw.address[2];
         tmp[3] = raw.address[1];
         tmp[4] = raw.address[0];
-        tmp[5] = raw.wize_control;
+        tmp[5] = LORAWAN_FRAME_CONTROL;
         tmp[6] = raw.wize_counter & 0xFF;
         tmp[7] = raw.wize_counter >> 8;
         tmp[8] = raw.wize_application;
@@ -102,23 +102,6 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     uint8_t LoRaWAN_Data_Length = 0;
     uint8_t MIC[4] = {0};
 
-    // Direction of frame is up
-    uint8_t Direction = 0x00;
-
-    // Unconfirmed data up
-    //  [7..5] MType (010 unconfirmed up, 100 confirmed up,...)
-    //  [4..2] RFU 
-    //  [1..0] Major
-    uint8_t Mac_Header = 0x40;
-
-    // Frame control
-    // [7] ADR
-    // [6] ADRACKReq
-    // [5] ACK
-    // [4] ClassB
-    // [3..0] FOptsLen
-    uint8_t Frame_Control = 0x00;
-
     // Make a copy of Data
     uint8_t tmpData[Data_Length];
     for (int i = 0; i < Data_Length; i++) {
@@ -126,17 +109,17 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     }
 
     // Encrypt Data (data argument is overwritten in this function)
-    Encrypt_Payload(tmpData, Data_Length, _frame_counter, Direction);
+    Encrypt_Payload(tmpData, Data_Length, _frame_counter, LORAWAN_DIRECTION);
 
     // MAC Header
-    LoRaWAN_Data[0] = Mac_Header;
+    LoRaWAN_Data[0] = LORAWAN_MAC_HEADER;
     
     // MAC Payload - Frame Header
     LoRaWAN_Data[1] = _devaddr[3];
     LoRaWAN_Data[2] = _devaddr[2];
     LoRaWAN_Data[3] = _devaddr[1];
     LoRaWAN_Data[4] = _devaddr[0];
-    LoRaWAN_Data[5] = Frame_Control;
+    LoRaWAN_Data[5] = LORAWAN_FRAME_CONTROL;
     LoRaWAN_Data[6] = (_frame_counter & 0x00FF);
     LoRaWAN_Data[7] = ((_frame_counter >> 8) & 0x00FF);
 
@@ -153,7 +136,7 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     LoRaWAN_Data_Length += Data_Length;
 
     // Calculate MIC
-    Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _frame_counter, Direction);
+    Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _frame_counter, LORAWAN_DIRECTION);
 
     // Load MIC in package
     for(i = 0; i < 4; i++) {
@@ -174,7 +157,6 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     #if ALLWIZE_LORAWAN_REDUCE_SIZE    
         setCounter(_frame_counter);
         setWizeApplication(Frame_Port);
-        setWizeControl(Frame_Control);
         #define ALLWIZE_LORAWAN_SKIP_BYTES 9
     #else 
         #define ALLWIZE_LORAWAN_SKIP_BYTES 0

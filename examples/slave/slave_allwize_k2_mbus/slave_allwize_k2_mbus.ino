@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "AllWize.h"
-#include "wiring_private.h"
+#include "MBUSPayload.h"
 
 // -----------------------------------------------------------------------------
 // Board configuration
@@ -48,30 +48,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_UID                0x20212223
 
 // -----------------------------------------------------------------------------
-// AllWize
+// Globals
 // -----------------------------------------------------------------------------
 
-AllWize * allwize;
+AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+MBUSPayload payload(32);
+
+// -----------------------------------------------------------------------------
+// AllWize
+// -----------------------------------------------------------------------------
 
 void wizeSetup() {
 
     DEBUG_SERIAL.println("Initializing radio module");
 
-    // Create and init AllWize object
-    allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
@@ -87,7 +91,7 @@ void wizeSend(uint8_t * payload, size_t len) {
     }
     DEBUG_SERIAL.print("\n");
 
-    if (!allwize->send(payload, len)) {
+    if (!allwize.send(payload, len)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
@@ -97,19 +101,23 @@ void wizeSend(uint8_t * payload, size_t len) {
 // Dummy sensors
 // -----------------------------------------------------------------------------
 
-#include "MBUSPayload.h"
-MBUSPayload payload(32);
-
 void sensorSetup() {
     randomSeed(analogRead(A0));
 }
 
+// Returns the temperature in C (with 1 decimal)
 float getTemperature() {
     return (float) random(100, 300) / 10.0;
 }
 
+// Returns the himidity in %
+float getHumidity() {
+    return (float) random(30, 90);
+}
+
+// Returns the pressure in hPa (with 1 decimal)
 float getPressure() {
-    return (float) random(980, 1030) * 1000;
+    return (float) random(9800, 10300) / 10.0;
 }
 
 // -----------------------------------------------------------------------------
@@ -138,7 +146,7 @@ void loop() {
     payload.reset();
     payload.addField(MBUS_CODE_ACCESS_NUMBER, count++);
     payload.addField(MBUS_CODE_FLOW_TEMPERATURE_C, getTemperature());
-    payload.addField(MBUS_CODE_PRESSURE_BAR, getPressure());
+    payload.addField(MBUS_CODE_PRESSURE_BAR, -3, getPressure()); // 1hPa == 1mbar
 
     // Send the string as payload
     wizeSend(payload.getBuffer(), payload.getSize());

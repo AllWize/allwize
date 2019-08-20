@@ -89,61 +89,66 @@ uint8_t NWKSKEY[16] = { 0xF6, 0x59, 0x13, 0x16, 0x99, 0x35, 0x0E, 0xBF, 0x41, 0x
 uint8_t APPSKEY[16] = { 0xA2, 0x40, 0xE9, 0xF6, 0xB1, 0xB1, 0x3B, 0x53, 0xB1, 0xE2, 0x0A, 0x0D, 0x3D, 0x50, 0x74, 0xCB };
 
 // -----------------------------------------------------------------------------
-// Dummy sensors
+// Globals
 // -----------------------------------------------------------------------------
 
+#if defined(MODULE_SERIAL)
+    AllWize_LoRaWAN allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize_LoRaWAN allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
 CayenneLPP lpp(16);
+
+// -----------------------------------------------------------------------------
+// Dummy sensors
+// -----------------------------------------------------------------------------
 
 void sensorSetup() {
     randomSeed(analogRead(A0));
 }
 
+// Returns the temperature in C (with 1 decimal)
 float getTemperature() {
     return (float) random(100, 300) / 10.0;
 }
 
-unsigned char getHumidity() {
-    return random(30, 90);
+// Returns the himidity in %
+float getHumidity() {
+    return (float) random(30, 90);
 }
 
+// Returns the pressure in hPa (with 1 decimal)
 float getPressure() {
-    return (float) random(98000, 103000) / 100.0;
+    return (float) random(9800, 10300) / 10.0;
 }
 
 // -----------------------------------------------------------------------------
 // AllWize
 // -----------------------------------------------------------------------------
 
-AllWize_LoRaWAN * allwize;
-
 void wizeSetup() {
 
     // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize_LoRaWAN(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize_LoRaWAN(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
     // WIZE radio settings
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
 
     // LoRaWan settings
-    allwize->joinABP(DEVADDR, APPSKEY, NWKSKEY);
+    allwize.joinABP(DEVADDR, APPSKEY, NWKSKEY);
 
     DEBUG_SERIAL.println();
-    DEBUG_SERIAL.print("Module Type     : "); DEBUG_SERIAL.println(allwize->getModuleTypeName());
-    DEBUG_SERIAL.print("Unique ID       : "); DEBUG_SERIAL.println(allwize->getUID());
-    DEBUG_SERIAL.print("Firmware Version: "); DEBUG_SERIAL.println(allwize->getFirmwareVersion());
-    DEBUG_SERIAL.print("Serial Number   : "); DEBUG_SERIAL.println(allwize->getSerialNumber());
+    DEBUG_SERIAL.print("Module Type     : "); DEBUG_SERIAL.println(allwize.getModuleTypeName());
+    DEBUG_SERIAL.print("Unique ID       : "); DEBUG_SERIAL.println(allwize.getUID());
+    DEBUG_SERIAL.print("Firmware Version: "); DEBUG_SERIAL.println(allwize.getFirmwareVersion());
+    DEBUG_SERIAL.print("Serial Number   : "); DEBUG_SERIAL.println(allwize.getSerialNumber());
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.println("[WIZE] Ready...");
     DEBUG_SERIAL.println();
@@ -155,7 +160,7 @@ void wizeSend(uint8_t * payload, size_t len) {
     char buffer[64];
     snprintf(buffer, sizeof(buffer),
         "[WIZE] CH: %d, TX: %d, DR: %d, Payload: ",
-        allwize->getChannel(), allwize->getPower(), allwize->getDataRate()
+        allwize.getChannel(), allwize.getPower(), allwize.getDataRate()
     );
     DEBUG_SERIAL.print(buffer);
 
@@ -165,7 +170,7 @@ void wizeSend(uint8_t * payload, size_t len) {
     }
     DEBUG_SERIAL.print("\n");
 
-    if (!allwize->send(payload, len, LORAWAN_PORT)) {
+    if (!allwize.send(payload, len, LORAWAN_PORT)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 

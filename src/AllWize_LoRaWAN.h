@@ -40,6 +40,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ALLWIZE_LORAWAN_REDUCE_SIZE 1
 #endif
 
+// Using invalid C-Field in Wize to encode the LoRaWAN MAC header
+// c_field = 0x20 | (mac_header >> 4)
+#define LORAWAN_C_FIELD_MASK        0x20
+
+// Unconfirmed data up
+//  [7..5] MType (010 unconfirmed up, 100 confirmed up,...)
+//  [4..2] RFU 
+//  [1..0] Major
+#define LORAWAN_MAC_HEADER          0x40
+
+// Message direction
+// 0: uplink
+// 1: downlink
+#define LORAWAN_DIRECTION           0x00
+
+// Frame control
+// [7] ADR
+// [6] ADRACKReq
+// [5] ACK
+// [4] ClassB
+// [3..0] FOptsLen
+#define LORAWAN_FRAME_CONTROL       0x00
+
 class AllWize_LoRaWAN: public AllWize {
 
     public:
