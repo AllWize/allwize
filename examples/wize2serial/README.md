@@ -6,7 +6,8 @@ The payload format is very simple at the moment being just a comma separated lis
 The topic is configured to be a placeholder with the node identification
 (now using the message CI file) and an index for each value in the payload.
 
-The `serial2mqtt.py` script show how to parse and forward the messages to an MQTT broker
+The `serial2mqtt.py` and `serial2idb.py` script show how to parse, 
+decode (using CayenneLPP) and forward the messages to an MQTT broker or InfluxDB instance.
 
 Always remember to connect the antenna before powering the board!
 

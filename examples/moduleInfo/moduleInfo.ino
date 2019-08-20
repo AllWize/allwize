@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -161,11 +163,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_ARCH_ESP32
 
 // -----------------------------------------------------------------------------
-// Config & globals
+// Globals
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
 
 // -----------------------------------------------------------------------------
 // Utils
@@ -210,16 +215,10 @@ void wizeSetup() {
         pinPeripheral(TX_PIN, SERCOM_MODE);
     #endif
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
+    // Init AllWize object
+    allwize.begin();
 
-    allwize->begin();
-
-    if (!allwize->waitForReady()) {
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true) delay(1);
     }
@@ -253,29 +252,29 @@ void setup() {
     format("Property", "Value");
     DEBUG_SERIAL.println("------------------------------");
 
-    format("Module type", allwize->getModuleTypeName());
-    format("UART speed", allwize->getBaudRateSpeed(allwize->getBaudRate()));
-    format("Channel", allwize->getChannel());
-    format("Power", allwize->getPower());
-    format("MBUS Mode", allwize->getMode(), true);
-    format("Sleep Mode", allwize->getSleepMode());
-    format("Data Rate", allwize->getDataRateSpeed(allwize->getDataRate()));
-    format("Preamble Length", allwize->getPreamble());
-    format("Control Field", allwize->getControlField(), true);
-    format("Network Role", allwize->getNetworkRole());
-    format("Install Mode", allwize->getInstallMode());
+    format("Module type", allwize.getModuleTypeName());
+    format("UART speed", allwize.getBaudRateSpeed(allwize.getBaudRate()));
+    format("Channel", allwize.getChannel());
+    format("Power", allwize.getPower());
+    format("MBUS Mode", allwize.getMode(), true);
+    format("Sleep Mode", allwize.getSleepMode());
+    format("Data Rate", allwize.getDataRateSpeed(allwize.getDataRate()));
+    format("Preamble Length", allwize.getPreamble());
+    format("Control Field", allwize.getControlField(), true);
+    format("Network Role", allwize.getNetworkRole());
+    format("Install Mode", allwize.getInstallMode());
 
-    format("Manufacturer ID", allwize->getMID(), true);
-    format("Unique ID", allwize->getUID(), true);
-    format("Device Type", allwize->getDevice());
-    format("Device Version", allwize->getVersion());
-    format("Part Number", allwize->getPartNumber());
-    format("Firmware Version", allwize->getFirmwareVersion());
-    format("Req. Hardware Version", allwize->getRequiredHardwareVersion());
-    format("Serial Number", allwize->getSerialNumber(), true);
+    format("Manufacturer ID", allwize.getMID(), true);
+    format("Unique ID", allwize.getUID(), true);
+    format("Device Type", allwize.getDevice());
+    format("Device Version", allwize.getVersion());
+    format("Part Number", allwize.getPartNumber());
+    format("Firmware Version", allwize.getFirmwareVersion());
+    format("Req. Hardware Version", allwize.getRequiredHardwareVersion());
+    format("Serial Number", allwize.getSerialNumber(), true);
 
-    format("Temperature (C)", allwize->getTemperature());
-    format("Voltage (mV)", allwize->getVoltage());
+    format("Temperature (C)", allwize.getTemperature());
+    format("Voltage (mV)", allwize.getVoltage());
 
     // -------------------------------------------------------------------------
 
@@ -283,7 +282,7 @@ void setup() {
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.println("Memory dump:");
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
     DEBUG_SERIAL.println("Done");
 

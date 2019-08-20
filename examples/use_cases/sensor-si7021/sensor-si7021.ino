@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+#include "SparkFun_Si7021_Breakout_Library.h"
+#include <Wire.h>
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -72,15 +76,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Globals
 // -----------------------------------------------------------------------------
 
-#include "SparkFun_Si7021_Breakout_Library.h"
-#include <Wire.h>
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
+
 Weather sensor;
 
 // -----------------------------------------------------------------------------
 // I2C utils
 // -----------------------------------------------------------------------------
-
-#include <Wire.h>
 
 bool i2cCheck(uint8_t address) {
     Wire.beginTransmission(address);
@@ -139,28 +145,20 @@ char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 // AllWize
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
-
 void wizeSetup() {
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
 }
 
@@ -169,7 +167,7 @@ void wizeSend(const char * payload) {
     DEBUG_SERIAL.print("[AllWize] Payload: ");
     DEBUG_SERIAL.println(payload);
 
-    if (!allwize->send(payload)) {
+    if (!allwize.send(payload)) {
         DEBUG_SERIAL.println("[AllWize] Error sending message");
     }
 

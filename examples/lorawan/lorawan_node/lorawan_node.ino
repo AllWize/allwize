@@ -128,7 +128,7 @@ float getPressure() {
 
 void wizeSetup() {
 
-    // Create and init AllWize object
+    // Init AllWize object
     allwize.begin();
     if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");

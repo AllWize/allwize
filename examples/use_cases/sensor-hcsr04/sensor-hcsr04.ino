@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -71,31 +73,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ECHO_PIN            6
 
 // -----------------------------------------------------------------------------
+// Globals
+// -----------------------------------------------------------------------------
+
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
+
+// -----------------------------------------------------------------------------
 // AllWize
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
-
 void wizeSetup() {
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
 }
 
@@ -104,7 +108,7 @@ void wizeSend(const char * payload) {
     DEBUG_SERIAL.print("[AllWize] Payload: ");
     DEBUG_SERIAL.println(payload);
 
-    if (!allwize->send(payload)) {
+    if (!allwize.send(payload)) {
         DEBUG_SERIAL.println("[AllWize] Error sending message");
     }
 

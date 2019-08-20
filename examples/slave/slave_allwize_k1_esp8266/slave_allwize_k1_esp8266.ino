@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -77,32 +79,33 @@ RESET   RST 	Reset 	                        RST
 #define WIZE_UID                0x20212223
 
 // -----------------------------------------------------------------------------
-// AllWize
+// Global
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
+AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+
+// -----------------------------------------------------------------------------
+// AllWize
+// -----------------------------------------------------------------------------
 
 void wizeSetup() {
 
     DEBUG_SERIAL.println("Initializing radio module");
 
-    // Create and init AllWize object
-    allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true) delay(1);
     }
 
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
@@ -114,7 +117,7 @@ void wizeSend(const char * payload) {
     snprintf(buffer, sizeof(buffer), "[WIZE] Sending '%s'\n", payload);
     DEBUG_SERIAL.print(buffer);
 
-    if (!allwize->send(payload)) {
+    if (!allwize.send(payload)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
@@ -152,7 +155,7 @@ void loop() {
     // Increment the number (it will overflow at 255)
     count++;
 
-    // Polling responses for 5 seconds
-   delay(5000);
+    // Delay responses for 20 seconds
+    delay(20000);
 
 }

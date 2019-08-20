@@ -151,7 +151,7 @@ void loop() {
     // Send the string as payload
     wizeSend(payload.getBuffer(), payload.getSize());
 
-    // Polling responses for 20 seconds
+    // Delay responses for 20 seconds
     delay(20000);
 
 }

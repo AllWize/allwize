@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -54,34 +56,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ANALOG_MAX          ((1 << ANALOG_DEPTH) - 1)
 
 // -----------------------------------------------------------------------------
-// AllWize
+// Globals
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
+AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+
+// -----------------------------------------------------------------------------
+// AllWize
+// -----------------------------------------------------------------------------
 
 void wizeSetup() {
 
     DEBUG_SERIAL.println("Checking radio module");
 
-    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
-        pinPeripheral(RX_PIN, SERCOM_MODE);
-        pinPeripheral(TX_PIN, SERCOM_MODE);
-    #endif
-
-    // Create and init AllWize object
-    allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
     DEBUG_SERIAL.println("Radio module OK");
 
@@ -92,7 +91,7 @@ void wizeSend(const char * payload) {
     DEBUG_SERIAL.print("Payload: ");
     DEBUG_SERIAL.println(payload);
 
-    if (!allwize->send(payload)) {
+    if (!allwize.send(payload)) {
         DEBUG_SERIAL.println("Error sending message");
     }
 

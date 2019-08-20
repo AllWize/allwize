@@ -11,35 +11,34 @@ WIZE MODULE
 
 #include "AllWize_LoRaWAN.h"
 
-AllWize_LoRaWAN * allwize;
+AllWize_LoRaWAN allwize(RX_PIN, TX_PIN, RESET_PIN);
 
 double wizeFrequency(uint8_t channel) {
-    return allwize->getFrequency(channel);
+    return allwize.getFrequency(channel);
 }
 
 uint16_t wizeDataRateSpeed(uint8_t dr) {
-    return allwize->getDataRateSpeed(dr);
+    return allwize.getDataRateSpeed(dr);
 }
 
 void wizeSetup() {
 
-    // Create and init AllWize object
-    allwize = new AllWize_LoRaWAN(RX_PIN, TX_PIN, RESET_PIN);
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_MSG("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->master();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.master();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setDataRate(WIZE_DATARATE);
 
     #if defined(DEBUG_PORT)
-    //allwize->dump(DEBUG_PORT);
+    //allwize.dump(DEBUG_PORT);
     #endif
 
-    DEBUG_MSG("[WIZE] Listening... CH %d, DR %d\n", allwize->getChannel(), allwize->getDataRate());
+    DEBUG_MSG("[WIZE] Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRate());
 
 }
 
@@ -66,10 +65,10 @@ void wizeDebugMessage(allwize_message_t message) {
 
 void wizeLoop() {
 
-    if (allwize->available()) {
+    if (allwize.available()) {
 
         // Get the message
-        allwize_message_t message = allwize->read();
+        allwize_message_t message = allwize.read();
 
         // Show it to console
         wizeDebugMessage(message);

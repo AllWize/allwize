@@ -58,8 +58,6 @@ CayenneLPP payload(32);
 // AllWize
 // -----------------------------------------------------------------------------
 
-AllWize * allwize;
-
 void wizeSetup() {
 
     DEBUG_SERIAL.println("Initializing radio module");
@@ -146,7 +144,6 @@ void loop() {
 
     // Build payload
     payload.reset();
-    payload.addGenericSensor(1, count++); // this is not LPP standard (safely remove if your library does not support it)
     payload.addTemperature(2, getTemperature());
     payload.addRelativeHumidity(3, getHumidity());
     payload.addBarometricPressure(4, getPressure());
@@ -155,7 +152,7 @@ void loop() {
     // Send the string as payload
     wizeSend(payload.getBuffer(), payload.getSize());
 
-    // Polling responses for 20 seconds
+    // Delay responses for 20 seconds
     delay(20000);
 
 }

@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -92,8 +96,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Globals
 // -----------------------------------------------------------------------------
 
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
+
 Adafruit_BME280 sensor;
 
 // -----------------------------------------------------------------------------
@@ -159,9 +167,6 @@ char * snfloat(char * buffer, uint8_t len, uint8_t decimals, float value) {
 // AllWize
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
-
 void wizeSetup() {
 
     DEBUG_SERIAL.println("Initializing radio module");
@@ -171,37 +176,29 @@ void wizeSetup() {
         pinPeripheral(TX_PIN, SERCOM_MODE);
     #endif
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->slave();
-    allwize->setMode(MBUS_MODE_OSP);
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
 }
-
 
 void wizeSend(const char * payload) {
 
     DEBUG_SERIAL.print("[AllWize] Payload: ");
     DEBUG_SERIAL.println(payload);
 
-    if (!allwize->send(payload)) {
+    if (!allwize.send(payload)) {
         DEBUG_SERIAL.println("[AllWize] Error sending message");
     }
 

@@ -81,10 +81,18 @@ void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
 #define WIZE_UID                0x20212223
 
 // -----------------------------------------------------------------------------
-// AllWize
+// Globals
 // -----------------------------------------------------------------------------
 
-AllWize * allwize;
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
+    
+// -----------------------------------------------------------------------------
+// AllWize
+// -----------------------------------------------------------------------------
 
 void wizeSetup() {
 
@@ -95,26 +103,19 @@ void wizeSetup() {
         pinPeripheral(TX_PIN, SERCOM_MODE);
     #endif
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
-    allwize->setUID(WIZE_UID);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
@@ -126,7 +127,7 @@ void wizeSend(const char * payload) {
     snprintf(buffer, sizeof(buffer), "[WIZE] Sending '%s'\n", payload);
     DEBUG_SERIAL.print(buffer);
 
-    if (!allwize->send(payload)) {
+    if (!allwize.send(payload)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
@@ -164,7 +165,7 @@ void loop() {
     // Increment the number (it will overflow at 255)
     count++;
 
-    // Polling responses for 5 seconds
-   delay(5000);
+    // Delay responses for 20 seconds
+    delay(20000);
 
 }

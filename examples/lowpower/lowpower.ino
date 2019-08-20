@@ -21,6 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+#include "wiring_private.h"
+#if defined(ARDUINO_ARCH_SAMD)
+    #include "ArduinoLowPower.h"
+#else
+    #include "LowPower.h"
+#endif
+
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
@@ -28,9 +36,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_POWER              POWER_14dBm
 #define WIZE_DATARATE           DATARATE_2400bps
+#define WIZE_UID                0x20212223
 
 #define RADIO_SLEEP             1
-#define MCU_SLEEP               1
+#define MCU_SLEEP               0
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -116,11 +125,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_ARCH_SAMD
 
 // -----------------------------------------------------------------------------
-// AllWize
+// Globals
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
+
+// -----------------------------------------------------------------------------
+// AllWize
+// -----------------------------------------------------------------------------
 
 void wizeSetup() {
 
@@ -133,45 +149,40 @@ void wizeSetup() {
         pinPeripheral(TX_PIN, SERCOM_MODE);
     #endif
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-
-    allwize->begin();
-
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         #if defined(DEBUG_SERIAL)
             DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         #endif
         while (true);
     }
 
-    allwize->slave();
-    allwize->setMode(MBUS_MODE_OSP);
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
+    allwize.setUID(WIZE_UID);
 
     #if defined(DEBUG_SERIAL)
-        DEBUG_SERIAL.println("Radio module OK");
+        allwize.dump(DEBUG_SERIAL);
+        DEBUG_SERIAL.println("[WIZE] Ready...");
     #endif
 
 }
 
-void wizeSend(const char * payload) {
+void wizeSend(uint8_t * payload, size_t len) {
 
-    #if defined(DEBUG_SERIAL)
-        DEBUG_SERIAL.print("[AllWize] Payload: ");
-        DEBUG_SERIAL.println(payload);
-    #endif
+    char buffer[64];
+    DEBUG_SERIAL.print("[WIZE] Sending: ");
+    for (uint8_t i = 0; i<len; i++) {
+        snprintf(buffer, sizeof(buffer), "%02X", payload[i]);
+    DEBUG_SERIAL.print(buffer);
+    }
+    DEBUG_SERIAL.print("\n");
 
-    if (!allwize->send(payload)) {
-        #if defined(DEBUG_SERIAL)
-            DEBUG_SERIAL.println("[AllWize] Error sending message");
-        #endif
+    if (!allwize.send(payload, len)) {
+        DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
 }
@@ -180,24 +191,18 @@ void wizeSend(const char * payload) {
 // Sleep
 // -----------------------------------------------------------------------------
 
-#if defined(ARDUINO_ARCH_SAMD)
-    #include "ArduinoLowPower.h"
-#else
-    #include "LowPower.h"
-#endif
-
 void sleep() {
 
     // Sleep the radio
     #if RADIO_SLEEP
-        allwize->sleep();
+        allwize.sleep();
         delay(10);
     #endif
 
     // Sleep the MCU
     #if MCU_SLEEP
         #if defined(ARDUINO_ARCH_SAMD)
-            LowPower.sleep(20000);
+            LowPower.sleep(8000);
         #else
             LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
         #endif
@@ -211,7 +216,7 @@ void wakeup() {
 
     // Wake up the radio
     #if RADIO_SLEEP
-        allwize->wakeup();
+        allwize.wakeup();
     #endif
 
     #if MCU_SLEEP
@@ -257,11 +262,9 @@ void loop() {
     // -------------------------------------------------------------------------
 
     digitalWrite(LED_BUILTIN, HIGH);
-    wizeSend("U");
-    #if defined(DEBUG_SERIAL)
-        DEBUG_SERIAL.println("Idle for 8s");
-    #endif
-    delay(8000);
+    uint8_t payload[1] = { 0x55 };
+    wizeSend(payload, sizeof(payload));
+    delay(1000);
     digitalWrite(LED_BUILTIN, LOW);
 
     // -------------------------------------------------------------------------

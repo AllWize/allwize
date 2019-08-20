@@ -39,8 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #error "This example is meant to run on an ESP8266 board!"
 #endif
 
-#include "SoftwareSerial.h"
 #include "AllWize.h"
+#include "SoftwareSerial.h"
 #include <ESP8266WiFi.h>
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
@@ -67,7 +67,7 @@ WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
 Ticker wifiTimer;
 
-AllWize * allwize;
+AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
 
 // -----------------------------------------------------------------------------
 // MQTT
@@ -117,21 +117,21 @@ void mqttSetup() {
 
 void wizeSetup() {
 
-    allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
-        while (true);
+        while (true) delay(1);
     }
 
-    allwize->master();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.master();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setDataRate(WIZE_DATARATE);
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
-    DEBUG_SERIAL.println("[WIZE] Listening...");
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRate());
+    DEBUG_SERIAL.print(buffer);
 
 }
 
@@ -262,10 +262,10 @@ void wizeMQTTParse(allwize_message_t message) {
 
 void wizeLoop() {
 
-    if (allwize->available()) {
+    if (allwize.available()) {
 
         // Get the message
-        allwize_message_t message = allwize->read();
+        allwize_message_t message = allwize.read();
 
         // Show it to console
         wizeDebugMessage(message);
@@ -325,6 +325,7 @@ void setup() {
 
 void loop() {
 
+    // Listen to messages
     wizeLoop();
 
 }

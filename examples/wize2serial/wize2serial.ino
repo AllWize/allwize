@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include "AllWize.h"
+
 // -----------------------------------------------------------------------------
 // Board definitions
 // -----------------------------------------------------------------------------
@@ -117,65 +119,73 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_DATARATE           DATARATE_2400bps
 
 // -----------------------------------------------------------------------------
+// Globals
+// -----------------------------------------------------------------------------
+
+
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
+
+char buffer[300];
+
+// -----------------------------------------------------------------------------
 // Wize
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
-char buffer[300];
-
 void wizeSetup() {
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("# Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->master();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.master();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
 
-    DEBUG_SERIAL.println("# Listening...");
-
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "# Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRate());
+    DEBUG_SERIAL.print(buffer);
 }
 
 void wizeLoop() {
 
-    if (allwize->available()) {
+    if (allwize.available()) {
 
         // Get the message
-        allwize_message_t message = allwize->read();
+        allwize_message_t message = allwize.read();
 
         if (CI_WIZE == message.ci) {
             snprintf(
                 buffer, sizeof(buffer),
-                "%02X%02X%02X%02X,%d,%d,%s\n",
+                "%02X%02X%02X%02X,%d,%d,",
                 message.address[0], message.address[1],
                 message.address[2], message.address[3],
-                message.wize_counter, (int16_t) message.rssi / -2,
-                (char *) message.data
+                message.wize_counter, (int16_t) message.rssi / -2
             );
         } else {
             snprintf(
                 buffer, sizeof(buffer),
-                "%02X%02X%02X%02X,%d,%d,%s\n",
+                "%02X%02X%02X%02X,%d,%d,",
                 message.address[0], message.address[1],
                 message.address[2], message.address[3],
-                message.c, (int16_t) message.rssi / -2,
-                (char *) message.data
+                message.c, (int16_t) message.rssi / -2
             );
         }
 
-        // Send it to serial port
         DEBUG_SERIAL.print(buffer);
+
+        for (uint8_t i=0; i<message.len; i++) {
+            snprintf(buffer, sizeof(buffer), "%02X", message.data[i]);
+            DEBUG_SERIAL.print(buffer);
+        }
+        DEBUG_SERIAL.println();
 
     }
 
