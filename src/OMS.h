@@ -16,10 +16,13 @@
 #define C_ACC_NR                        0x47    // Slave, empty, allows bidirectionallity
 #define C_ACC_DMD                       0x48    // Slave, demand to master for application data (expects ACK)
 #define C_NACK                          0x01    // Slave, response in case of error
-#define C_RSPUD                         0x08    // Slave, response of app data after a request from master
+#define C_RSP_UD                        0x08    // Slave, response of app data after a request from master
 
-// Custom C-Fields
-#define C_LORAWAN_UPLINK_UNCNF          0x40    // Slave, LoRaWAN unconfirmed uplink
+#define C_WIZE_INSTPING                 0x46    // C_SND_IR
+#define C_WIZE_INSTPONG                 0x06    // C_CNF_IR
+#define C_WIZE_DATA                     0x44    // C_SND_NR
+#define C_WIZE_COMMAND                  0x43    // C_SND_UD2
+#define C_WIZE_RESPONSE                 0x08    // C_RSP_UD
 
 // CI-Field values
 #define CI_WIZE                         0x20
