@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "AllWize.h"
-#include "SoftwareSerial.h"
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -109,7 +108,7 @@ void wizeSetup() {
 void wizeDebugMessage(allwize_message_t message) {
 
     // Code to pretty-print the message
-    char buffer[128];
+    char buffer[256];
     if (CI_WIZE == message.ci) {
         snprintf(
             buffer, sizeof(buffer),

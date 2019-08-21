@@ -117,6 +117,7 @@ void mqttSetup() {
 
 void wizeSetup() {
 
+    // Init AllWize object
     allwize.begin();
     if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
@@ -149,8 +150,7 @@ void wizeDebugMessage(allwize_message_t message) {
     DEBUG_SERIAL.print(buffer);
 
     for (uint8_t i=0; i<message.len; i++) {
-        char ch = message.data[i];
-        snprintf(buffer, sizeof(buffer), "%02X", ch);
+        snprintf(buffer, sizeof(buffer), "%02X", message.data[i]);
         DEBUG_SERIAL.print(buffer);
     }
     DEBUG_SERIAL.println();

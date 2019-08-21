@@ -139,9 +139,6 @@ void setup() {
 
 void loop() {
 
-    // This static variables will hold the frame counter 
-    static uint16_t count = 0;
-
     // Build payload
     payload.reset();
     payload.addTemperature(2, getTemperature());
