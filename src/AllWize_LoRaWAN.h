@@ -79,12 +79,11 @@ class AllWize_LoRaWAN: public AllWize {
         uint16_t getFrameCounter();
         void setFrameCounter(uint16_t value);
 
-    private:
+    protected:
 
         uint8_t _devaddr[4];
         uint8_t _appskey[16];
         uint8_t _nwkskey[16];
-        uint16_t _frame_counter = 0;
         static const uint8_t S_Table[16][16];
 
         void Encrypt_Payload(uint8_t *Data, uint8_t Data_Length, uint16_t Frame_Counter, uint8_t Direction);

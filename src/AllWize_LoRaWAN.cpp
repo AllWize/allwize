@@ -109,7 +109,7 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     }
 
     // Encrypt Data (data argument is overwritten in this function)
-    Encrypt_Payload(tmpData, Data_Length, _frame_counter, LORAWAN_DIRECTION);
+    Encrypt_Payload(tmpData, Data_Length, _counter, LORAWAN_DIRECTION);
 
     // MAC Header
     LoRaWAN_Data[0] = LORAWAN_MAC_HEADER;
@@ -120,8 +120,8 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     LoRaWAN_Data[3] = _devaddr[1];
     LoRaWAN_Data[4] = _devaddr[0];
     LoRaWAN_Data[5] = LORAWAN_FRAME_CONTROL;
-    LoRaWAN_Data[6] = (_frame_counter & 0x00FF);
-    LoRaWAN_Data[7] = ((_frame_counter >> 8) & 0x00FF);
+    LoRaWAN_Data[6] = (_counter & 0x00FF);
+    LoRaWAN_Data[7] = ((_counter >> 8) & 0x00FF);
 
     // MAC Payload - Frame Port
     LoRaWAN_Data[8] = Frame_Port;
@@ -136,7 +136,7 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     LoRaWAN_Data_Length += Data_Length;
 
     // Calculate MIC
-    Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _frame_counter, LORAWAN_DIRECTION);
+    Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _counter, LORAWAN_DIRECTION);
 
     // Load MIC in package
     for(i = 0; i < 4; i++) {
@@ -155,35 +155,15 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     #endif
 
     #if ALLWIZE_LORAWAN_REDUCE_SIZE    
-        setCounter(_frame_counter);
         setWizeApplication(Frame_Port);
         #define ALLWIZE_LORAWAN_SKIP_BYTES 9
     #else 
         #define ALLWIZE_LORAWAN_SKIP_BYTES 0
     #endif
 
-    // Update frame counter
-    ++_frame_counter;
-
     // Send Package
     return AllWize::send(&LoRaWAN_Data[ALLWIZE_LORAWAN_SKIP_BYTES], LoRaWAN_Data_Length - ALLWIZE_LORAWAN_SKIP_BYTES);
 
-}
-
-/**
- * @brief               Returns current frame counter
- * @return              Frame counter
- */
-uint16_t AllWize_LoRaWAN::getFrameCounter() { 
-    return _frame_counter; 
-}
-
-/**
- * @brief               Sets new frame counter
- * @param value         2-bytes long new frame counter
- */
-void AllWize_LoRaWAN::setFrameCounter(uint16_t value) { 
-    _frame_counter = value; 
 }
 
 // ----------------------------------------------------------------------------
