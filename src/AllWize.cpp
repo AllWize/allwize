@@ -92,7 +92,7 @@ void AllWize::begin(uint8_t baudrate) {
     
     _baudrate = BAUDRATES[baudrate-1];
     reset();
-    delay(200);
+    _niceDelay(200);
     
     // Figure out module type
     _readModel();
@@ -117,7 +117,7 @@ void AllWize::begin(uint8_t baudrate) {
 /**
  * @brief               Resets the serial object
  */
-void AllWize::_reset_serial() {
+void AllWize::_resetSerial() {
 
     if (_hw_serial) {
 
@@ -161,31 +161,31 @@ void AllWize::_reset_serial() {
  */
 bool AllWize::reset() {
     if (GPIO_NONE == _reset_gpio) {
-        _reset_serial();
-        delay(100);
+        _resetSerial();
+        _niceDelay(100);
         _setSlot(MEM_CONFIG_INTERFACE, 1);
         if (_setConfig(true)) {
             _send('@');
             _send('R');
             _send('R');
-            delay(100);
+            _niceDelay(100);
             if (GPIO_NONE != _config_gpio) {
                 digitalWrite(_config_gpio, LOW);
             }
             _config = false;
-            _reset_serial();
+            _resetSerial();
             return true;
         }
     } else {
         digitalWrite(_reset_gpio, LOW);
-        delay(1);
+        _niceDelay(1);
         digitalWrite(_reset_gpio, HIGH);
-        delay(100);
+        _niceDelay(100);
         if (GPIO_NONE != _config_gpio) {
             digitalWrite(_config_gpio, LOW);
         }
         _config = false;
-        _reset_serial();
+        _resetSerial();
         return true;
     }
     return false;
@@ -201,7 +201,7 @@ void AllWize::softReset() {
         _flush();
         _send(CMD_EXIT_CONFIG);
     }
-    delay(10);
+    _niceDelay(10);
     */
 }
 
@@ -210,19 +210,19 @@ void AllWize::softReset() {
  * @return              Factory reset successfully issued
  */
 bool AllWize::factoryReset() {
-    _reset_serial();
-    delay(100);
+    _resetSerial();
+    _niceDelay(100);
     _setSlot(MEM_CONFIG_INTERFACE, 1);
     if (_setConfig(true)) {
         _send('@');
         _send('R');
         _send('C');
-        delay(100);
+        _niceDelay(100);
         if (GPIO_NONE != _config_gpio) {
             digitalWrite(_config_gpio, LOW);
         }
         _config = false;
-        _reset_serial();
+        _resetSerial();
         return true;
     }
     return false;
@@ -275,7 +275,7 @@ void AllWize::sleep() {
  */
 void AllWize::wakeup() {
     _send(CMD_AWAKE);
-    delay(5);
+    _niceDelay(5);
     ready();
 }
 
@@ -295,7 +295,7 @@ bool AllWize::waitForReady(uint32_t timeout) {
     uint32_t start = millis();
     while (millis() - start < timeout) {
         if (ready()) return true;
-        delay(100);
+        _niceDelay(100);
     }
     return false;
 }
@@ -1183,7 +1183,7 @@ bool AllWize::_setConfig(bool value) {
                 digitalWrite(_config_gpio, LOW);
             }
             _send(CMD_EXIT_CONFIG);
-            delay(5);
+            _niceDelay(5);
             _config = false;
         }
     }
@@ -1760,9 +1760,9 @@ int AllWize::_timedRead() {
     uint32_t _start = millis();
     int ch = -1;
     while (millis() - _start < _timeout) {
-#if defined(ARDUINO_ARCH_ESP8266)
-        yield();
-#endif
+        #if defined(ARDUINO_ARCH_ESP8266)
+            yield();
+        #endif
         ch = _stream->read();
         if (ch >= 0) break;
     };
@@ -1856,4 +1856,14 @@ void AllWize::_bin2hex(uint8_t *bin, char *hex, uint8_t len) {
     for (uint8_t i = 0; i < len; i++) {
         sprintf(&hex[i * 2], "%02X", bin[i]);
     }
+}
+
+/**
+ * @brief               Does a non-blocking delay
+ * @param ms            milliseconds to delay
+ * @protected
+ */
+void AllWize::_niceDelay(uint32_t ms) {
+    uint32_t start = millis();
+    while (millis() - start < ms) delay(1);
 }

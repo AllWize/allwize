@@ -215,7 +215,7 @@ class AllWize {
         bool _decode();
 
         void _flush();
-        void _reset_serial();
+        void _resetSerial();
         uint8_t _send(uint8_t * buffer, uint8_t len);
         uint8_t _send(uint8_t ch);
         int8_t _receive();
@@ -227,6 +227,8 @@ class AllWize {
         int _readBytesUntil(char terminator, char * buffer, uint16_t len);
         void _hex2bin(char * hex, uint8_t * bin, uint8_t len);
         void _bin2hex(uint8_t * bin, char * hex, uint8_t len);
+
+        void _niceDelay(uint32_t ms);
 
     private:
 

@@ -163,9 +163,11 @@ void setup() {
 
     // Setup serial DEBUG_SERIAL
     DEBUG_SERIAL.begin(115200);
-    delay(2000);
+    while (millis() < 2000) yield();
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.println("[MAIN] Wize Master Example");
+    DEBUG_SERIAL.print("[MAIN] Core version: ");
+    DEBUG_SERIAL.println(ESP.getCoreVersion());
     DEBUG_SERIAL.println();
 
     // Init radio
