@@ -38,8 +38,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_DATARATE           DATARATE_2400bps
 #define WIZE_UID                0x20212223
 
+#define DEBUG                   0
 #define RADIO_SLEEP             1
-#define MCU_SLEEP               0
+#define MCU_SLEEP               1
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -140,7 +141,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void wizeSetup() {
 
-    #if defined(DEBUG_SERIAL)
+    #if defined(DEBUG)
         DEBUG_SERIAL.println("Initializing radio module");
     #endif
 
@@ -152,7 +153,7 @@ void wizeSetup() {
     // Init AllWize object
     allwize.begin();
     if (!allwize.waitForReady()) {
-        #if defined(DEBUG_SERIAL)
+        #if defined(DEBUG)
             DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         #endif
         while (true);
@@ -173,16 +174,20 @@ void wizeSetup() {
 
 void wizeSend(uint8_t * payload, size_t len) {
 
-    char buffer[64];
-    DEBUG_SERIAL.print("[WIZE] Sending: ");
-    for (uint8_t i = 0; i<len; i++) {
-        snprintf(buffer, sizeof(buffer), "%02X", payload[i]);
-    DEBUG_SERIAL.print(buffer);
-    }
-    DEBUG_SERIAL.print("\n");
+    #if DEBUG
+        char buffer[64];
+        DEBUG_SERIAL.print("[WIZE] Sending: ");
+        for (uint8_t i = 0; i<len; i++) {
+            snprintf(buffer, sizeof(buffer), "%02X", payload[i]);
+        DEBUG_SERIAL.print(buffer);
+        }
+        DEBUG_SERIAL.print("\n");
+    #endif
 
     if (!allwize.send(payload, len)) {
-        DEBUG_SERIAL.println("[WIZE] Error sending message");
+        #if DEBUG
+            DEBUG_SERIAL.println("[WIZE] Error sending message");
+        #endif
     }
 
 }
@@ -236,7 +241,7 @@ void wakeup() {
 void setup() {
 
     // Init DEBUG_SERIAL
-    #if defined(DEBUG_SERIAL)
+    #if defined(DEBUG)
         DEBUG_SERIAL.begin(115200);
         while (!DEBUG_SERIAL && millis() < 2000);
         DEBUG_SERIAL.println();
@@ -251,7 +256,7 @@ void setup() {
 
     wizeSetup();
 
-    #if defined(DEBUG_SERIAL)
+    #if defined(DEBUG)
         DEBUG_SERIAL.println("Ready");
     #endif
 
@@ -264,15 +269,14 @@ void loop() {
     digitalWrite(LED_BUILTIN, HIGH);
     uint8_t payload[1] = { 0x55 };
     wizeSend(payload, sizeof(payload));
-    delay(1000);
+    delay(100);
     digitalWrite(LED_BUILTIN, LOW);
 
     // -------------------------------------------------------------------------
 
-    #if defined(DEBUG_SERIAL)
+    #if defined(DEBUG)
         DEBUG_SERIAL.println("Going into low-power mode for 8s");
     #endif
-    delay(10);
     sleep();
     wakeup();
 
