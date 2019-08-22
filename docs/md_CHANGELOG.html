@@ -66,6 +66,23 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p class="">The format is based on <a href="http://keepachangelog.com/">Keep a Changelog</a> and this project adheres to <a href="http://semver.org/">Semantic Versioning</a>.</p>
+<h2>[1.1.4] 2019-08-22</h2>
+<h3>Fixed</h3>
+<ul>
+<li>Fix wrong buffer length when CI not WIZE (undocumented?)</li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li>Examples using CayenneLPP and MBUSPayload payload encoders</li>
+<li>Non-blocking delay for esp8266 boards</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Reduce payload size when using <a class="el" href="classAllWize__LoRaWAN.html">AllWize_LoRaWAN</a> class by merging Wize and LoRaWAN headers</li>
+<li>Change examples to not use pointer to class objects</li>
+<li><a class="el" href="classAllWize__LoRaWAN.html">AllWize_LoRaWAN</a> class using main class frame counter</li>
+<li>Overall examples clean up</li>
+</ul>
 <h2>[1.1.3] 2019-08-14</h2>
 <h3>Fixed</h3>
 <ul>

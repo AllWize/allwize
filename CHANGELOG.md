@@ -3,6 +3,20 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.4] 2019-08-22
+### Fixed
+- Fix wrong buffer length when CI not WIZE (undocumented?)
+
+### Added
+- Examples using CayenneLPP and MBUSPayload payload encoders
+- Non-blocking delay for esp8266 boards
+
+### Changed
+- Reduce payload size when using AllWize_LoRaWAN class by merging Wize and LoRaWAN headers
+- Change examples to not use pointer to class objects
+- AllWize_LoRaWAN class using main class frame counter
+- Overall examples clean up
+
 ## [1.1.3] 2019-08-14
 ### Fixed
 - Fix documentation issues preventing correct checkout (#9)

@@ -1,10 +1,11 @@
 <map id="AllWize::send" name="AllWize::send">
-<area shape="rect" id="node2" href="$classAllWize.html#aa22cb94ed64656f3ba3aef64c566e708" title="Cleans the RX/TX line. " alt="" coords="156,95,288,121"/>
+<area shape="rect" id="node2" href="$classAllWize.html#aa22cb94ed64656f3ba3aef64c566e708" title="Cleans the RX/TX line. " alt="" coords="156,81,288,108"/>
 <area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="759,107,869,133"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="336,81,475,108"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="336,107,475,133"/>
 <area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="558,56,669,83"/>
-<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="523,5,704,32"/>
-<area shape="rect" id="node7" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="752,5,876,32"/>
-<area shape="rect" id="node8" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="924,5,1092,32"/>
-<area shape="rect" id="node9" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1140,5,1285,32"/>
+<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="523,157,704,184"/>
+<area shape="rect" id="node10" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="Does a non&#45;blocking delay. " alt="" coords="543,208,683,235"/>
+<area shape="rect" id="node7" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="752,157,876,184"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="924,157,1092,184"/>
+<area shape="rect" id="node9" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1140,157,1285,184"/>
 </map>

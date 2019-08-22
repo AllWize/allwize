@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['s_5ftable',['S_Table',['../classAllWize__LoRaWAN.html#a31e5a59da8b34e50a1831caf7ae1c154',1,'AllWize_LoRaWAN']]],
   ['send',['send',['../classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d',1,'AllWize::send(uint8_t *buffer, uint8_t len)'],['../classAllWize.html#abaf41b1ea4c1ffe08c65be9612a58639',1,'AllWize::send(const char *buffer)'],['../classAllWize__LoRaWAN.html#a99faabcc5e67ed0a2dfde556f9025fcd',1,'AllWize_LoRaWAN::send()']]],
   ['serial2idb_2epy',['serial2idb.py',['../serial2idb_8py.html',1,'']]],
   ['serial2mqtt_2epy',['serial2mqtt.py',['../serial2mqtt_8py.html',1,'']]],
@@ -33,6 +34,7 @@ var searchData=
   ['setwizeapplication',['setWizeApplication',['../classAllWize.html#a940670a47f30ab7971f8fdec8e68400b',1,'AllWize']]],
   ['setwizecontrol',['setWizeControl',['../classAllWize.html#a7ebeceb2863b8445bbb90b6007853b2d',1,'AllWize']]],
   ['setwizeoperatorid',['setWizeOperatorId',['../classAllWize.html#ab1bb4aadb1aeb0192249064fe6147a52',1,'AllWize']]],
+  ['shift_5fleft',['Shift_Left',['../classAllWize__LoRaWAN.html#a4715016ddbeb6c512822110b9832274e',1,'AllWize_LoRaWAN']]],
   ['slave',['slave',['../classAllWize.html#a04923626b08d628f4fa4ecef2f424f88',1,'AllWize']]],
   ['sleep',['sleep',['../classAllWize.html#a9e38bd627db0ad557551b66e1b9897c4',1,'AllWize']]],
   ['sleep_5fmode_5fafter_5ftx',['SLEEP_MODE_AFTER_TX',['../RC1701HP_8h.html#a4a3411945d8ea5ccd308a65f83eb8307',1,'RC1701HP.h']]],

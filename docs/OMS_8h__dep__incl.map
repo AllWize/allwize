@@ -1,11 +1,12 @@
 <map id="src/OMS.h" name="src/OMS.h">
-<area shape="rect" id="node2" href="$AllWize_8h.html" title="src/AllWize.h" alt="" coords="412,80,512,107"/>
-<area shape="rect" id="node3" href="$forwarder_8h.html" title="examples/lorawan/lorawan\l_gateway/src/forwarder.h" alt="" coords="111,155,287,196"/>
+<area shape="rect" id="node2" href="$AllWize_8h.html" title="src/AllWize.h" alt="" coords="451,80,551,107"/>
+<area shape="rect" id="node3" href="$forwarder_8h.html" title="examples/lorawan/lorawan\l_gateway/src/forwarder.h" alt="" coords="413,155,589,196"/>
 <area shape="rect" id="node4" href="$forwarder_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/forwarder.cpp" alt="" coords="5,244,188,285"/>
-<area shape="rect" id="node6" href="$wize_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/wize.cpp" alt="" coords="413,244,589,285"/>
-<area shape="rect" id="node7" href="$wize_8h.html" title="examples/lorawan/lorawan\l_gateway/src/wize.h" alt="" coords="311,155,487,196"/>
-<area shape="rect" id="node8" href="$AllWize_8cpp.html" title="src/AllWize.cpp" alt="" coords="562,162,677,189"/>
-<area shape="rect" id="node9" href="$AllWize__LoRaWAN_8h.html" title="src/AllWize_LoRaWAN.h" alt="" coords="701,162,871,189"/>
+<area shape="rect" id="node8" href="$wize_8h.html" title="examples/lorawan/lorawan\l_gateway/src/wize.h" alt="" coords="213,155,389,196"/>
+<area shape="rect" id="node9" href="$AllWize_8cpp.html" title="src/AllWize.cpp" alt="" coords="809,162,923,189"/>
+<area shape="rect" id="node10" href="$AllWize__LoRaWAN_8h.html" title="src/AllWize_LoRaWAN.h" alt="" coords="614,162,785,189"/>
 <area shape="rect" id="node5" href="$main_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/main.cpp" alt="" coords="213,244,389,285"/>
-<area shape="rect" id="node10" href="$AllWize__LoRaWAN_8cpp.html" title="src/AllWize_LoRaWAN.cpp" alt="" coords="694,251,878,278"/>
+<area shape="rect" id="node6" href="$ntp_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/ntp.cpp" alt="" coords="413,244,589,285"/>
+<area shape="rect" id="node7" href="$wize_8cpp.html" title="examples/lorawan/lorawan\l_gateway/src/wize.cpp" alt="" coords="613,244,789,285"/>
+<area shape="rect" id="node11" href="$AllWize__LoRaWAN_8cpp.html" title="src/AllWize_LoRaWAN.cpp" alt="" coords="813,251,997,278"/>
 </map>

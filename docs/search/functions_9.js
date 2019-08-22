@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['master',['master',['../classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9',1,'AllWize']]]
+  ['loop',['loop',['../main_8cpp.html#afe461d27b9c48d5921c00d521181f12f',1,'main.cpp']]]
 ];

@@ -1,7 +1,8 @@
 <map id="AllWize::setControlField" name="AllWize::setControlField">
-<area shape="rect" id="node2" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="216,5,331,32"/>
-<area shape="rect" id="node5" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="220,56,327,83"/>
-<area shape="rect" id="node6" href="$classAllWize.html#a4e471ab83ad5bb3b04d0f6361c636172" title="Sends an ACK. " alt="" coords="225,107,321,133"/>
-<area shape="rect" id="node3" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="379,5,461,32"/>
-<area shape="rect" id="node4" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="509,5,564,32"/>
+<area shape="rect" id="node2" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="255,5,369,32"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="259,56,365,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a4e471ab83ad5bb3b04d0f6361c636172" title="Sends an ACK. " alt="" coords="264,107,360,133"/>
+<area shape="rect" id="node7" href="$classAllWize__LoRaWAN.html#a744997b05e64e223306d6a4b737d5d18" title="Stores the application and network keys for ABP activation. " alt="" coords="216,157,408,184"/>
+<area shape="rect" id="node3" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="456,5,539,32"/>
+<area shape="rect" id="node4" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="587,5,641,32"/>
 </map>

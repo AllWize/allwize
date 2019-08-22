@@ -1,7 +1,7 @@
 var searchData=
 [
   ['rc1701hp_2eh',['RC1701HP.h',['../RC1701HP_8h.html',1,'']]],
-  ['read',['read',['../classAllWize.html#a241b1e78848ba29d8ed34a1747531f84',1,'AllWize']]],
+  ['read',['read',['../classAllWize.html#a241b1e78848ba29d8ed34a1747531f84',1,'AllWize::read()'],['../classAllWize__LoRaWAN.html#aa4c26ec51ccaac634ffbc5363f811469',1,'AllWize_LoRaWAN::read()']]],
   ['readme_2emd',['README.md',['../factoryReset_2README_8md.html',1,'(Global Namespace)'],['../lorawan_2README_8md.html',1,'(Global Namespace)'],['../lowpower_2README_8md.html',1,'(Global Namespace)'],['../master_2README_8md.html',1,'(Global Namespace)'],['../moduleInfo_2README_8md.html',1,'(Global Namespace)'],['../slave_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2sensor-bme280_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2sensor-hcsr04_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2sensor-mcp9701_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2sensor-mhz16_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2sensor-mics4514_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2sensor-si7021_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2uc-vineryards_2README_8md.html',1,'(Global Namespace)'],['../use__cases_2uc-wcpaper_2README_8md.html',1,'(Global Namespace)'],['../wize2mqtt_2README_8md.html',1,'(Global Namespace)'],['../wize2serial_2README_8md.html',1,'(Global Namespace)'],['../wize2thethingsio_2README_8md.html',1,'(Global Namespace)']]],
   ['ready',['ready',['../classAllWize.html#abc11db103b75ef6cf585c18cca13142c',1,'AllWize']]],
   ['repeater',['repeater',['../classAllWize.html#a5c455d5592a76becb86dc80ecc60e318',1,'AllWize']]],

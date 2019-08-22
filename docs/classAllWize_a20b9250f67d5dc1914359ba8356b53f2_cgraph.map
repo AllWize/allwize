@@ -1,10 +1,11 @@
 <map id="AllWize::wakeup" name="AllWize::wakeup">
-<area shape="rect" id="node2" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="751,17,861,44"/>
-<area shape="rect" id="node3" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="173,43,280,69"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="328,56,467,83"/>
-<area shape="rect" id="node5" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="550,68,661,95"/>
-<area shape="rect" id="node6" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="515,119,696,145"/>
-<area shape="rect" id="node7" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="744,119,868,145"/>
-<area shape="rect" id="node8" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="916,119,1084,145"/>
-<area shape="rect" id="node9" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1132,119,1277,145"/>
+<area shape="rect" id="node2" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="751,100,861,127"/>
+<area shape="rect" id="node3" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="Does a non&#45;blocking delay. " alt="" coords="535,49,675,76"/>
+<area shape="rect" id="node4" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="173,100,280,127"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="328,100,467,127"/>
+<area shape="rect" id="node6" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="550,151,661,177"/>
+<area shape="rect" id="node7" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="515,201,696,228"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="744,201,868,228"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="916,201,1084,228"/>
+<area shape="rect" id="node10" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1132,201,1277,228"/>
 </map>

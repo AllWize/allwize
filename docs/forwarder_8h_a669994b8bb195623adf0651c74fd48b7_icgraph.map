@@ -1,4 +1,5 @@
 <map id="forwarderPing" name="forwarderPing">
 <area shape="rect" id="node2" href="$forwarder_8h.html#a0af8c5cee19904701f9a0de74816f2b1" title="forwarderSetup" alt="" coords="156,5,267,32"/>
-<area shape="rect" id="node3" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="315,5,369,32"/>
+<area shape="rect" id="node4" href="$ntp_8h.html#a847af86ba560289d959bed21d17349b2" title="ntpSetup" alt="" coords="174,56,249,83"/>
+<area shape="rect" id="node3" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="315,31,369,57"/>
 </map>

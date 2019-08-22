@@ -1,6 +1,7 @@
 <map id="AllWize::waitForReady" name="AllWize::waitForReady">
-<area shape="rect" id="node2" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="209,56,316,83"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="364,56,503,83"/>
+<area shape="rect" id="node2" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="209,107,316,133"/>
+<area shape="rect" id="node10" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="Does a non&#45;blocking delay. " alt="" coords="571,157,711,184"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="364,107,503,133"/>
 <area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="586,5,697,32"/>
 <area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="551,107,732,133"/>
 <area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="787,56,897,83"/>
