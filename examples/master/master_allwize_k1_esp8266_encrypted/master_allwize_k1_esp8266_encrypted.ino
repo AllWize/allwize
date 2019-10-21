@@ -73,6 +73,14 @@ RESET   RST 	Reset 	                        RST
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_DATARATE           DATARATE_2400bps
 
+// Clients
+#define CLIENT_01_REGISTER_ID   1
+#define CLIENT_01_UID           0x20212223
+#define CLIENT_01_MID           0x4824
+#define CLIENT_01_VERSION       0x01
+#define CLIENT_01_DEVICE_TYPE   0x00
+#define CLIENT_01_KEY           { 0xc8, 0xc7, 0xa4, 0xe3, 0x5d, 0xe3, 0x78, 0x97, 0x0d, 0x52, 0x76, 0x4c, 0x14, 0x1b, 0x3c, 0xd7 }
+
 // -----------------------------------------------------------------------------
 // Globals
 // -----------------------------------------------------------------------------
@@ -92,10 +100,19 @@ void wizeSetup() {
         while (true) delay(1);
     }
 
+    // This is a master device (receiver, gateway)
     allwize.master();
+
+    // Radio configuration
     allwize.setChannel(WIZE_CHANNEL, true);
     allwize.setDataRate(WIZE_DATARATE);
-    //allwize.softReset();
+
+    // Clients configuration
+    uint8_t key[] = CLIENT_01_KEY;
+    allwize.setKey(CLIENT_01_REGISTER_ID, key);
+    //allwize.bindSlave(CLIENT_01_REGISTER_ID, CLIENT_01_MID, CLIENT_01_UID, CLIENT_01_VERSION, CLIENT_01_DEVICE_TYPE);
+    //allwize.clearRegister(CLIENT_01_REGISTER_ID);
+    //allwize.setInstallMode(INSTALL_MODE_NORMAL);
 
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "[WIZE] Module type: %s\n", allwize.getModuleTypeName().c_str());
@@ -106,8 +123,9 @@ void wizeSetup() {
     DEBUG_SERIAL.print(buffer);
     snprintf(buffer, sizeof(buffer), "[WIZE] Datarate: %d (%d bps)\n", allwize.getDataRate(), allwize.getDataRateSpeed(allwize.getDataRate()));
     DEBUG_SERIAL.print(buffer);
+    snprintf(buffer, sizeof(buffer), "[WIZE] Slave registered at #%d: %s\n", CLIENT_01_REGISTER_ID, allwize.listSlave(CLIENT_01_REGISTER_ID).c_str());
+    DEBUG_SERIAL.print(buffer);
     DEBUG_SERIAL.print("[WIZE] Listening...\n");
-
 }
 
 void wizeDebugMessage(allwize_message_t message) {

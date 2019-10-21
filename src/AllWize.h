@@ -46,6 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define WIZE_CONTROL_MASK               0x00
 
 #ifndef USE_MEMORY_CACHE
 #define USE_MEMORY_CACHE                1
@@ -135,10 +136,6 @@ class AllWize {
         void setDataInterface(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
         void setInstallMode(uint8_t mode, bool persist = false);
-        void setEncryptFlag(uint8_t flag);
-        void setDecryptFlag(uint8_t flag);
-        void setKey(uint8_t reg, const uint8_t * key);
-        void setDefaultKey(const uint8_t * key);
         void setAccessNumber(uint8_t value);
         void setBaudRate(uint8_t baudrate);
 
@@ -155,15 +152,24 @@ class AllWize {
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
         uint8_t getInstallMode();
+        uint8_t getBaudRate();
+        uint32_t getBaudRateSpeed(uint8_t value);
+
+        bool bindSlave(uint8_t reg, uint16_t mid, uint32_t uid, uint8_t version, uint8_t type);
+        bool clearRegister(uint8_t reg);
+        String listSlave(uint8_t reg);
+        void setEncryptFlag(uint8_t flag);
+        void setDecryptFlag(uint8_t flag);
+        void setKey(uint8_t reg, const uint8_t * key);
+        void setDefaultKey(const uint8_t * key);
         uint8_t getEncryptFlag();
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
-        uint8_t getBaudRate();
-        uint32_t getBaudRateSpeed(uint8_t value);
 
         float getRSSI();
         uint8_t getTemperature();
         uint16_t getVoltage();
+        String getAddress();
         String getMID();
         bool setMID(uint16_t mid);
         String getUID();
@@ -183,7 +189,7 @@ class AllWize {
 
         // Wize specific
         bool setWizeControl(uint8_t wize_control);
-        void setWizeOperatorId(uint16_t wize_operator_id);
+        void setWizeOperatorId(uint8_t wize_operator_id);
         void setWizeApplication(uint8_t wize_application);
         void setCounter(uint16_t counter);
         uint16_t getCounter();
@@ -274,9 +280,9 @@ class AllWize {
 
         // Wize specific
         uint8_t _wize_control = 0x00;
-        uint16_t _wize_operator_id = 0;
-        uint8_t _wize_application = 0;
-        uint16_t _counter = 0;
+        uint8_t _wize_operator_id = 0x20;
+        uint8_t _wize_application = 0x20;
+        uint16_t _counter = 0x00;
 
         // Message buffers
         allwize_message_t _message;

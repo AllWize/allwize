@@ -380,7 +380,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 6 (wize transport layer if wize)
     uint8_t message_len = len + 1;
     if (MODULE_WIZE == _module) message_len += 2;
-    if (send_wize_transport_layer) message_len += 6;
+    if (send_wize_transport_layer) message_len += 5;
 
     // max payload size is 0xF6 bytes
     if (message_len > 0xF6) return false;
@@ -394,8 +394,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // transport layer
     if (send_wize_transport_layer) {
         _send(_wize_control);                   // Wize Control
-        _send((_wize_operator_id >> 0) & 0xFF); // Operator ID HIGH
-        _send((_wize_operator_id >> 8) & 0xFF); // Operator ID HIGH
+        _send(_wize_operator_id);               // Operator ID
         _send((_counter >> 0) & 0xFF);          // Frame counter LOW
         _send((_counter >> 8) & 0xFF);          // Frame counter HIGH
         _send(_wize_application);               // Wize app indicator
@@ -466,18 +465,20 @@ bool AllWize::available() {
         uint8_t ch = _stream->read();
 
         #if defined(ALLWIZE_DEBUG_PORT)
+        /*
         {
             char buffer[10];
             snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
             ALLWIZE_DEBUG_PRINTLN(buffer);
         }
+        */
         #endif
 
         _buffer[_pointer++] = ch;
         when = millis();
 
         #if defined(ARDUINO_ARCH_ESP8266)
-            yield();
+            //yield();
         #endif
 
     }
@@ -512,7 +513,7 @@ allwize_message_t AllWize::read() {
  */
 bool AllWize::setWizeControl(uint8_t wize_control) {
     if (wize_control > 14) return false;
-    _wize_control = wize_control;
+    _wize_control = WIZE_CONTROL_MASK | (wize_control & 0x0F);
     return true;
 }
 
@@ -520,7 +521,7 @@ bool AllWize::setWizeControl(uint8_t wize_control) {
  * @brief                   Sets the wize operator ID field in the transpoprt layer
  * @param wize_operator_id  Wize Operator ID
  */
-void AllWize::setWizeOperatorId(uint16_t wize_operator_id) {
+void AllWize::setWizeOperatorId(uint8_t wize_operator_id) {
     _wize_operator_id = wize_operator_id;
 }
 
@@ -847,69 +848,6 @@ uint8_t AllWize::getInstallMode() {
 }
 
 /**
- * @brief               Sets the encrypt flag setting
- * @param flag          Encrypt flag
- */
-void AllWize::setEncryptFlag(uint8_t flag) {
-    if (0 == flag || 1 == flag || 3 == flag) {
-        _setSlot(MEM_ENCRYPT_FLAG, flag);
-    }
-}
-
-/**
- * @brief               Gets the encrypt flag setting
- * @return              Encrypt flag
- */
-uint8_t AllWize::getEncryptFlag() {
-    return _getSlot(MEM_ENCRYPT_FLAG);
-}
-
-/**
- * @brief               Sets the decrypt flag setting
- * @param flag          Decrypt flag
- */
-void AllWize::setDecryptFlag(uint8_t flag) {
-    _setSlot(MEM_DECRYPT_FLAG, flag);
-}
-
-/**
- * @brief               Gets the decrypt flag setting
- * @return              Decrypt flag
- */
-uint8_t AllWize::getDecryptFlag() {
-    return _getSlot(MEM_DECRYPT_FLAG);
-}
-
-/**
- * @brief               Sets the default encryption key
- * @param reg           Register number (1-64)
- * @param key           A 16-byte encryption key as binary array
- */
-void AllWize::setKey(uint8_t reg, const uint8_t *key) {
-    if (reg > 128) return;
-    uint8_t data[17];
-    data[0] = reg;
-    memcpy(&data[1], key, 16);
-    _sendCommand(CMD_KEY_REGISTER, data, 17);
-}
-
-/**
- * @brief               Sets the default encryption key
- * @param key           A 16-byte encryption key as binary array
- */
-void AllWize::setDefaultKey(const uint8_t *key) {
-    _setSlot(MEM_DEFAULT_KEY, (uint8_t *)key, 16);
-}
-
-/**
- * @brief               Gets the default encryption key
- * @param key           A binary buffer to store the key (16 bytes)
- */
-void AllWize::getDefaultKey(uint8_t *key) {
-    _getSlot(MEM_DEFAULT_KEY, key, 16);
-}
-
-/**
  * @brief               Sets new/specific access number.
  * @param value         New access number
  */
@@ -946,6 +884,188 @@ uint32_t AllWize::getBaudRateSpeed(uint8_t value) {
         return BAUDRATES[value-1];
     }
     return 0;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief               Enqueues a message for auto-responding
+ * @param mid           Manufacturer ID (2 bytes)
+ * @param uid           Unique ID (4 bytes)
+ * @param version       Device version (1 byte)
+ * @param type          Device type (1 byte)
+ * @param buffer        Byte array with the application payload
+ * @param len           Length of the payload
+ * @return              Returns mailbox number or -1 if error
+ */
+int8_t AllWize::enqueue(uint16_t mid, uint32_t uid, uint8_t version, uint8_t type, uint8_t *buffer, uint8_t len) {
+    
+    int8_t reg = -1;
+
+    // Define mailbox configuration
+    _setSlot(MEM_MAILBOX, MAILBOX_REGISTER_ACSM || MAILBOX_REGISTER_MBSM || MAILBOX_REGISTER_DFC || MAILBOX_REGISTER_A);
+
+    // Find a free slot
+    {
+        for (uint8_t i=0; i<128; i++) {
+            if (_sendCommand(CMD_READ_AUTO_MESSAGE_FLAGS, i) > 1) {
+
+            }
+        }
+    }
+
+    // Set the auto-message flag for the registry
+    {
+        uint8_t data[2];
+        _sendCommand(CMD_AUTO_MESSAGE_FLAGS, data, 2)
+    }
+
+    {
+        // Build the message
+        uint8_t i = 0;
+        uint8_t data[10 + len];
+        data[i++] = 0x00;
+        data[i++] = reg;
+        data[i++] = mid & 0xFF;
+        data[i++] = (mid >> 8) & 0xFF;
+        data[i++] = uid & 0xFF;
+        data[i++] = (uid >> 8) & 0xFF;
+        data[i++] = (uid >> 16) & 0xFF;
+        data[i++] = (uid >> 24) & 0xFF;
+        data[i++] = version;
+        data[i++] = type;
+        
+        // Store the message in the mailbox
+        return (_sendCommand(CMD_WRITE_MAILBOX, data, i) != -1);
+    }
+
+    return reg;
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief               Bind a slave to a master register (use only in master devices)
+ * @param reg           Register to store the slave to (1-254)
+ * @param mid           Manufacturer ID (2 bytes)
+ * @param uid           Unique ID (4 bytes)
+ * @param version       Device version (1 byte)
+ * @param type          Device type (1 byte)
+ * @return              True if everything OK
+ */
+bool AllWize::bindSlave(uint8_t reg, uint16_t mid, uint32_t uid, uint8_t version, uint8_t type) {
+    uint8_t i = 0;
+    uint8_t data[10];
+    data[i++] = 0x00;
+    data[i++] = reg;
+    data[i++] = mid & 0xFF;
+    data[i++] = (mid >> 8) & 0xFF;
+    data[i++] = uid & 0xFF;
+    data[i++] = (uid >> 8) & 0xFF;
+    data[i++] = (uid >> 16) & 0xFF;
+    data[i++] = (uid >> 24) & 0xFF;
+    data[i++] = version;
+    data[i++] = type;
+    return (_sendCommand(CMD_BIND, data, i) != -1);
+}
+
+/**
+ * @brief               Clears a binding registry
+ * @param reg           Register to store the slave to (1-254)
+ * @return              True if everything OK
+ */
+bool AllWize::clearRegister(uint8_t reg) {
+    uint8_t i = 0;
+    uint8_t data[10] = {0};
+    data[i++] = 0x00;
+    data[i++] = reg;
+    return (_sendCommand(CMD_BIND, data, i) != -1);
+}
+
+/**
+ * @brief               List a slave register (use only in master devices)
+ * @param reg           Register to read the slave from (1-254)
+ * @return              Full address of the slave
+ */
+String AllWize::listSlave(uint8_t reg) {
+    uint8_t len = _sendCommand(CMD_LIST_BINDING, reg);
+    if (len < 1) return String();
+    char hex[2 * len + 1];
+    hex[0] = 0;
+    _bin2hex(_buffer, hex, len);
+    return String(hex);
+}
+
+/**
+ * @brief               Saves an encryption key in the given registry
+ * @param reg           Register number (1-254)
+ * @param key           A 16-byte encryption key as binary array
+ */
+void AllWize::setKey(uint8_t reg, const uint8_t *key) {
+    uint8_t i = 0;
+    uint8_t data[18];
+    data[i++] = 0x00;
+    data[i++] = reg;
+    memcpy(&data[i], key, 16);
+    i+=16;
+    _sendCommand(CMD_KEY_REGISTER, data, i);
+}
+
+/**
+ * @brief               Sets the encrypt flag setting
+ * @param flag          Encrypt flag
+ * @deprecated
+ */
+void AllWize::setEncryptFlag(uint8_t flag) {
+    if (0 == flag || 1 == flag || 3 == flag) {
+        _setSlot(MEM_ENCRYPT_FLAG, flag);
+    }
+}
+
+/**
+ * @brief               Gets the encrypt flag setting
+ * @return              Encrypt flag
+ * @deprecated
+ */
+uint8_t AllWize::getEncryptFlag() {
+    return _getSlot(MEM_ENCRYPT_FLAG);
+}
+
+/**
+ * @brief               Sets the decrypt flag setting
+ * @param flag          Decrypt flag
+ * @deprecated
+ */
+void AllWize::setDecryptFlag(uint8_t flag) {
+    _setSlot(MEM_DECRYPT_FLAG, flag);
+}
+
+/**
+ * @brief               Gets the decrypt flag setting
+ * @return              Decrypt flag
+ * @deprecated
+ */
+uint8_t AllWize::getDecryptFlag() {
+    return _getSlot(MEM_DECRYPT_FLAG);
+}
+
+/**
+ * @brief               Sets the default encryption key
+ * @param key           A 16-byte encryption key as binary array
+ * @deprecated
+ */
+void AllWize::setDefaultKey(const uint8_t *key) {
+    _setSlot(MEM_DEFAULT_KEY, (uint8_t *)key, 16);
+}
+
+/**
+ * @brief               Gets the default encryption key
+ * @param key           A binary buffer to store the key (16 bytes)
+ * @deprecated
+ */
+void AllWize::getDefaultKey(uint8_t *key) {
+    _getSlot(MEM_DEFAULT_KEY, key, 16);
 }
 
 // -----------------------------------------------------------------------------
@@ -992,6 +1112,14 @@ uint16_t AllWize::getVoltage() {
     }
 
     return ret_val;
+}
+
+/**
+ * @brief               Returns the full address of the device
+ * @return              Manufacturer ID + Unique ID + Version + Device Type
+ */
+String AllWize::getAddress() {
+    return _getSlotAsHexString(MEM_MANUFACTURER_ID, 8);
 }
 
 /**
@@ -1618,14 +1746,13 @@ bool AllWize::_decode() {
         
         if (CI_WIZE == _message.ci) {
         
-            bytes_not_in_app += 6;
+            bytes_not_in_app += 5;
             
             // Wize control
             _message.wize_control = _buffer[in++];
 
             // Wize operator ID
-            _message.wize_operator_id = (_buffer[in + 1] << 8) + _buffer[in];
-            in += 2;
+            _message.wize_operator_id = _buffer[in++];
 
             // Wize counter
             _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
@@ -1761,7 +1888,7 @@ int AllWize::_timedRead() {
     int ch = -1;
     while (millis() - _start < _timeout) {
         #if defined(ARDUINO_ARCH_ESP8266)
-            yield();
+            //yield();
         #endif
         ch = _stream->read();
         if (ch >= 0) break;
@@ -1770,7 +1897,7 @@ int AllWize::_timedRead() {
     #if defined(ALLWIZE_DEBUG_PORT)
     /*
     {
-        if (ch < 0) {
+                if (ch < 0) {
             ALLWIZE_DEBUG_PRINTLN("r TIMEOUT");
         } else {
             char buffer[10];

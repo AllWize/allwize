@@ -263,4 +263,11 @@ static const uint32_t DATARATES[4] = {2400, 4800, 6400, 9600};
 #define BAUDRATE_115200                 0x0A
 #define BAUDRATE_230400                 0x0B
 
+// Mailbox register flags
+#define MAILBOX_REGISTER_ACSM           (1 << 4)
+#define MAILBOX_REGISTER_ACMB           (1 << 3)
+#define MAILBOX_REGISTER_MBSM           (1 << 2)
+#define MAILBOX_REGISTER_DFC            (1 << 1)
+#define MAILBOX_REGISTER_A              (1 << 0)
+
 static const uint32_t BAUDRATES[11] = {2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76800, 115200, 230400};
