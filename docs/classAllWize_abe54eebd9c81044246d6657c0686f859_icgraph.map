@@ -1,3 +1,13 @@
 <map id="AllWize::_readBytes" name="AllWize::_readBytes">
-<area shape="rect" id="node2" href="$classAllWize.html#a97bd049b28f17fcb7fbad99f9d42c790" title="Dumps the current memory configuration to the given stream. " alt="" coords="195,5,301,32"/>
+<area shape="rect" id="node2" href="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e" title="Reads and caches the module memory. " alt="" coords="195,81,359,108"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a496979330409adb0e7241f763e4a4b16" title="Decodes the current RX buffer contents. " alt="" coords="215,132,339,159"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="426,5,530,32"/>
+<area shape="rect" id="node7" href="$classAllWize.html#a97bd049b28f17fcb7fbad99f9d42c790" title="Dumps the current memory configuration to the given stream. " alt="" coords="425,56,531,83"/>
+<area shape="rect" id="node8" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Searches for the module model. " alt="" coords="407,107,549,133"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a3e7625c51daa24747ddefa07097977b8" title="Inits the module communications. " alt="" coords="597,56,704,83"/>
+<area shape="rect" id="node5" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="752,56,835,83"/>
+<area shape="rect" id="node6" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="883,56,937,83"/>
+<area shape="rect" id="node10" href="$classAllWize.html#ae75c391473baf8107cae11f2134b7316" title="Returns true if a new message has been received and decoded This method has to be called in the main ..." alt="" coords="415,157,541,184"/>
+<area shape="rect" id="node11" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="612,157,689,184"/>
+<area shape="rect" id="node12" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="770,157,817,184"/>
 </map>

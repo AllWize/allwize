@@ -1,0 +1,10 @@
+<map id="ntpDateTime" name="ntpDateTime">
+<area shape="rect" id="node2" href="$forwarder_8h.html#a669994b8bb195623adf0651c74fd48b7" title="forwarderPing" alt="" coords="164,56,267,83"/>
+<area shape="rect" id="node6" href="$forwarder_8h.html#a5259acd604e9c3f80400191241404628" title="forwarderMessage" alt="" coords="151,107,280,133"/>
+<area shape="rect" id="node9" href="$ntp_8h.html#aa1c5012ed6a292854a702deac4d358fc" title="ntpDateTime" alt="" coords="167,157,264,184"/>
+<area shape="rect" id="node3" href="$forwarder_8h.html#a0af8c5cee19904701f9a0de74816f2b1" title="forwarderSetup" alt="" coords="328,5,439,32"/>
+<area shape="rect" id="node5" href="$ntp_8h.html#a847af86ba560289d959bed21d17349b2" title="ntpSetup" alt="" coords="346,56,421,83"/>
+<area shape="rect" id="node4" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="487,31,541,57"/>
+<area shape="rect" id="node7" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="345,107,422,133"/>
+<area shape="rect" id="node8" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="491,107,537,133"/>
+</map>

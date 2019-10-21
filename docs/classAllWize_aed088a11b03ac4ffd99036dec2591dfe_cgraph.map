@@ -1,0 +1,12 @@
+<map id="AllWize::setBaudRate" name="AllWize::setBaudRate">
+<area shape="rect" id="node2" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="603,88,709,115"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a594ee81885697cfe4dde313e2d3f6731" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="204,132,327,159"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="789,100,928,127"/>
+<area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="1011,5,1122,32"/>
+<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="976,157,1157,184"/>
+<area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="1011,56,1122,83"/>
+<area shape="rect" id="node7" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="997,107,1137,133"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="375,132,523,159"/>
+<area shape="rect" id="node10" href="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="375,183,522,209"/>
+<area shape="rect" id="node11" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="571,157,741,184"/>
+</map>

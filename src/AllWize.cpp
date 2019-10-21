@@ -2,7 +2,7 @@
 
 AllWize Library
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,6 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+/**
+ * @file AllWize.cpp
+ * AllWize library code file
+ */
+
 #include "AllWize.h"
 #include <assert.h>
 
@@ -28,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @brief               AllWize object constructor
- * @param stream        HardwareSerial object to communicate with the module
+ * @param serial        HardwareSerial object to communicate with the module
  * @param reset_gpio    GPIO connected to the module RESET pin
  * @param config_gpio   GPIO connected to the module CONFIG pin
  */
@@ -36,13 +41,13 @@ AllWize::AllWize(HardwareSerial *serial, uint8_t reset_gpio, uint8_t config_gpio
     _init();
 }
 
+#if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 /**
  * @brief               AllWize object constructor
- * @param stream        SoftwareSerial object to communicate with the module
+ * @param serial        SoftwareSerial object to communicate with the module
  * @param reset_gpio    GPIO connected to the module RESET pin
  * @param config_gpio   GPIO connected to the module CONFIG pin
  */
-#if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
 AllWize::AllWize(SoftwareSerial *serial, uint8_t reset_gpio, uint8_t config_gpio) : _stream(serial), _sw_serial(serial), _reset_gpio(reset_gpio), _config_gpio(config_gpio) {
     _init();
 }
@@ -93,13 +98,13 @@ void AllWize::begin(uint8_t baudrate) {
     }
 
     reset();
-    delay(200);
+    _niceDelay(200);
     
     // Figure out module type
     _readModel();
     String part_number = getPartNumber();
-    if (part_number.equals("RC1701HP-WMBUS4")) {
-        _module = MODULE_WMBUS4;
+    if (part_number.equals("RC1701HP-MBUS4")) {
+        _module = MODULE_MBUS4;
     } else if (part_number.equals("RC1701HP-OSP")) {
         _module = MODULE_OSP;
     } else if (part_number.equals("RC1701HP-WIZE")) {
@@ -118,7 +123,7 @@ void AllWize::begin(uint8_t baudrate) {
 /**
  * @brief               Resets the serial object
  */
-void AllWize::_reset_serial() {
+void AllWize::_resetSerial() {
 
     if (_hw_serial) {
 
@@ -159,12 +164,12 @@ uint8_t AllWize::sync() {
     uint8_t copy = _baudrate;
     for (uint8_t i = 1; i < 12; i++) {
         _baudrate = BAUDRATES[i-1];
-        _reset_serial();
+        _resetSerial();
         delay(10);
         if (ready()) return i;
     }
     _baudrate = copy;
-    _reset_serial();
+    _resetSerial();
     return 0;
 }
 
@@ -177,32 +182,32 @@ bool AllWize::reset() {
     bool ret = false;
 
     if (GPIO_NONE == _reset_gpio) {
-        _reset_serial();
-        delay(100);
+        _resetSerial();
+        _niceDelay(100);
         _setSlot(MEM_CONFIG_INTERFACE, 1);
         if (_setConfig(true)) {
             _send('@');
             _send('R');
             _send('R');
-            delay(100);
+            _niceDelay(100);
             if (GPIO_NONE != _config_gpio) {
                 digitalWrite(_config_gpio, LOW);
             }
             _config = false;
-            _reset_serial();
-            ret = true;
+            _resetSerial();
+            return true;
         }
     } else {
         digitalWrite(_reset_gpio, LOW);
-        delay(1);
+        _niceDelay(1);
         digitalWrite(_reset_gpio, HIGH);
-        delay(100);
+        _niceDelay(100);
         if (GPIO_NONE != _config_gpio) {
             digitalWrite(_config_gpio, LOW);
         }
         _config = false;
-        _reset_serial();
-        ret =  true;
+        _resetSerial();
+        return true;
     }
     
     // Cache memory
@@ -217,8 +222,15 @@ bool AllWize::reset() {
 /**
  * @brief               Forces module to IDLE
  */
-void AllWize::soft_reset() {
+void AllWize::softReset() {
     if (_setConfig(true)) _setConfig(false);
+    /*
+    if (_send(CMD_ENTER_CONFIG) == 1) {
+        _flush();
+        _send(CMD_EXIT_CONFIG);
+    }
+    _niceDelay(10);
+    */
 }
 
 /**
@@ -226,23 +238,22 @@ void AllWize::soft_reset() {
  * @return              Factory reset successfully issued
  */
 bool AllWize::factoryReset() {
-
-    bool ret = false;
-
-    _reset_serial();
-    delay(100);
+    
+    _resetSerial();
+    _niceDelay(100);
     _setSlot(MEM_CONFIG_INTERFACE, 1);
+    
     if (_setConfig(true)) {
         _send('@');
         _send('R');
         _send('C');
-        delay(100);
+        _niceDelay(100);
         if (GPIO_NONE != _config_gpio) {
             digitalWrite(_config_gpio, LOW);
         }
         _config = false;
-        _reset_serial();
-        ret = true;
+        _resetSerial();
+        return true;
     }
 
     // Cache memory
@@ -250,7 +261,7 @@ bool AllWize::factoryReset() {
         _ready = _cacheMemory(_memory);
     #endif
     
-    return ret;
+    return true;
 
 }
 
@@ -317,7 +328,7 @@ void AllWize::sleep() {
  */
 void AllWize::wakeup() {
     _send(CMD_AWAKE);
-    delay(5);
+    _niceDelay(5);
     ready();
 }
 
@@ -337,7 +348,7 @@ bool AllWize::waitForReady(uint32_t timeout) {
     uint32_t start = millis();
     while (millis() - start < timeout) {
         if (ready()) return true;
-        delay(100);
+        _niceDelay(100);
     }
     return false;
 }
@@ -411,7 +422,7 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     if (_config) return false;
 
     // Clean line
-    soft_reset();
+    softReset();
 
     // Send no response message in len is 0
     if (0 == len) return (1 == _send(0xFE));
@@ -496,43 +507,44 @@ bool AllWize::enableRX(bool enable) {
 
 /**
  * @brief               Returns true if a new message has been received and decoded
- *                      This method has to be called in the main loop to monitor for incomming messages
+ *                      This method has to be called in the main loop to monitor for incoming messages
  * @return              Whether a new message is available
  */
 bool AllWize::available() {
 
     bool response = false;
 
-    if (!_config) {
+    static uint32_t when = millis();
 
-        static uint32_t when = millis();
+    while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
 
-        while (_stream->available() && _pointer < RX_BUFFER_SIZE) {
+        uint8_t ch = _stream->read();
 
-            uint8_t ch = _stream->read();
-
-            #if defined(ALLWIZE_DEBUG_PORT)
-            {
-                char buffer[10];
-                snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
-                ALLWIZE_DEBUG_PRINTLN(buffer);
-            }
-            #endif
-
-            _buffer[_pointer++] = ch;
-            when = millis();
-
-            #if defined(ARDUINO_ARCH_ESP8266)
-                yield();
-            #endif
-
+        #if defined(ALLWIZE_DEBUG_PORT)
+        {
+            char buffer[10];
+            snprintf(buffer, sizeof(buffer), "r %02X '%c'", ch, (32 <= ch && ch <= 126) ? ch : 32);
+            ALLWIZE_DEBUG_PRINTLN(buffer);
         }
+        #endif
 
-        // Check if message finished and decode it
-        if ((_pointer > 0) && (millis() - when > 100)) {
-            response = _decode();
-            _pointer = 0;
-        }
+        _buffer[_pointer++] = ch;
+        when = millis();
+
+        #if defined(ARDUINO_ARCH_ESP8266)
+            yield();
+        #endif
+
+    }
+
+    // Check if message finished and decode it
+    if ((_pointer > 0) && (millis() - when > 100)) {
+        
+        response = _decode();
+        _pointer = 0;
+        
+        // If we don't soft-reset the line the RX channel gets stalled
+        softReset();
 
     }
 
@@ -550,7 +562,7 @@ allwize_message_t AllWize::read() {
 
 /**
  * @brief               Sets the wize control field in the transpoprt layer
- * @param uint8_t       Wize Control (defined the key to be used)
+ * @param wize_control  Wize Control (defined the key to be used)
  * @return              True is correctly set
  */
 bool AllWize::setWizeControl(uint8_t wize_control) {
@@ -560,16 +572,16 @@ bool AllWize::setWizeControl(uint8_t wize_control) {
 }
 
 /**
- * @brief               Sets the wize operator ID field in the transpoprt layer
- * @param uint16_t      Wize Operator ID
+ * @brief                   Sets the wize operator ID field in the transpoprt layer
+ * @param wize_operator_id  Wize Operator ID
  */
 void AllWize::setWizeOperatorId(uint16_t wize_operator_id) {
     _wize_operator_id = wize_operator_id;
 }
 
 /**
- * @brief               Sets the wize applicaton field in the transpoprt layer
- * @param uint8_t       Wize Application
+ * @brief                   Sets the wize applicaton field in the transpoprt layer
+ * @param wize_application  Wize Application
  */
 void AllWize::setWizeApplication(uint8_t wize_application) {
     _wize_application = wize_application;
@@ -577,7 +589,7 @@ void AllWize::setWizeApplication(uint8_t wize_application) {
 
 /**
  * @brief               Sets the wize couonter field in the transpoprt layer
- * @param uint16_t      Wize counter
+ * @param counter       Wize counter
  */
 void AllWize::setCounter(uint16_t counter) { 
     _counter = counter; 
@@ -663,7 +675,7 @@ uint8_t AllWize::getPower() {
  */
 void AllWize::setDataRate(uint8_t dr) {
 
-    if (_module == MODULE_WMBUS4) return;
+    if (_module == MODULE_MBUS4) return;
     if (dr < 1) return;
     if (_module == MODULE_OSP) {
         if (DATARATE_6400bps == dr) {
@@ -778,7 +790,7 @@ uint8_t AllWize::getPreamble() {
 
 /**
  * @brief               Sets the buffer timeout (also used for auto sleep modes)
- * @param timeout       Timeout value in milliseconds
+ * @param ms            Timeout value in milliseconds
  */
 void AllWize::setTimeout(uint16_t ms) {
     if (ms > 4080) return;
@@ -830,7 +842,7 @@ uint8_t AllWize::getLEDControl() {
 
 /**
  * @brief               Sets the data interface for receiving packets
- * @param               Value from 0x00 to 0x0C
+ * @param value         Value from 0x00 to 0x0C
  */
 void AllWize::setDataInterface(uint8_t value) {
     if (value <= 0x0C) {
@@ -1047,7 +1059,7 @@ String AllWize::getMID() {
 
 /**
  * @brief               Sets the Manufacturer ID
- * @uint16_t mid        MID to save
+ * @param mid           MID to save
  */
 bool AllWize::setMID(uint16_t mid) {
     uint8_t buffer[2];
@@ -1066,7 +1078,7 @@ String AllWize::getUID() {
 
 /**
  * @brief               Saved the UID into the module memory
- * @uint32_t uid        UID to save
+ * @param uid           UID to save
  */
 bool AllWize::setUID(uint32_t uid) {
     uint8_t buffer[4];
@@ -1087,7 +1099,7 @@ uint8_t AllWize::getVersion() {
 
 /**
  * @brief               Sets the device version
- * @uint8_t version     Device version
+ * @param version       Device version
  */
 void AllWize::setVersion(uint8_t version) {
     _setSlot(MEM_VERSION, version);
@@ -1103,7 +1115,7 @@ uint8_t AllWize::getDevice() {
 
 /**
  * @brief               Sets the device type
- * @uint8_t type        Device type
+ * @param type          Device type
  */
 void AllWize::setDevice(uint8_t type) {
     _setSlot(MEM_DEVICE, type);
@@ -1143,7 +1155,7 @@ String AllWize::getSerialNumber() {
 
 /**
  * @brief               Returns the module type
- * @return              One of MODULE_UNKNOWN, MODULE_WMBUS4, MODULE_OSP and MODULE_WIZE
+ * @return              One of MODULE_UNKNOWN, MODULE_MBUS4, MODULE_OSP and MODULE_WIZE
  */
 uint8_t AllWize::getModuleType() {
     return _module;
@@ -1151,11 +1163,11 @@ uint8_t AllWize::getModuleType() {
 
 /**
  * @brief               Returns the module type
- * @return              One of MODULE_UNKNOWN, MODULE_WMBUS4, MODULE_OSP and MODULE_WIZE
+ * @return              One of MODULE_UNKNOWN, MODULE_MBUS4, MODULE_OSP and MODULE_WIZE
  */
 String AllWize::getModuleTypeName() {
     switch (_module) {
-        case MODULE_WMBUS4: return String("WMBUS4");
+        case MODULE_MBUS4: return String("MBUS4");
         case MODULE_OSP: return String("OSP");
         case MODULE_WIZE: return String("WIZE");
     }
@@ -1226,7 +1238,7 @@ bool AllWize::_setConfig(bool value) {
                 digitalWrite(_config_gpio, LOW);
             }
             _send(CMD_EXIT_CONFIG);
-            delay(5);
+            _niceDelay(5);
             _config = false;
         }
     }
@@ -1596,10 +1608,6 @@ bool AllWize::_decode() {
     }
     #endif
 
-    // Local copy of the buffer
-    uint8_t _local[RX_BUFFER_SIZE];
-    memcpy(_local, _buffer, RX_BUFFER_SIZE);
-
     // Get current values
     uint8_t mbus_mode = getMode();
     uint8_t data_interface = getDataInterface();
@@ -1609,29 +1617,27 @@ bool AllWize::_decode() {
     bool has_crc = (data_interface & 0x08) == 0x08;
     uint8_t bytes_not_in_len = has_start ? 3 : 1;
     uint8_t bytes_not_in_app = (has_header ? 9 : 0) + 1 + (has_rssi ? 1 : 0) + (has_crc ? 2 : 0);
+    uint8_t bytes_not_in_msg = 0;
 
     // This variable will contain the pointer to the current reading position
     uint8_t in = 0;
 
     // Start byte
     if (has_start) {
-        if (START_BYTE != _local[in]) return false;
-        in += 1;
+        if (START_BYTE != _buffer[in++]) return false;
     };
 
     // Get and check buffer length
-    uint8_t len = _local[in];
+    uint8_t len = _buffer[in++];
     if (_pointer != len + bytes_not_in_len) return false;
-    in += 1;
 
     if (has_header) {
 
         // C-field
-        _message.c = _local[in];
-        in += 1;
+        _message.c = _buffer[in++];
 
         // Manufacturer
-        uint16_t man = (_local[in + 1] << 8) + _local[in];
+        uint16_t man = (_buffer[in + 1] << 8) + _buffer[in];
         _message.man[0] = ((man >> 10) & 0x001F) + 64;
         _message.man[1] = ((man >> 5) & 0x001F) + 64;
         _message.man[2] = ((man >> 0) & 0x001F) + 64;
@@ -1639,18 +1645,17 @@ bool AllWize::_decode() {
         in += 2;
 
         // Address
-        _message.address[0] = _local[in + 3];
-        _message.address[1] = _local[in + 2];
-        _message.address[2] = _local[in + 1];
-        _message.address[3] = _local[in + 0];
-
-        // Type
-        _message.type = _local[in + 5];
+        _message.address[0] = _buffer[in + 3];
+        _message.address[1] = _buffer[in + 2];
+        _message.address[2] = _buffer[in + 1];
+        _message.address[3] = _buffer[in + 0];
+        in += 4;
 
         // Version
-        _message.version = _local[in + 4];
+        _message.version = _buffer[in++];
 
-        in += 6;
+        // Type
+        _message.type = _buffer[in++];
 
     } else {
         _message.c = 0xFF;
@@ -1661,42 +1666,47 @@ bool AllWize::_decode() {
     }
 
     // Control information
-    _message.ci = _buffer[in];
-    in += 1;
+    _message.ci = _buffer[in++];
 
     // Wize transport layer
-    if ((MODULE_WIZE == _module) && (CI_WIZE == _message.ci)) {
+    if (MODULE_WIZE == _module) {
         
-        bytes_not_in_app += 6;
+        if (CI_WIZE == _message.ci) {
         
-        // Wize control
-        _message.wize_control = _buffer[in];
-        in += 1;
+            bytes_not_in_app += 6;
+            
+            // Wize control
+            _message.wize_control = _buffer[in++];
 
-        // Wize operator ID
-        _message.wize_operator_id = (_local[in + 1] << 8) + _local[in];
-        in += 2;
+            // Wize operator ID
+            _message.wize_operator_id = (_buffer[in + 1] << 8) + _buffer[in];
+            in += 2;
 
-        // Wize counter
-        _message.wize_counter = (_local[in + 1] << 8) + _local[in];
-        in += 2;
+            // Wize counter
+            _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
+            in += 2;
 
-        // Wize application
-        _message.wize_application = _buffer[in];
-        in += 1;
+            // Wize application
+            _message.wize_application = _buffer[in++];
 
+        } else {
+            
+            // Undocumented hack 
+            bytes_not_in_msg = 8;
+        
+        }
+    
     }
 
     // Application data
-    _message.len = len - bytes_not_in_app;
-    memcpy(_message.data, &_local[in], _message.len);
+    _message.len = len - bytes_not_in_app - bytes_not_in_msg;
+    memcpy(_message.data, &_buffer[in], _message.len);
     _message.data[_message.len] = 0;
-    in += _message.len;
+    in += (_message.len + bytes_not_in_msg);
 
     // RSSI
     if (has_rssi) {
-        _message.rssi = _local[in];
-        in += 1;
+        _message.rssi = _buffer[in++];
     } else {
         _message.rssi = 0xFF;
     }
@@ -1708,7 +1718,7 @@ bool AllWize::_decode() {
 
     // Stop byte
     if (has_start) {
-        if (STOP_BYTE != _local[in]) return false;
+        if (STOP_BYTE != _buffer[in]) return false;
     }
 
     return true;
@@ -1764,7 +1774,7 @@ uint8_t AllWize::_send(uint8_t *buffer, uint8_t len) {
 }
 
 /**
- * @brief               Listens to incomming data from the module until timeout or END_OF_RESPONSE.
+ * @brief               Listens to incoming data from the module until timeout or END_OF_RESPONSE.
  * @return              Number of bytes received and stored in the internal _buffer.
  * @protected
  */
@@ -1805,14 +1815,15 @@ int AllWize::_timedRead() {
     uint32_t _start = millis();
     int ch = -1;
     while (millis() - _start < _timeout) {
-#if defined(ARDUINO_ARCH_ESP8266)
-        yield();
-#endif
+        #if defined(ARDUINO_ARCH_ESP8266)
+            yield();
+        #endif
         ch = _stream->read();
         if (ch >= 0) break;
     };
 
     #if defined(ALLWIZE_DEBUG_PORT)
+    /*
     {
         if (ch < 0) {
             ALLWIZE_DEBUG_PRINTLN("r TIMEOUT");
@@ -1822,6 +1833,7 @@ int AllWize::_timedRead() {
             ALLWIZE_DEBUG_PRINTLN(buffer);
         }
     }
+    */
     #endif
 
     return ch;
@@ -1899,4 +1911,14 @@ void AllWize::_bin2hex(uint8_t *bin, char *hex, uint8_t len) {
     for (uint8_t i = 0; i < len; i++) {
         sprintf(&hex[i * 2], "%02X", bin[i]);
     }
+}
+
+/**
+ * @brief               Does a non-blocking delay
+ * @param ms            milliseconds to delay
+ * @protected
+ */
+void AllWize::_niceDelay(uint32_t ms) {
+    uint32_t start = millis();
+    while (millis() - start < ms) delay(1);
 }

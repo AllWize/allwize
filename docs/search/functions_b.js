@@ -1,27 +1,8 @@
 var searchData=
 [
-  ['send',['send',['../classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d',1,'AllWize::send(uint8_t *buffer, uint8_t len)'],['../classAllWize.html#abaf41b1ea4c1ffe08c65be9612a58639',1,'AllWize::send(const char *buffer)']]],
-  ['setaccessnumber',['setAccessNumber',['../classAllWize.html#ae44ffec387467a6d58848e3097b0a3fc',1,'AllWize']]],
-  ['setappendrssi',['setAppendRSSI',['../classAllWize.html#aa32e17a16a67d8bcfea3fd62cbf1855e',1,'AllWize']]],
-  ['setchannel',['setChannel',['../classAllWize.html#a9923767d522f096380a594d7f4bbd828',1,'AllWize']]],
-  ['setcontrolfield',['setControlField',['../classAllWize.html#aedb6eec9766105625527f4895dffb8f3',1,'AllWize']]],
-  ['setcontrolinformation',['setControlInformation',['../classAllWize.html#ac5e174380a5dbbd2c973a7e5a472d70c',1,'AllWize']]],
-  ['setdatainterface',['setDataInterface',['../classAllWize.html#a17db48a22fa545462cb9c09a3266e13d',1,'AllWize']]],
-  ['setdatarate',['setDataRate',['../classAllWize.html#a66458505e82e3105cd5b4357bf02e3e8',1,'AllWize']]],
-  ['setdecryptflag',['setDecryptFlag',['../classAllWize.html#a8168552661cf74214e50d960d33c0308',1,'AllWize']]],
-  ['setdefaultkey',['setDefaultKey',['../classAllWize.html#a972d9db80929b234f8eb63b5093b2d1d',1,'AllWize']]],
-  ['setencryptflag',['setEncryptFlag',['../classAllWize.html#acf4efed5e28aff4ad476b9258c842c99',1,'AllWize']]],
-  ['setinstallmode',['setInstallMode',['../classAllWize.html#ab4907595aa6aa98fd7144fd81ee92c71',1,'AllWize']]],
-  ['setkey',['setKey',['../classAllWize.html#a451f2afd2c9a41ffa3fb3eaf8fd89023',1,'AllWize']]],
-  ['setledcontrol',['setLEDControl',['../classAllWize.html#ae4a883aaf21420ea3c780dca07063ad5',1,'AllWize']]],
-  ['setMode',['setMode',['../classAllWize.html#a1ad16b71cc866e9f403e61b1916c451f',1,'AllWize']]],
-  ['setmid',['setMID',['../classAllWize.html#a192b6add24fdc1eb1e81eec5faafe52a',1,'AllWize']]],
-  ['setnetworkrole',['setNetworkRole',['../classAllWize.html#ae6b73decc8d7282c38a9437374ff26eb',1,'AllWize']]],
-  ['setpower',['setPower',['../classAllWize.html#a0982b5aa67cb6a8ef098b33cc9894004',1,'AllWize']]],
-  ['setpreamble',['setPreamble',['../classAllWize.html#ab0861d7eed244d6b769a32a8826528d4',1,'AllWize']]],
-  ['setsleepmode',['setSleepMode',['../classAllWize.html#acfb61dcd3146e1c21fab1338651359a5',1,'AllWize']]],
-  ['settimeout',['setTimeout',['../classAllWize.html#ae255df548bec31843b4a1d555214aa6a',1,'AllWize']]],
-  ['setuid',['setUID',['../classAllWize.html#a085442c11746e6a49eedf5d600636bae',1,'AllWize']]],
-  ['slave',['slave',['../classAllWize.html#a04923626b08d628f4fa4ecef2f424f88',1,'AllWize']]],
-  ['sleep',['sleep',['../classAllWize.html#a9e38bd627db0ad557551b66e1b9897c4',1,'AllWize']]]
+  ['ntpconnect',['ntpConnect',['../ntp_8cpp.html#aeeb729465bd4f0804f4978b61174e8e4',1,'ntpConnect():&#160;ntp.cpp'],['../ntp_8h.html#aeeb729465bd4f0804f4978b61174e8e4',1,'ntpConnect():&#160;ntp.cpp']]],
+  ['ntpdatetime',['ntpDateTime',['../ntp_8cpp.html#a10568245db35b122c3f432a867af3a1d',1,'ntpDateTime(time_t t):&#160;ntp.cpp'],['../ntp_8cpp.html#aa1c5012ed6a292854a702deac4d358fc',1,'ntpDateTime():&#160;ntp.cpp'],['../ntp_8h.html#a10568245db35b122c3f432a867af3a1d',1,'ntpDateTime(time_t t):&#160;ntp.cpp'],['../ntp_8h.html#aa1c5012ed6a292854a702deac4d358fc',1,'ntpDateTime():&#160;ntp.cpp']]],
+  ['ntploop',['ntpLoop',['../ntp_8cpp.html#a0507409db577936d3471821370c27b27',1,'ntpLoop():&#160;ntp.cpp'],['../ntp_8h.html#a0507409db577936d3471821370c27b27',1,'ntpLoop():&#160;ntp.cpp']]],
+  ['ntpsetup',['ntpSetup',['../ntp_8cpp.html#a847af86ba560289d959bed21d17349b2',1,'ntpSetup():&#160;ntp.cpp'],['../ntp_8h.html#a847af86ba560289d959bed21d17349b2',1,'ntpSetup():&#160;ntp.cpp']]],
+  ['ntpsynced',['ntpSynced',['../ntp_8cpp.html#a38176e018674e131012199be52193c4d',1,'ntpSynced():&#160;ntp.cpp'],['../ntp_8h.html#a38176e018674e131012199be52193c4d',1,'ntpSynced():&#160;ntp.cpp']]]
 ];

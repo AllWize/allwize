@@ -1,13 +1,16 @@
 #
 #
-# AllWize - WIZE 2 InfluxDB Bridge
+# AllWize - WIZE 2 InfluxDB Bridge with CayenneLPP
 #
 # Listens to messages in the serial port and inserts them to an InfluxDB instance.
-# Requires pyserial and requests packages: `pip install pyserial requests`.
+# Requires pyserial, requests and python-cayennelpp packages: 
+# 
+# `pip install pyserial requests python-cayennelpp`.
+#
 # You might need to give permissions to the dialout group to the current user
 # if on Linux /Raspberry Pi): `sudo adduser $USER dialout`
 #
-# Copyright (C) 2018 by AllWize <github@allwize.io>
+# Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,31 +26,48 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-import glob
 import serial
 import requests
+from python_cayennelpp.decoder import decode
 
 # configuration
 SERIAL_PORT = "/dev/ttyACM0"
 SERIAL_BAUD = 115200
+
+IDB_DATABASE = "data"
 IDB_ENDPOINT = "http://localhost:8086/write?db=bridge"
+
+def send(data):
+    print("[IDB] Inserting %s" % data)
+    #requests.post(url = IDB_ENDPOINT, data = data)
 
 # parse message
 def parse(data):
-    
+
     parts = data.rstrip().split(",")
-    uid = parts[0]
+    if len(parts) != 4:
+        print("[PARSER] Wrong number of fields")
+        return
+    device = parts[0]
+    counter = parts[1]
     rssi = parts[2]
-    fields = parts[3:]
-    data = "%s,uid=%s rssi=%s" % ("data", uid, rssi)
-    index = 0
+    payload = parts[3]
+    fields = decode(payload)
+
+    send("rssi,uid=%s value=%s" % (device, rssi))
     for f in fields:
-        index = index + 1
-        data = "%s,field%d=%s" % (data, index, f)
-    print("[IDB] Inserting %s" % data)
-    r = requests.post(url = IDB_ENDPOINT, data = data) 
+        name = f["name"].replace(' ', '_').lower()
+        if isinstance(f["value"], dict):
+            data = "%s,uid=%s" % (name, device)
+            sep = " "
+            for k, v in f["value"].items():
+                name = k.replace(' ', '_').lower()
+                data = "%s%s%s=%s" % (data, sep, name, v)
+                sep = ","
+            send(data)
+                
+        else:
+            send("%s,uid=%s value=%s" % (name, device, f["value"]))
 
 # connect to device
 ser = serial.Serial(SERIAL_PORT, SERIAL_BAUD, timeout=0.5)

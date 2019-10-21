@@ -1,10 +1,11 @@
 <map id="AllWize::getSleepMode" name="AllWize::getSleepMode">
-<area shape="rect" id="node2" href="$classAllWize.html#a02b15aea0053d11c206973706df9f4a0" title="Returns the contents of consecutive memory addresses. " alt="" coords="212,81,359,108"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="407,56,545,83"/>
-<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="593,107,775,133"/>
-<area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="629,5,739,32"/>
-<area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="829,56,940,83"/>
-<area shape="rect" id="node7" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incomming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="823,107,947,133"/>
-<area shape="rect" id="node8" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="995,107,1163,133"/>
-<area shape="rect" id="node9" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1211,107,1356,133"/>
+<area shape="rect" id="node2" href="$classAllWize.html#ac0d6169d045fc89d16c17e8cfe838169" title="Returns the contents of single&#45;byte memory slot. " alt="" coords="212,31,335,57"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="383,5,531,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a34b0c983476c007f65c9da0501a4037d" title="Returns the contents of memory address. " alt="" coords="383,56,530,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="579,56,749,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="797,81,936,108"/>
+<area shape="rect" id="node8" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="984,31,1165,57"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="1019,81,1130,108"/>
+<area shape="rect" id="node9" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="1019,132,1130,159"/>
+<area shape="rect" id="node10" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="1005,183,1145,209"/>
 </map>

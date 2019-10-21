@@ -7,8 +7,8 @@ cache:
         - "~/.platformio"
 install:
     - pip install -U platformio
+    - git clone https://github.com/AllWize/allwize-boards && pushd allwize-boards && ./pio-install.sh 0.1.1 && popd
 script:
-    - pushd examples/master && pio run && popd
     - pushd examples/moduleInfo && pio run && popd
-    - pushd examples/slave && pio run && popd
+    - pushd examples/slave/slave_allwize_k2 && pio run && popd
     - pushd examples/wize2mqtt && cp configuration.sample.h configuration.h && pio run && popd

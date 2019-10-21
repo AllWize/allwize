@@ -1,0 +1,10 @@
+<map id="AllWize::_setSlot" name="AllWize::_setSlot">
+<area shape="rect" id="node2" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="176,5,324,32"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="177,56,323,83"/>
+<area shape="rect" id="node4" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="372,56,543,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="591,81,729,108"/>
+<area shape="rect" id="node7" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="777,31,959,57"/>
+<area shape="rect" id="node6" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="813,81,923,108"/>
+<area shape="rect" id="node8" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="813,132,923,159"/>
+<area shape="rect" id="node9" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="798,183,938,209"/>
+</map>

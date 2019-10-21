@@ -6,7 +6,7 @@ Listens to messages on the same channel, data rate and CF and
 forwards them to TheThings.io.
 This example is meant to run on a Wemos D1 board (ESP8266).
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
 Ticker wifiTimer;
 
-AllWize * allwize;
+AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);;
 
 // -----------------------------------------------------------------------------
 // MQTT
@@ -206,19 +206,18 @@ bool ttioSend(allwize_message_t message) {
 
 void wizeSetup() {
 
-    allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->master();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.master();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
     DEBUG_SERIAL.println("[WIZE] Listening...");
 
@@ -253,10 +252,10 @@ void wizeDebugMessage(allwize_message_t message) {
 
 void wizeLoop() {
 
-    if (allwize->available()) {
+    if (allwize.available()) {
 
         // Get the message
-        allwize_message_t message = allwize->read();
+        allwize_message_t message = allwize.read();
 
         // Show it to console
         wizeDebugMessage(message);

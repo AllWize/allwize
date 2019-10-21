@@ -1,6 +1,7 @@
-// -----------------------------------------------------------------------------
-// Open Metering System Specification
-// -----------------------------------------------------------------------------
+/**
+ * @file OMS.h
+ * Open Metering System Specification header file
+ */
 
 // C-Field values (master to slave)
 #define C_SND_NKE                       0x40    // Master, link reset after communication
@@ -16,9 +17,15 @@
 #define C_SND_IR                        0x46    // Slave, send manually initiated installation data
 #define C_ACC_NR                        0x47    // Slave, empty, allows bidirectionallity
 #define C_ACC_DMD                       0x48    // Slave, demand to master for application data (expects ACK)
-#define C_RSP_UD                        0x08    // Slave, response of app data after a request from master
 #define C_NACK                          0x01    // Slave, response in case of error
 #define C_ACK_METER                     0x00    // Slave, ACK
+#define C_RSP_UD                        0x08    // Slave, response of app data after a request from master
+
+#define C_WIZE_INSTPING                 0x46    // C_SND_IR
+#define C_WIZE_INSTPONG                 0x06    // C_CNF_IR
+#define C_WIZE_DATA                     0x44    // C_SND_NR
+#define C_WIZE_COMMAND                  0x43    // C_SND_UD2
+#define C_WIZE_RESPONSE                 0x08    // C_RSP_UD
 
 // CI-Field values
 #define CI_WIZE                         0x20

@@ -1,0 +1,6 @@
+<map id="AllWize::_hex2bin" name="AllWize::_hex2bin">
+<area shape="rect" id="node2" href="$classAllWize.html#a496979330409adb0e7241f763e4a4b16" title="Decodes the current RX buffer contents. " alt="" coords="180,5,304,32"/>
+<area shape="rect" id="node3" href="$classAllWize.html#ae75c391473baf8107cae11f2134b7316" title="Returns true if a new message has been received and decoded This method has to be called in the main ..." alt="" coords="352,5,479,32"/>
+<area shape="rect" id="node4" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="527,5,604,32"/>
+<area shape="rect" id="node5" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="652,5,699,32"/>
+</map>

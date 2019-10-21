@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['begin',['begin',['../classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f',1,'AllWize']]]
+  ['begin',['begin',['../classAllWize.html#a3e7625c51daa24747ddefa07097977b8',1,'AllWize']]]
 ];

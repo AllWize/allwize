@@ -1,5 +1,0 @@
-<map id="AllWize::setMode" name="AllWize::setMode">
-<area shape="rect" id="node2" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="216,5,331,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="220,56,327,83"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a5c455d5592a76becb86dc80ecc60e318" title="Sets the module in repeater mode. " alt="" coords="212,107,335,133"/>
-</map>

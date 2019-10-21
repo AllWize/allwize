@@ -1,4 +1,3 @@
 <map id="AllWize::setPower" name="AllWize::setPower">
-<area shape="rect" id="node2" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="184,5,299,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="188,56,295,83"/>
+<area shape="rect" id="node2" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="184,5,291,32"/>
 </map>

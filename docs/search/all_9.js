@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['waitforready',['waitForReady',['../classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086',1,'AllWize']]],
-  ['wakeup',['wakeup',['../classAllWize.html#a20b9250f67d5dc1914359ba8356b53f2',1,'AllWize']]]
+  ['install_5fmode_5ffilter',['INSTALL_MODE_FILTER',['../RC1701HP_8h.html#a9a7dc23743d229b4155bf6eaddbdff14',1,'RC1701HP.h']]],
+  ['install_5fmode_5fhost',['INSTALL_MODE_HOST',['../RC1701HP_8h.html#a8ee6b3ae137bfec7b09b600845ea54c6',1,'RC1701HP.h']]],
+  ['install_5fmode_5finstall',['INSTALL_MODE_INSTALL',['../RC1701HP_8h.html#a4197680d721a593341e78d17561b24e2',1,'RC1701HP.h']]]
 ];

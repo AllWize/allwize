@@ -1,10 +1,8 @@
 <map id="AllWize::setKey" name="AllWize::setKey">
-<area shape="rect" id="node2" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="169,81,340,108"/>
+<area shape="rect" id="node2" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="169,31,340,57"/>
 <area shape="rect" id="node3" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="388,56,527,83"/>
-<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="575,107,756,133"/>
-<area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="610,5,721,32"/>
-<area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="811,56,921,83"/>
-<area shape="rect" id="node7" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incomming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="804,107,928,133"/>
-<area shape="rect" id="node8" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="976,107,1144,133"/>
-<area shape="rect" id="node9" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1192,107,1337,133"/>
+<area shape="rect" id="node5" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="575,5,756,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="610,56,721,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="610,107,721,133"/>
+<area shape="rect" id="node7" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="595,157,735,184"/>
 </map>

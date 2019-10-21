@@ -1,4 +1,5 @@
 <map id="AllWize::send" name="AllWize::send">
-<area shape="rect" id="node2" href="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d" title="Sends a byte array. " alt="" coords="156,5,259,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="307,5,417,32"/>
+<area shape="rect" id="node2" href="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d" title="Sends a byte array. " alt="" coords="156,31,259,57"/>
+<area shape="rect" id="node3" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="307,5,417,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="307,56,417,83"/>
 </map>

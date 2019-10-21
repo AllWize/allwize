@@ -6,7 +6,7 @@ Listens to messages on the same channel, data rate and CF and
 forwards them to a LoRaWAN 1.X server using
 Semtech legacy packet format
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wifi.h"
 #include "wize.h"
 #include "ntp.h"
-#include "lorawan.h"
+#include "forwarder.h"
 
 // -----------------------------------------------------------------------------
 // Main
@@ -49,8 +49,8 @@ void setup() {
     // Setup NTP client
     ntpSetup();
 
-    // Init LoRaWAN
-    lorawanSetup();
+    // Init Packet Forwarder
+    forwarderSetup();
 
     // Connect to wifi
     wifiSetup();

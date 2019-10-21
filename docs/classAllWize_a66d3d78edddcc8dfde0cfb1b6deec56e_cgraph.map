@@ -1,0 +1,8 @@
+<map id="AllWize::_cacheMemory" name="AllWize::_cacheMemory">
+<area shape="rect" id="node2" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="219,107,357,133"/>
+<area shape="rect" id="node5" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="442,157,553,184"/>
+<area shape="rect" id="node7" href="$classAllWize.html#abe54eebd9c81044246d6657c0686f859" title="AllWize::_readBytes" alt="" coords="217,208,359,235"/>
+<area shape="rect" id="node3" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="442,5,553,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="407,56,588,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="427,107,567,133"/>
+</map>

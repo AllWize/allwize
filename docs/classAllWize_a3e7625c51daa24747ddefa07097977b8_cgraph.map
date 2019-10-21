@@ -1,0 +1,19 @@
+<map id="AllWize::begin" name="AllWize::begin">
+<area shape="rect" id="node2" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="189,230,293,257"/>
+<area shape="rect" id="node5" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="1205,433,1345,459"/>
+<area shape="rect" id="node15" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Searches for the module model. " alt="" coords="170,129,313,155"/>
+<area shape="rect" id="node16" href="$classAllWize.html#ac717b96d3682372b50506a1f49dc5791" title="Returns the module part number. " alt="" coords="160,357,323,383"/>
+<area shape="rect" id="node17" href="$classAllWize.html#ac0d6169d045fc89d16c17e8cfe838169" title="Returns the contents of single&#45;byte memory slot. " alt="" coords="391,331,514,358"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a49c6e7f221248b0f3a20247346da21f8" title="Resets the serial object. " alt="" coords="792,179,936,206"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a594ee81885697cfe4dde313e2d3f6731" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="391,281,514,307"/>
+<area shape="rect" id="node10" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="997,230,1136,257"/>
+<area shape="rect" id="node12" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="1219,129,1330,155"/>
+<area shape="rect" id="node13" href="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e" title="Reads and caches the module memory. " alt="" coords="371,78,535,105"/>
+<area shape="rect" id="node4" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="1219,205,1330,231"/>
+<area shape="rect" id="node7" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="583,331,731,358"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="583,281,730,307"/>
+<area shape="rect" id="node9" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="779,281,949,307"/>
+<area shape="rect" id="node11" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="1184,269,1365,295"/>
+<area shape="rect" id="node14" href="$classAllWize.html#abe54eebd9c81044246d6657c0686f859" title="AllWize::_readBytes" alt="" coords="586,27,727,54"/>
+<area shape="rect" id="node18" href="$classAllWize.html#a34b0c983476c007f65c9da0501a4037d" title="Returns the contents of memory address. " alt="" coords="583,382,730,409"/>
+</map>

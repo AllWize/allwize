@@ -1,4 +1,10 @@
 <map id="AllWize::_bin2hex" name="AllWize::_bin2hex">
-<area shape="rect" id="node2" href="$classAllWize.html#a48dccaac94d8e75a05cd19fdd682803e" title="Returns the contents of the memory from a certain address as an HEX String. " alt="" coords="180,5,367,47"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464" title="Returns the module serial number. " alt="" coords="415,13,587,39"/>
+<area shape="rect" id="node2" href="$classAllWize.html#a00c33c9c6ea16acda17c42e2070b2c74" title="Returns the contents of the memory from a certain address as an HEX String. " alt="" coords="180,69,377,96"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a496979330409adb0e7241f763e4a4b16" title="Decodes the current RX buffer contents. " alt="" coords="217,145,341,172"/>
+<area shape="rect" id="node3" href="$classAllWize.html#af5845d6ca0dcab9a6b334c23315601ca" title="Returns the Manufacturer ID. " alt="" coords="452,5,571,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a9b1ffa7c920060bb835003f064c0da49" title="Returns the Unique ID string. " alt="" coords="453,56,570,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464" title="Returns the module serial number. " alt="" coords="425,107,597,133"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ae75c391473baf8107cae11f2134b7316" title="Returns true if a new message has been received and decoded This method has to be called in the main ..." alt="" coords="448,157,575,184"/>
+<area shape="rect" id="node8" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="645,157,723,184"/>
+<area shape="rect" id="node9" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="771,157,817,184"/>
 </map>

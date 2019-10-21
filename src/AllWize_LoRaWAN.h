@@ -6,7 +6,7 @@ This code is based on Adafruit's TinyLora Library and thus
 
 Copyright (C) 2015, 2016 Ideetron B.V.
 Modified by Brent Rubell for Adafruit Industries.
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file AllWize library header file
+ * @file AllWize_LoRaWAN.h
+ * AllWize library LoRaWAN wrapper header file
  */
 
 #pragma once
@@ -32,28 +33,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Arduino.h>
 #include "AllWize.h"
 
+// Setting ALLWIZE_LORAWAN_REDUCE_SIZE to 1 reduced the payload by 9 bytes 
+// by merging the LoRaWAN MAC header and payload and WIZE headers
+// The message is then sent using special C-Field 0x40
+#ifndef ALLWIZE_LORAWAN_REDUCE_SIZE
+#define ALLWIZE_LORAWAN_REDUCE_SIZE 1
+#endif
+
+// Using invalid C-Field in Wize to encode the LoRaWAN MAC header
+// c_field = 0x20 | (mac_header >> 4)
+#define LORAWAN_C_FIELD_MASK        0x20
+
+// Unconfirmed data up
+//  [7..5] MType (010 unconfirmed up, 100 confirmed up,...)
+//  [4..2] RFU 
+//  [1..0] Major
+#define LORAWAN_MAC_HEADER          0x40
+
+// Message direction
+// 0: uplink
+// 1: downlink
+#define LORAWAN_DIRECTION           0x00
+
+// Frame control
+// [7] ADR
+// [6] ADRACKReq
+// [5] ACK
+// [4] ClassB
+// [3..0] FOptsLen
+#define LORAWAN_FRAME_CONTROL       0x00
+
 class AllWize_LoRaWAN: public AllWize {
 
     public:
         
-        AllWize_LoRaWAN(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE): AllWize(serial, reset_gpio) {}
+        AllWize_LoRaWAN(HardwareSerial * serial, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(serial, reset_gpio, config_gpio) {}
         #if not defined(ARDUINO_ARCH_SAMD) && not defined(ARDUINO_ARCH_ESP32)
-        AllWize_LoRaWAN(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE): AllWize(serial, reset_gpio) {}
+        AllWize_LoRaWAN(SoftwareSerial * serial, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(serial, reset_gpio, config_gpio) {}
         #endif
-        AllWize_LoRaWAN(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE): AllWize(rx, tx, reset_gpio) {}
+        AllWize_LoRaWAN(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE): AllWize(rx, tx, reset_gpio, config_gpio) {}
 
-
+        allwize_message_t read();
         bool joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkSKey);
         bool send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Port = 0x01);
-        uint16_t getFrameCounter() { return _frame_counter; }
-        void setFrameCounter(uint16_t value) { _frame_counter = value; }
+        uint16_t getFrameCounter();
+        void setFrameCounter(uint16_t value);
 
-    private:
+    protected:
 
         uint8_t _devaddr[4];
         uint8_t _appskey[16];
         uint8_t _nwkskey[16];
-        uint16_t _frame_counter = 0;
         static const uint8_t S_Table[16][16];
 
         void Encrypt_Payload(uint8_t *Data, uint8_t Data_Length, uint16_t Frame_Counter, uint8_t Direction);

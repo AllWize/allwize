@@ -1,13 +1,16 @@
 #
 #
-# AllWize - WIZE 2 Serial Bridge
+# AllWize - WIZE 2 Serial Bridge with CayenneLPP
 #
-# Listens to messages in the serial port and forwards them to an MQTT broker.
-# Requires pyseria and paho-mqtt packages: `pip install pyserial paho-mqtt`.
+# Listens to messages in the serial port, decodes using CayenneLPP and forwards them to an MQTT broker.
+# Requires pyserial, paho-mqtt and python-cayennelpp packages: 
+# 
+# `pip install pyserial paho-mqtt python-cayennelpp`.
+#
 # You might also need to give permissions to the dialout group to the current user
 # if on Linux /Raspberry Pi): `sudo adduser $USER dialout`
 #
-# Copyright (C) 2018 by AllWize <github@allwize.io>
+# Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,16 +26,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-import glob
 import serial
 import paho.mqtt.client as mqtt
+from python_cayennelpp.decoder import decode
 
 # configuration
 SERIAL_PORT = "/dev/ttyACM0"
 SERIAL_BAUD = 115200
-MQTT_TOPIC = "team/%s/field_%d"
+
+MQTT_TOPIC = "device/%s/payload"
 MQTT_SERVER = "localhost"
 MQTT_PORT = 1883
 #MQTT_USER =
@@ -40,17 +42,34 @@ MQTT_PORT = 1883
 MQTT_QOS = 2
 MQTT_RETAIN = 0
 
+def send(topic, payload):
+    print("[MQTT] Sending %s => %s" % (topic, payload))
+    client.publish(topic, payload, MQTT_QOS, MQTT_RETAIN)
+
 # parse message
 def parse(data):
+
     parts = data.rstrip().split(",")
-    fields = parts[5:]
-    ci = parts[3]
-    index = 0
-    for payload in fields:
-        index = index + 1
-        topic = MQTT_TOPIC % (ci, index)
-        print("[MQTT] Sending %s => %s" % (topic, payload))
-        client.publish(topic, payload, MQTT_QOS, MQTT_RETAIN)
+    if len(parts) != 4:
+        print("[PARSER] Wrong number of fields")
+        return
+    device = parts[0]
+    counter = parts[1]
+    rssi = parts[2]
+    payload = parts[3]
+    fields = decode(payload)
+
+    for f in fields:
+        name = f["name"].replace(' ', '_').lower()
+        if isinstance(f["value"], dict):
+            for k, v in f["value"].items():
+                name = k.replace(' ', '_').lower()
+                topic = "device/%s/%s" % (device, name)
+                send(topic, v)
+                
+        else:
+            topic = "device/%s/%s" % (device, name)
+            send(topic, f["value"])
 
 # callback functions
 def on_connect(client, userdata, flags, rc):

@@ -2,7 +2,7 @@
 
 AllWize Library
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file AllWize library header file
+ * @file AllWize.h
+ * AllWize library header file
  */
 
 #ifndef ALLWIZE_H
@@ -45,7 +46,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N2
+
+#ifndef USE_MEMORY_CACHE
 #define USE_MEMORY_CACHE                1
+#endif
 
 typedef struct {
     uint8_t c;
@@ -97,7 +101,7 @@ class AllWize {
         void begin(uint8_t baudrate = 0);
         bool reset();
         uint8_t sync();
-        void soft_reset();
+        void softReset();
         bool factoryReset();
         void sleep();
         void wakeup();
@@ -212,7 +216,7 @@ class AllWize {
         bool _decode();
 
         void _flush();
-        void _reset_serial();
+        void _resetSerial();
         uint8_t _send(uint8_t * buffer, uint8_t len);
         uint8_t _send(uint8_t ch);
         int8_t _receive();
@@ -224,6 +228,8 @@ class AllWize {
         int _readBytesUntil(char terminator, char * buffer, uint16_t len);
         void _hex2bin(char * hex, uint8_t * bin, uint8_t len);
         void _bin2hex(uint8_t * bin, char * hex, uint8_t len);
+
+        void _niceDelay(uint32_t ms);
 
     private:
 
@@ -276,7 +282,7 @@ class AllWize {
         // Message buffers
         allwize_message_t _message;
         uint8_t _buffer[RX_BUFFER_SIZE];
-        uint8_t _pointer;
+        uint8_t _pointer = 0;
 
 };
 

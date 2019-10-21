@@ -34,20 +34,20 @@ AllWize_LoRaWAN allwize(RX_PIN, TX_PIN, RESET_PIN);
 void wizeSetup() {
 
     // Init communication to the module
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         Serial.println("[WIZE] Error connecting to the module, check your wiring!");
         while (true);
     }
 
     // Wize settings
-    allwize->slave();
-    allwize->setChannel(WIZE_CHANNEL, true);
-    allwize->setPower(WIZE_POWER);
-    allwize->setDataRate(WIZE_DATARATE);
+    allwize.slave();
+    allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
+    allwize.setDataRate(WIZE_DATARATE);
 
     // LoRaWan settings
-    allwize->joinABP(DEVADDR, APPSKEY, NWKSKEY);
+    allwize.joinABP(DEVADDR, APPSKEY, NWKSKEY);
 
 }
 
@@ -75,7 +75,7 @@ You will need two thrid party libraries (both available in the Arduino Library M
 
 ## License
 
-Copyright (C) 2018 by AllWize ([http://allwize.io](http://allwize.io))
+Copyright (C) 2018-2019 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

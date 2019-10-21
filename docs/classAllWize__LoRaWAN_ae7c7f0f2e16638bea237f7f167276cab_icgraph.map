@@ -1,0 +1,4 @@
+<map id="AllWize_LoRaWAN::XOR" name="AllWize_LoRaWAN::XOR">
+<area shape="rect" id="node2" href="$classAllWize__LoRaWAN.html#affeceb3ef34459a595360cb528e6d7d4" title="Function used to calculate the validity of data messages. " alt="" coords="228,5,460,32"/>
+<area shape="rect" id="node3" href="$classAllWize__LoRaWAN.html#a99faabcc5e67ed0a2dfde556f9025fcd" title="Function to assemble and send a LoRaWAN package. " alt="" coords="508,5,681,32"/>
+</map>

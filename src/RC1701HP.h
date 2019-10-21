@@ -1,6 +1,7 @@
-// -----------------------------------------------------------------------------
-// RC1701HP
-// -----------------------------------------------------------------------------
+/**
+ * @file RC1701HP.h
+ * RC1701HP command and memory codes header file
+ */
 
 // Module signature
 #define MODULE_SIGNATURE                "RC1701"
@@ -10,7 +11,7 @@ enum {
     
     MODULE_UNKNOWN,
     
-    MODULE_WMBUS4,
+    MODULE_MBUS4,
     MODULE_OSP,
     MODULE_WIZE,
 

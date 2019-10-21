@@ -6,7 +6,7 @@ This test suite tests the hardware by running a series of commands over a RC1701
 This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
 
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2019 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -68,23 +68,61 @@ using namespace aunit;
         #define RX_PIN                  8
         #define TX_PIN                  9
     #else
-        #define HARDWARE_SERIAL         Serial1
+        #define MODULE_SERIAL         Serial1
     #endif
 #endif // ARDUINO_AVR_LEONARDO
 
 // The SAMD has 3 configurable hardware UART, so we can use both options too
-#if defined(ARDUINO_SAMD_ZERO)
-    #define RESET_PIN                   8
-    #if USE_SOFTWARE_SERIAL
-        #define RX_PIN                  7
-        #define TX_PIN                  6
-        #include "wiring_private.h"
-        Uart Serial3(&sercom3, RX_PIN, TX_PIN, SERCOM_RX_PAD_3, UART_TX_PAD_2);
-        void SERCOM3_Handler() { Serial3.IrqHandler(); }
-        #define HARDWARE_SERIAL         Serial3
+#if defined(ARDUINO_ARCH_SAMD)
+
+    // Common:
+    #define DEBUG_SERIAL        SerialUSB
+
+    // Configuring additional hardware serials:
+    // Possible combinations:
+    //
+    // SERCOM1:
+    //    RX on 10,11,12,13
+    //    TX on 10,11
+    //    Mode PIO_SERCOM
+    //
+    // SERCOM3:
+    //    RX on 6,7,10,11,12,13
+    //    TX on 6,10,11
+    //    Mode PIO_SERCOM_ALT
+    //    6-10 and 7-12 are not compatible
+    //
+    // Pads:
+    //    6   pad 2
+    //    7   pad 3 (only RX)
+    //    10  pad 2
+    //    11  pad 0
+    //    12  pad 3 (only RX)
+    //    13  pad 1 (only RX)
+
+    #if defined(ALLWIZE_K2)
+
+        #define RX_PIN              (29ul)
+        #define TX_PIN              (26ul)
+        #define SERCOM_PORT         sercom4
+        #define SERCOM_HANDLER      SERCOM4_Handler
+        #define SERCOM_MODE         PIO_SERCOM_ALT
+        #define SERCOM_RX_PAD       SERCOM_RX_PAD_3
+        #define SERCOM_TX_PAD       UART_TX_PAD_0
+        #include "wiring_private.h" // pinPeripheral() function
+        Uart SerialWize(&SERCOM_PORT, RX_PIN, TX_PIN, SERCOM_RX_PAD, SERCOM_TX_PAD);
+        void SERCOM_HANDLER() { SerialWize.IrqHandler(); }
+        #define MODULE_SERIAL       SerialWize
+        #define RESET_PIN           (30u)
+
     #else
-        #define HARDWARE_SERIAL         Serial1
+
+        // Using exposed hardware serials:
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+
     #endif
+
 #endif // ARDUINO_ARCH_SAMD
 
 // The ESP8266 Wemos D1 has just one hardware serial, so communication
@@ -197,9 +235,9 @@ void info() {
         DEBUG_SERIAL.println("Board : ESP32");
     #endif
 
-    #if USE_SOFTWARE_SERIAL
+    #if defined(RX_PIN) && defined(TX_PIN)
         char buffer[32];
-        snprintf(buffer, sizeof(buffer), "Serial: Pins %d & %d", RX_PIN, TX_PIN);
+        snprintf(buffer, sizeof(buffer), "Serial: Pins %d & %d", (int) RX_PIN, (int) TX_PIN);
         DEBUG_SERIAL.println(buffer);
     #else
         DEBUG_SERIAL.println("Serial: Pins 0 & 1");
@@ -216,9 +254,14 @@ void setup() {
 
     info();
 
+    #if defined(ARDUINO_ARCH_SAMD) && defined(RX_PIN) && defined(TX_PIN)
+        pinPeripheral(RX_PIN, SERCOM_MODE);
+        pinPeripheral(TX_PIN, SERCOM_MODE);
+    #endif
+
     // Create and init AllWize object
-    #if defined(HARDWARE_SERIAL)
-        allwize = new AllWize(&HARDWARE_SERIAL, RESET_PIN);
+    #if defined(MODULE_SERIAL)
+        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
     #else
         allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
     #endif

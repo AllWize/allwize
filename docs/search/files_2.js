@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['rc1701hp_2eh',['RC1701HP.h',['../RC1701HP_8h.html',1,'']]],
-  ['rc1701xx_5fmockup_2eh',['RC1701XX_Mockup.h',['../RC1701XX__Mockup_8h.html',1,'']]],
-  ['readme_2emd',['README.md',['../examples_2factoryReset_2README_8md.html',1,'(Global Namespace)'],['../examples_2lowpower_2README_8md.html',1,'(Global Namespace)'],['../examples_2master_2README_8md.html',1,'(Global Namespace)'],['../examples_2moduleInfo_2README_8md.html',1,'(Global Namespace)'],['../examples_2sensor-bme280_2README_8md.html',1,'(Global Namespace)'],['../examples_2sensor-hcsr04_2README_8md.html',1,'(Global Namespace)'],['../examples_2sensor-mcp9701_2README_8md.html',1,'(Global Namespace)'],['../examples_2sensor-mhz16_2README_8md.html',1,'(Global Namespace)'],['../examples_2sensor-si7021_2README_8md.html',1,'(Global Namespace)'],['../examples_2slave_2README_8md.html',1,'(Global Namespace)'],['../examples_2uc-airquality_2README_8md.html',1,'(Global Namespace)'],['../examples_2uc-parking_2README_8md.html',1,'(Global Namespace)'],['../examples_2uc-pollution_2README_8md.html',1,'(Global Namespace)'],['../examples_2uc-vineryards_2README_8md.html',1,'(Global Namespace)'],['../examples_2uc-wcpaper_2README_8md.html',1,'(Global Namespace)'],['../examples_2wize2mqtt_2README_8md.html',1,'(Global Namespace)'],['../examples_2wize2serial_2README_8md.html',1,'(Global Namespace)'],['../examples_2wize2thethingsio_2README_8md.html',1,'(Global Namespace)'],['../README_8md.html',1,'(Global Namespace)']]]
+  ['debug_2ecpp',['debug.cpp',['../debug_8cpp.html',1,'']]],
+  ['debug_2eh',['debug.h',['../debug_8h.html',1,'']]]
 ];

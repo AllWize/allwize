@@ -1,0 +1,12 @@
+<map id="AllWize::_getSlotAsHexString" name="AllWize::_getSlotAsHexString">
+<area shape="rect" id="node2" href="$classAllWize.html#ac0d6169d045fc89d16c17e8cfe838169" title="Returns the contents of single&#45;byte memory slot. " alt="" coords="253,31,375,57"/>
+<area shape="rect" id="node11" href="$classAllWize.html#a94b1aaf0da885e981348fd4545856403" title="AllWize::_bin2hex" alt="" coords="251,81,377,108"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="425,5,573,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a34b0c983476c007f65c9da0501a4037d" title="Returns the contents of memory address. " alt="" coords="426,56,573,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="621,56,792,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="840,81,979,108"/>
+<area shape="rect" id="node8" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="AllWize::_sendAndReceive" alt="" coords="1027,31,1208,57"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="AllWize::_flush" alt="" coords="1062,81,1173,108"/>
+<area shape="rect" id="node9" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="AllWize::_send" alt="" coords="1062,132,1173,159"/>
+<area shape="rect" id="node10" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="AllWize::_niceDelay" alt="" coords="1047,183,1187,209"/>
+</map>
