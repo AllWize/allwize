@@ -1767,7 +1767,14 @@ bool AllWize::_decode() {
             _message.address[i] = _buffer[in + i];
         }
 
-        in += 8;
+        // Version
+        _message.version = _buffer[in + 6];
+
+        // Type
+        _message.type = _buffer[in + 7];
+
+	// Update counter
+	in += 8;
 
     } else {
         _message.c = 0xFF;

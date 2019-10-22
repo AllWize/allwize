@@ -56,8 +56,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef struct {
     uint8_t c;
     uint8_t ci;
-    uint8_t address[8];
     char man[4];
+    uint8_t type;       // deprecated
+    uint8_t version;    // deprecated
+    uint8_t address[8];
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
@@ -160,13 +162,7 @@ class AllWize {
         bool bindSlave(uint8_t reg, uint16_t mid, uint32_t uid, uint8_t version, uint8_t type);
         bool clearRegister(uint8_t reg);
         String listSlave(uint8_t reg);
-        void setEncryptFlag(uint8_t flag);
-        void setDecryptFlag(uint8_t flag);
         void setKey(uint8_t reg, const uint8_t * key);
-        void setDefaultKey(const uint8_t * key);
-        uint8_t getEncryptFlag();
-        uint8_t getDecryptFlag();
-        void getDefaultKey(uint8_t * key);
 
         float getRSSI();
         uint8_t getTemperature();
@@ -201,6 +197,12 @@ class AllWize {
         void setVersion(uint8_t version);
         uint8_t getDevice();
         void setDevice(uint8_t type);
+        void setEncryptFlag(uint8_t flag);
+        void setDecryptFlag(uint8_t flag);
+        uint8_t getEncryptFlag();
+        uint8_t getDecryptFlag();
+        void setDefaultKey(const uint8_t * key);
+        void getDefaultKey(uint8_t * key);
 
     protected:
 

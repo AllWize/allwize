@@ -46,12 +46,13 @@ void wizeDebugMessage(allwize_message_t message) {
 
     // Code to pretty-print the message
     DEBUG_MSG(
-        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: %3d, DATA: ",
+        "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X%02X%02X%02X%02X, CI: 0x%02X, RSSI: %3d, DATA: ",
         message.c,
         message.man,
         message.address[0], message.address[1],
         message.address[2], message.address[3],
-        message.type, message.version,
+        message.address[4], message.address[5],
+        message.address[6], message.address[7],
         message.ci, (int16_t) message.rssi / -2
     );
 

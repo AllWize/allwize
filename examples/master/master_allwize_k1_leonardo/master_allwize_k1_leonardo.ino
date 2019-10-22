@@ -114,8 +114,6 @@ void wizeLoop() {
         // Show it to console
         wizeDebugMessage(message);
 
-        allwize->ack();
-
     }
 
 }
