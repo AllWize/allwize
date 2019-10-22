@@ -154,6 +154,11 @@ void AllWize::_resetSerial() {
 
     _flush();
 
+    // Cache memory
+    #if USE_MEMORY_CACHE
+        _ready = _cacheMemory(_memory);
+    #endif
+
 }
 
 /**
@@ -178,8 +183,6 @@ uint8_t AllWize::sync() {
  * @return              Reset successfully issued
  */
 bool AllWize::reset() {
-
-    bool ret = false;
 
     if (GPIO_NONE == _reset_gpio) {
         _resetSerial();
@@ -210,12 +213,7 @@ bool AllWize::reset() {
         return true;
     }
     
-    // Cache memory
-    #if USE_MEMORY_CACHE
-        _ready = _cacheMemory(_memory);
-    #endif
-    
-    return ret;
+    return false;
 
 }
 
@@ -256,12 +254,7 @@ bool AllWize::factoryReset() {
         return true;
     }
 
-    // Cache memory
-    #if USE_MEMORY_CACHE
-        _ready = _cacheMemory(_memory);
-    #endif
-    
-    return true;
+    return false;
 
 }
 
@@ -280,20 +273,6 @@ void AllWize::master() {
     setControlInformation(CI_TRANSPORT_DOWN_LONG);
     setAppendRSSI(true);
     
-    /*
-    _setSlot(MEM_MAILBOX, 0x00);
-    {
-        uint8_t data[] = { 0x01, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x01, 0x00 };   // Also 0x0000 or 0x4000
-        _sendCommand(CMD_BIND, data, sizeof(data));
-    }
-    {
-        uint8_t data[] = { 0x01, 0x20, 0x00 };   // Also 0x0000 or 0x4000
-        _sendCommand(CMD_BIND, data, sizeof(data));
-    }
-    setInstallMode(INSTALL_MODE_HOST);
-    */
-    
-
 }
 
 /**
@@ -481,12 +460,46 @@ bool AllWize::send(const char *buffer) {
 }
 
 /**
- * @brief               Sends an ACK
+ * @brief               Sends a byte array to a given address
+ * @param address       8 byte address of destination device
+ * @param buffer        Byte array with the application payload
+ * @param len           Length of the payload
  * @return              Returns true if message has been correctly sent
  */
-bool AllWize::ack() {
-    if (_config) return false;
-    return send("0");
+bool AllWize::send(uint8_t * address, uint8_t *buffer, uint8_t len) {
+
+    // Set destination address
+    if (-1 == _sendCommand(CMD_DESTINATION, address, 8)) return false;
+
+    // Send message
+    return send(buffer, len);
+
+}
+
+/**
+ * @brief               Sends c-string to a given device
+ * @param address       8 byte address of destination device
+ * @param buffer        C-string with the application payload
+ * @return              Returns true if message has been correctly sent
+ */
+bool AllWize::send(uint8_t * address, const char *buffer) {
+    
+    // Set destination address
+    if (-1 == _sendCommand(CMD_DESTINATION, address, 8)) return false;
+
+    // Send message
+    return send((uint8_t *)buffer, strlen(buffer));
+
+}
+
+/**
+ * @brief               Sends an ACK
+ * @param address       8 byte address of destination device
+ * @return              Returns true if message has been correctly sent
+ */
+bool AllWize::ack(uint8_t * address) {
+    setControlField(C_ACK_MUC);
+    return send(address, {}, 0);
 }
 
 /**
@@ -944,63 +957,6 @@ uint32_t AllWize::getBaudRateSpeed(uint8_t value) {
 // -----------------------------------------------------------------------------
 
 /**
- * @brief               Enqueues a message for auto-responding
- * @param mid           Manufacturer ID (2 bytes)
- * @param uid           Unique ID (4 bytes)
- * @param version       Device version (1 byte)
- * @param type          Device type (1 byte)
- * @param buffer        Byte array with the application payload
- * @param len           Length of the payload
- * @return              Returns mailbox number or -1 if error
- */
-int8_t AllWize::enqueue(uint16_t mid, uint32_t uid, uint8_t version, uint8_t type, uint8_t *buffer, uint8_t len) {
-    
-    int8_t reg = -1;
-
-    // Define mailbox configuration
-    _setSlot(MEM_MAILBOX, MAILBOX_REGISTER_ACSM || MAILBOX_REGISTER_MBSM || MAILBOX_REGISTER_DFC || MAILBOX_REGISTER_A);
-
-    // Find a free slot
-    {
-        for (uint8_t i=0; i<128; i++) {
-            if (_sendCommand(CMD_READ_AUTO_MESSAGE_FLAGS, i) > 1) {
-
-            }
-        }
-    }
-
-    // Set the auto-message flag for the registry
-    {
-        uint8_t data[2];
-        _sendCommand(CMD_AUTO_MESSAGE_FLAGS, data, 2)
-    }
-
-    {
-        // Build the message
-        uint8_t i = 0;
-        uint8_t data[10 + len];
-        data[i++] = 0x00;
-        data[i++] = reg;
-        data[i++] = mid & 0xFF;
-        data[i++] = (mid >> 8) & 0xFF;
-        data[i++] = uid & 0xFF;
-        data[i++] = (uid >> 8) & 0xFF;
-        data[i++] = (uid >> 16) & 0xFF;
-        data[i++] = (uid >> 24) & 0xFF;
-        data[i++] = version;
-        data[i++] = type;
-        
-        // Store the message in the mailbox
-        return (_sendCommand(CMD_WRITE_MAILBOX, data, i) != -1);
-    }
-
-    return reg;
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
  * @brief               Bind a slave to a master register (use only in master devices)
  * @param reg           Register to store the slave to (1-254)
  * @param mid           Manufacturer ID (2 bytes)
@@ -1178,8 +1134,36 @@ String AllWize::getAddress() {
 }
 
 /**
+ * @brief               Returns the full address of the device
+ * @return              Manufacturer ID + Unique ID + Version + Device Type
+ */
+bool AllWize::getAddress(uint8_t * address) {
+    return (8 == _getSlot(MEM_MANUFACTURER_ID, address, 8));
+}
+
+/**
+ * @brief               Sets the full address of the device
+ * @return              Manufacturer ID + Unique ID + Version + Device Type
+ */
+bool AllWize::setAddress(String address) {
+    if (address.length() != 8) return false;
+    uint8_t data[8];
+    _hex2bin((char *) address.c_str(), data, 8);
+    return _setSlot(MEM_MANUFACTURER_ID, data, 8);
+}
+
+/**
+ * @brief               Sets the full address of the device
+ * @return              Manufacturer ID + Unique ID + Version + Device Type
+ */
+bool AllWize::setAddress(uint8_t * address) {
+    return _setSlot(MEM_MANUFACTURER_ID, address, 8);
+}
+
+/**
  * @brief               Returns the Manufacturer ID
  * @return              Manufacturer ID
+ * @deprecated
  */
 String AllWize::getMID() {
     return _getSlotAsHexString(MEM_MANUFACTURER_ID, 2);
@@ -1188,6 +1172,7 @@ String AllWize::getMID() {
 /**
  * @brief               Sets the Manufacturer ID
  * @param mid           MID to save
+ * @deprecated
  */
 bool AllWize::setMID(uint16_t mid) {
     uint8_t buffer[2];
@@ -1199,6 +1184,7 @@ bool AllWize::setMID(uint16_t mid) {
 /**
  * @brief               Returns the Unique ID string
  * @return              4-byte hex string with the unique ID
+ * @deprecated
  */
 String AllWize::getUID() {
     return _getSlotAsHexString(MEM_UNIQUE_ID, 4);
@@ -1207,6 +1193,7 @@ String AllWize::getUID() {
 /**
  * @brief               Saved the UID into the module memory
  * @param uid           UID to save
+ * @deprecated
  */
 bool AllWize::setUID(uint32_t uid) {
     uint8_t buffer[4];
@@ -1220,6 +1207,7 @@ bool AllWize::setUID(uint32_t uid) {
 /**
  * @brief               Returns the device version from non-volatile memory
  * @return              Version
+ * @deprecated
  */
 uint8_t AllWize::getVersion() {
     return _getSlot(MEM_VERSION);
@@ -1228,6 +1216,7 @@ uint8_t AllWize::getVersion() {
 /**
  * @brief               Sets the device version
  * @param version       Device version
+ * @deprecated
  */
 void AllWize::setVersion(uint8_t version) {
     _setSlot(MEM_VERSION, version);
@@ -1236,6 +1225,7 @@ void AllWize::setVersion(uint8_t version) {
 /**
  * @brief               Returns the device type from non-volatile memory
  * @return              Device
+ * @deprecated
  */
 uint8_t AllWize::getDevice() {
     return _getSlot(MEM_DEVICE);
@@ -1244,6 +1234,7 @@ uint8_t AllWize::getDevice() {
 /**
  * @brief               Sets the device type
  * @param type          Device type
+ * @deprecated
  */
 void AllWize::setDevice(uint8_t type) {
     _setSlot(MEM_DEVICE, type);
@@ -1770,27 +1761,18 @@ bool AllWize::_decode() {
         _message.man[1] = ((man >> 5) & 0x001F) + 64;
         _message.man[2] = ((man >> 0) & 0x001F) + 64;
         _message.man[3] = 0;
-        in += 2;
 
         // Address
-        _message.address[0] = _buffer[in + 3];
-        _message.address[1] = _buffer[in + 2];
-        _message.address[2] = _buffer[in + 1];
-        _message.address[3] = _buffer[in + 0];
-        in += 4;
+        for (uint8_t i=0; i<8; i++) {
+            _message.address[i] = _buffer[in + i];
+        }
 
-        // Version
-        _message.version = _buffer[in++];
-
-        // Type
-        _message.type = _buffer[in++];
+        in += 8;
 
     } else {
         _message.c = 0xFF;
-        _message.type = 0;
-        _message.version = 0;
         _message.man[0] = 0;
-        memset(_message.address, 0, 6);
+        memset(_message.address, 0, 8);
     }
 
     // Control information
@@ -1952,7 +1934,7 @@ int AllWize::_timedRead() {
     #if defined(ALLWIZE_DEBUG_PORT)
     /*
     {
-                if (ch < 0) {
+        if (ch < 0) {
             ALLWIZE_DEBUG_PRINTLN("r TIMEOUT");
         } else {
             char buffer[10];

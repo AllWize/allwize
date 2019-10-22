@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // General
 #define DEFAULT_BAUDRATE                19200
+#define DEFAULT_BAUDRATE_INDEX          BAUDRATE_19200
 #define GPIO_NONE                       0x99
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 100
@@ -55,10 +56,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef struct {
     uint8_t c;
     uint8_t ci;
+    uint8_t address[8];
     char man[4];
-    uint8_t type;
-    uint8_t version;
-    uint8_t address[4];
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
@@ -99,7 +98,7 @@ class AllWize {
         #endif
         AllWize(uint8_t rx, uint8_t tx, uint8_t reset_gpio = GPIO_NONE, uint8_t config_gpio = GPIO_NONE);
 
-        void begin(uint8_t baudrate = 0);
+        void begin(uint8_t baudrate = DEFAULT_BAUDRATE_INDEX);
         bool reset();
         uint8_t sync();
         void softReset();
@@ -110,9 +109,11 @@ class AllWize {
         bool waitForReady(uint32_t timeout = DEFAULT_TIMEOUT);
         void dump(Stream & debug);
 
-        bool ack();
+        bool ack(uint8_t * address);
         bool send(uint8_t * buffer, uint8_t len);
+        bool send(uint8_t * address, uint8_t * buffer, uint8_t len);
         bool send(const char * buffer);
+        bool send(uint8_t * address, const char * buffer);
         bool available();
         bool enableRX(bool enable);
         allwize_message_t read();
@@ -171,14 +172,10 @@ class AllWize {
         uint8_t getTemperature();
         uint16_t getVoltage();
         String getAddress();
-        String getMID();
-        bool setMID(uint16_t mid);
-        String getUID();
-        bool setUID(uint32_t uid);
-        uint8_t getVersion();
-        void setVersion(uint8_t version);
-        uint8_t getDevice();
-        void setDevice(uint8_t type);
+        bool getAddress(uint8_t * address);
+        bool setAddress(String address);
+        bool setAddress(uint8_t * address);
+
         String getPartNumber();
         String getRequiredHardwareVersion();
         String getFirmwareVersion();
@@ -194,6 +191,16 @@ class AllWize {
         void setWizeApplication(uint8_t wize_application);
         void setCounter(uint16_t counter);
         uint16_t getCounter();
+
+        // Deprecated
+        String getMID();
+        bool setMID(uint16_t mid);
+        String getUID();
+        bool setUID(uint32_t uid);
+        uint8_t getVersion();
+        void setVersion(uint8_t version);
+        uint8_t getDevice();
+        void setDevice(uint8_t type);
 
     protected:
 
