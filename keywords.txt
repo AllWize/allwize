@@ -98,7 +98,7 @@ getModuleType KEYWORD2
 getModuleTypeName KEYWORD2
 
 setWizeControl KEYWORD2
-setWizeOperatorId KEYWORD2
+setWizeNetworkId KEYWORD2
 setWizeApplication KEYWORD2
 setCounter KEYWORD2
 getCounter KEYWORD2
