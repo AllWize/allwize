@@ -62,7 +62,7 @@ typedef struct {
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
     uint8_t wize_control;
-    uint16_t wize_operator_id;
+    uint8_t wize_network_id;
     uint16_t wize_counter;
     uint8_t wize_application;
 } allwize_message_t;
@@ -183,7 +183,8 @@ class AllWize {
 
         // Wize specific
         bool setWizeControl(uint8_t wize_control);
-        void setWizeOperatorId(uint16_t wize_operator_id);
+        void setWizeOperatorId(uint8_t wize_network_id);
+        void setWizeNetworkId(uint8_t wize_network_id);
         void setWizeApplication(uint8_t wize_application);
         void setCounter(uint16_t counter);
         uint16_t getCounter();
@@ -274,8 +275,8 @@ class AllWize {
 
         // Wize specific
         uint8_t _wize_control = 0x00;
-        uint16_t _wize_operator_id = 0;
-        uint8_t _wize_application = 0;
+        uint16_t _wize_network_id = 0;
+        uint8_t _wize_application = 0xFE;
         uint16_t _counter = 0;
 
         // Message buffers

@@ -150,8 +150,16 @@ void wizeSetup() {
     allwize.setDataRate(WIZE_DATARATE);
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "# Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRate());
+    snprintf(buffer, sizeof(buffer), "# Module type: %s\n", allwize.getModuleTypeName().c_str());
     DEBUG_SERIAL.print(buffer);
+    snprintf(buffer, sizeof(buffer), "# MBUS mode: 0x%2X\n", allwize.getMode());
+    DEBUG_SERIAL.print(buffer);
+    snprintf(buffer, sizeof(buffer), "# Channel: %d\n", allwize.getChannel());
+    DEBUG_SERIAL.print(buffer);
+    snprintf(buffer, sizeof(buffer), "# Datarate: %d (%d bps)\n", allwize.getDataRate(), allwize.getDataRateSpeed(allwize.getDataRate()));
+    DEBUG_SERIAL.print(buffer);
+    DEBUG_SERIAL.print("# Listening...\n");
+
 }
 
 void wizeLoop() {

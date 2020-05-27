@@ -371,16 +371,16 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     // Clean line
     softReset();
 
-    // Send no response message in len is 0
+    // Send no response message if len is 0
     if (0 == len) return (1 == _send(0xFE));
 
     // Wize transport layer
     bool send_wize_transport_layer = (MODULE_WIZE == _module) && (CI_WIZE == _ci);
 
-    // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 6 (wize transport layer if wize)
+    // message length is payload length + 1 (CI) + 2 (for timestamp if wize) + 5 (wize transport layer if wize)
     uint8_t message_len = len + 1;
     if (MODULE_WIZE == _module) message_len += 2;
-    if (send_wize_transport_layer) message_len += 6;
+    if (send_wize_transport_layer) message_len += 5;
 
     // max payload size is 0xF6 bytes
     if (message_len > 0xF6) return false;
@@ -393,12 +393,11 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
 
     // transport layer
     if (send_wize_transport_layer) {
-        _send(_wize_control);                   // Wize Control
-        _send((_wize_operator_id >> 0) & 0xFF); // Operator ID HIGH
-        _send((_wize_operator_id >> 8) & 0xFF); // Operator ID HIGH
-        _send((_counter >> 0) & 0xFF);          // Frame counter LOW
-        _send((_counter >> 8) & 0xFF);          // Frame counter HIGH
-        _send(_wize_application);               // Wize app indicator
+        _send(_wize_control & 0xFF);        // Wize Control
+        _send(_wize_network_id & 0xFF);     // Network ID HIGH
+        _send((_counter >> 0) & 0xFF);      // Frame counter LOW
+        _send((_counter >> 8) & 0xFF);      // Frame counter HIGH
+        _send(_wize_application);           // Wize app indicator
     }
 
     // application payload
@@ -517,11 +516,19 @@ bool AllWize::setWizeControl(uint8_t wize_control) {
 }
 
 /**
- * @brief                   Sets the wize operator ID field in the transpoprt layer
- * @param wize_operator_id  Wize Operator ID
+ * @brief                   Use AllWize::setWizeNetworkId instead
+ * @deprecated
  */
-void AllWize::setWizeOperatorId(uint16_t wize_operator_id) {
-    _wize_operator_id = wize_operator_id;
+void AllWize::setWizeOperatorId(uint8_t wize_network_id) { 
+    setWizeNetworkId(wize_network_id);
+}
+
+/**
+ * @brief                   Sets the wize network ID field in the transpoprt layer
+ * @param wize_network_id   Wize Network ID
+ */
+void AllWize::setWizeNetworkId(uint8_t wize_network_id) {
+    _wize_network_id = wize_network_id;
 }
 
 /**
@@ -1618,14 +1625,13 @@ bool AllWize::_decode() {
         
         if (CI_WIZE == _message.ci) {
         
-            bytes_not_in_app += 6;
+            bytes_not_in_app += 5;
             
             // Wize control
             _message.wize_control = _buffer[in++];
 
             // Wize operator ID
-            _message.wize_operator_id = (_buffer[in + 1] << 8) + _buffer[in];
-            in += 2;
+            _message.wize_network_id = _buffer[in++];
 
             // Wize counter
             _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
