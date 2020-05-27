@@ -8,12 +8,15 @@ Configuration file
 
 //------------------------------------------------------------------------------
 // Payload data format
-// You have to uncomment just one of these defines
 //------------------------------------------------------------------------------
 
-#define PAYLOAD_CSV
-//#define PAYLOAD_MBUS
-//#define PAYLOAD_LPP
+#define DECODE_PAYLOAD          1
+
+#define PAYLOAD_CSV             1
+#define PAYLOAD_MBUS            2
+#define PAYLOAD_LPP             3
+
+#define PAYLOAD_ENCODING        PAYLOAD_LPP
 
 //------------------------------------------------------------------------------
 // General configuration
@@ -54,3 +57,9 @@ Configuration file
 #define MQTT_PASS               ""
 #define MQTT_QOS                2
 #define MQTT_RETAIN             0
+
+//------------------------------------------------------------------------------
+// Forwarder
+//------------------------------------------------------------------------------
+
+#define PING_INTERVAL           30000

@@ -70,20 +70,35 @@ Ticker wifiTimer;
 AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
 
 // -----------------------------------------------------------------------------
+// Utils
+// -----------------------------------------------------------------------------
+
+String bin2hex(uint8_t * bin, uint8_t len) {
+    char b[3];
+    String output = String("");
+    for (uint8_t i = 0; i < len; i++) {
+        sprintf(b, "%02X", bin[i]);
+        output += String(b);
+    }
+    return output;
+}
+
+// -----------------------------------------------------------------------------
 // MQTT
 // -----------------------------------------------------------------------------
 
 void mqttConnect() {
-    DEBUG_SERIAL.println("[MQTT] Connecting...");
+    DEBUG_SERIAL.printf("[MQTT] Connecting to %s:%d...\n", MQTT_HOST, MQTT_PORT);
     mqtt.connect();
 }
 
 void mqttOnConnect(bool sessionPresent) {
-    DEBUG_SERIAL.println("[MQTT] Connected!");
+    DEBUG_SERIAL.printf("[MQTT] Connected!\n");
+    ping();
 }
 
 void mqttOnDisconnect(AsyncMqttClientDisconnectReason reason) {
-    DEBUG_SERIAL.println("[MQTT] Disconnected!");
+    DEBUG_SERIAL.printf("[MQTT] Disconnected!\n");
     if (WiFi.isConnected()) {
         mqttTimer.detach();
         mqttTimer.once(2, mqttConnect);
@@ -91,13 +106,8 @@ void mqttOnDisconnect(AsyncMqttClientDisconnectReason reason) {
 }
 
 void mqttSend(const char * topic, const char * payload) {
-
-    char buffer[128];
-    snprintf(buffer, sizeof(buffer), "[MQTT] Sending: %s => %s\n", topic, payload);
-    DEBUG_SERIAL.print(buffer);
-
+    DEBUG_SERIAL.printf("[MQTT] Sending: %s => %s\n", topic, payload);
     mqtt.publish(topic, MQTT_QOS, MQTT_RETAIN, payload);
-
 }
 
 void mqttSetup() {
@@ -120,143 +130,165 @@ void wizeSetup() {
     // Init AllWize object
     allwize.begin();
     if (!allwize.waitForReady()) {
-        DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
+        DEBUG_SERIAL.printf("[WIZE] Error connecting to the module, check your wiring!\n");
         while (true) delay(1);
     }
 
     allwize.master();
     allwize.setChannel(WIZE_CHANNEL, true);
+    allwize.setPower(WIZE_POWER);
     allwize.setDataRate(WIZE_DATARATE);
 
-    allwize.dump(DEBUG_SERIAL);
-
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRate());
-    DEBUG_SERIAL.print(buffer);
+    DEBUG_SERIAL.printf("[WIZE] Module type: %s\n", allwize.getModuleTypeName().c_str());
+    DEBUG_SERIAL.printf("[WIZE] MBUS mode: 0x%2X\n", allwize.getMode());
+    DEBUG_SERIAL.printf("[WIZE] Channel: %d\n", allwize.getChannel());
+    DEBUG_SERIAL.printf("[WIZE] Datarate: %d (%d bps)\n", allwize.getDataRate(), allwize.getDataRateSpeed(allwize.getDataRate()));
+    DEBUG_SERIAL.printf("[WIZE] Listening...\n");
 
 }
 
 void wizeDebugMessage(allwize_message_t message) {
 
     // Code to pretty-print the message
-    char buffer[128];
-    snprintf(
-        buffer, sizeof(buffer),
-        "[WIZE] ADDR: 0x%02X%02X%02X%02X, RSSI: %d, DATA: ",
-        message.address[0], message.address[1],
-        message.address[2], message.address[3],
-        (int16_t) message.rssi / -2
+    DEBUG_SERIAL.printf(
+        "[WIZE] ADDR: 0x%s, RSSI: %d, DATA: 0x%s\n",
+        bin2hex(message.address, 4).c_str(),
+        (int16_t) message.rssi / -2,
+        bin2hex(message.data, message.len).c_str()
     );
-    DEBUG_SERIAL.print(buffer);
 
-    for (uint8_t i=0; i<message.len; i++) {
-        snprintf(buffer, sizeof(buffer), "%02X", message.data[i]);
-        DEBUG_SERIAL.print(buffer);
-    }
-    DEBUG_SERIAL.println();
+}
+
+void ping() {
+
+    DynamicJsonDocument root(512);
+    
+    JsonObject gateway = root.createNestedObject("gateway");
+    gateway["mid"] = allwize.getMID();
+    gateway["uid"] = allwize.getUID();
+    //gateway["sn"] = allwize.getSerialNumber();
+
+    char topic[32];
+    snprintf(topic, sizeof(topic), "gateway/%s%s/ping", allwize.getMID().c_str(), allwize.getUID().c_str());
+    String payload;
+    serializeJson(root, payload);
+    mqttSend(topic, payload.c_str());
 
 }
 
 void wizeMQTTParse(allwize_message_t message) {
 
-    char uid[10];
-    snprintf(
-        uid, sizeof(uid), "%02X%02X%02X%02X",
-        message.address[0], message.address[1],
-        message.address[2], message.address[3]
-    );
+    DynamicJsonDocument root(512);
+    
+    root["app"] = message.wize_application;
+    root["net"] = message.wize_network_id;
+    root["uid"] = bin2hex(message.address, 4);
+    root["cpt"] = message.wize_counter;
 
-    // RSSI
+    JsonObject metadata = root.createNestedObject("metadata");
+    metadata["ch"] = allwize.getChannel();
+    metadata["freq"] = allwize.getFrequency(allwize.getChannel());
+    metadata["dr"] = allwize.getDataRateSpeed(allwize.getDataRate());
+    metadata["toa"] = 8000.0 * message.len / allwize.getDataRateSpeed(allwize.getDataRate());
+    
+    JsonObject gateway = root.createNestedObject("gateway");
+    gateway["mid"] = allwize.getMID();
+    gateway["uid"] = allwize.getUID();
+    //gateway["sn"] = allwize.getSerialNumber();
+    gateway["rssi"] = message.rssi / -2;
+
+    root["payload"] = bin2hex(message.data, message.len);
+
     char topic[32];
-    snprintf(topic, sizeof(topic), "/device/%s/rssi", uid);
-    mqttSend(topic, String(message.rssi / -2).c_str());
 
-    #ifdef PAYLOAD_CSV
+    #if DECODE_PAYLOAD
 
-        // Parse a comma-separated payload
-        uint8_t field = 1;
-        char * payload;
-        payload = strtok((char *) message.data, ",");
+        JsonObject fields = root.createNestedObject("fields");
 
-        // While there is a field
-        while (NULL != payload) {
+        #if PAYLOAD_ENCODING == PAYLOAD_CSV
 
-            // Publish message
-            snprintf(topic, sizeof(topic), "/device/%s/field_%d", uid, field);
-            mqttSend(topic, payload);
+            // Parse a comma-separated payload
+            uint8_t field = 1;
+            char * payload;
+            payload = strtok((char *) message.data, ",");
 
-            // Get new token and update field counter
-            payload = strtok (NULL, ",");
-            field++;
+            // While there is a field
+            while (NULL != payload) {
 
-        }
+                snprintf(topic, sizeof(topic), "field_%d", field);
+                fields[topic] = String(payload);
 
-    #endif // PAYLOAD_CSV
+                // Get new token and update field counter
+                payload = strtok (NULL, ",");
+                field++;
 
-    #ifdef PAYLOAD_MBUS
-
-        // Parse payload
-        MBUSPayload payload;
-        DynamicJsonDocument jsonBuffer(512);
-        JsonArray root = jsonBuffer.createNestedArray();
-        payload.decode(message.data, message.len, root);
-
-        char format[10];
-        char value[16];
-
-        // Walk JsonArray
-        for (JsonObject element: root) {
-
-            uint32_t vif = element["vif"].as<uint32_t>();
-            int8_t scalar = element["scalar"].as<int>();
-            float value_scaled = element["value_scaled"].as<float>();
-
-            snprintf(topic, sizeof(topic), "/device/%s/%06X", uid, vif);
-            
-            uint8_t decimals = (scalar > 0) ? 0 : -scalar;
-            if (decimals == 0) {
-                snprintf(value, sizeof(value), "%u", (int) value_scaled);
-            } else {
-                snprintf(format, sizeof(format), "%%.%df", decimals);
-                snprintf(value, sizeof(value), format, value_scaled);
             }
-            mqttSend(topic, value);
 
-        }
+        #endif // PAYLOAD_CSV
 
-    #endif // PAYLOAD_MBUS
+        #if PAYLOAD_ENCODING == PAYLOAD_MBUS
 
-    #ifdef PAYLOAD_LPP
+            // Parse payload
+            MBUSPayload payload;
+            DynamicJsonDocument jsonBuffer(512);
+            JsonArray input = jsonBuffer.createNestedArray();
+            payload.decode(message.data, message.len, input);
 
-        // Parse payload
-        CayenneLPP payload(1);
-        DynamicJsonDocument jsonBuffer(512);
-        JsonArray root = jsonBuffer.createNestedArray();
-        payload.decode(message.data, message.len, root);
+            char format[10];
+            char value[16];
 
-        char value[16];
-        
-        // Walk JsonArray
-        for (JsonObject element: root) {
-            JsonVariant v = element["value"];
-            if (v.is<JsonObject>()) {
-                for (JsonPair kv : v.as<JsonObject>()) {
+            // Walk JsonArray
+            for (JsonObject element: input) {
 
-                    snprintf(topic, sizeof(topic), "/device/%s/%s", uid, kv.key().c_str());
-                    snprintf(value, sizeof(value), "%.4f", kv.value().as<float>());
-                    mqttSend(topic, value);
+                uint32_t vif = element["vif"].as<uint32_t>();
+                int8_t scalar = element["scalar"].as<int>();
+                float value_scaled = element["value_scaled"].as<float>();
+
+                snprintf(topic, sizeof(topic), "%06X", vif);
+                
+                uint8_t decimals = (scalar > 0) ? 0 : -scalar;
+                if (decimals == 0) {
+                    snprintf(value, sizeof(value), "%u", (int) value_scaled);
+                } else {
+                    snprintf(format, sizeof(format), "%%.%df", decimals);
+                    snprintf(value, sizeof(value), format, value_scaled);
+                }
+                
+                fields[topic] = String(value);
+
+            }
+
+        #endif // PAYLOAD_MBUS
+
+        #if PAYLOAD_ENCODING == PAYLOAD_LPP
+
+            // Parse payload
+            CayenneLPP payload(1);
+            DynamicJsonDocument jsonBuffer(512);
+            JsonArray input = jsonBuffer.createNestedArray();
+            payload.decode(message.data, message.len, input);
+
+            // Walk JsonArray
+            for (JsonObject element: input) {
+                JsonVariant v = element["value"];
+                if (v.is<JsonObject>()) {
+                    for (JsonPair kv : v.as<JsonObject>()) {
+                        fields[kv.key()] = kv.value().as<float>();
+                    }
+                } else {
+                    fields[element["name"].as<char *>()] = element["value"].as<float>();
 
                 }
-            } else {
-
-                snprintf(topic, sizeof(topic), "/device/%s/%s", uid, element["name"].as<char*>());
-                snprintf(value, sizeof(value), "%.2f", element["value"].as<float>());
-                mqttSend(topic, value);
-
             }
-        }
 
-    #endif // PAYLOAD_LPP
+        #endif // PAYLOAD_LPP
+
+    #endif // DECODE_PAYLOAD
+
+    snprintf(topic, sizeof(topic), "gateway/%s%s/uplink", allwize.getMID().c_str(), allwize.getUID().c_str());
+    String output;
+    serializeJson(root, output);
+    mqttSend(topic, output.c_str());
 
 }
 
@@ -271,7 +303,9 @@ void wizeLoop() {
         wizeDebugMessage(message);
 
         // Parse and send via MQTT
-	    if (mqtt.connected()) wizeMQTTParse(message);
+	    if (mqtt.connected()) {
+            wizeMQTTParse(message);
+        }
 
     }
 
@@ -282,17 +316,17 @@ void wizeLoop() {
 // -----------------------------------------------------------------------------
 
 void wifiConnect() {
-    DEBUG_SERIAL.println("[WIFI] Connecting...");
+    DEBUG_SERIAL.printf("[WIFI] Connecting to %s...\n", WIFI_SSID);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
 
 void wifiOnConnect(const WiFiEventStationModeGotIP& event) {
-    DEBUG_SERIAL.println("[WIFI] Connected!");
+    DEBUG_SERIAL.printf("[WIFI] Connected!\n");
     mqttConnect();
 }
 
 void wifiOnDisconnect(const WiFiEventStationModeDisconnected& event) {
-    DEBUG_SERIAL.println("[WIFI] Disconnected!");
+    DEBUG_SERIAL.printf("[WIFI] Disconnected!\n");
     wifiTimer.detach();
     wifiTimer.once(2, wifiConnect);
 }
@@ -311,9 +345,7 @@ void setup() {
     // Setup serial DEBUG_SERIAL
     DEBUG_SERIAL.begin(115200);
     while (!DEBUG_SERIAL && millis() < 5000);
-    DEBUG_SERIAL.println();
-    DEBUG_SERIAL.println("[MAIN] Wize 2 MQTT bridge");
-    DEBUG_SERIAL.println();
+    DEBUG_SERIAL.printf("\n[MAIN] Wize 2 MQTT bridge\n\n");
 
     mqttSetup();
     wifiSetup();
@@ -327,5 +359,16 @@ void loop() {
 
     // Listen to messages
     wizeLoop();
+
+    // PING
+    #if PING_INTERVAL
+        static unsigned long last_ping = 0;
+        if (millis() - last_ping > PING_INTERVAL) {
+            last_ping = millis();
+            ping();
+        }
+    #endif
+
+    delay(1);
 
 }

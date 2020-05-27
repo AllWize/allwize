@@ -46,6 +46,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
 #define WIZE_UID                0x20212223
+#define WIZE_APP_ID		0xFE
+#define WIZE_NETWORK_ID		0x10
 
 // -----------------------------------------------------------------------------
 // Globals
@@ -74,6 +76,8 @@ void wizeSetup() {
     allwize.setPower(WIZE_POWER);
     allwize.setDataRate(WIZE_DATARATE);
     allwize.setUID(WIZE_UID);
+    allwize.setWizeApplication(WIZE_APP_ID);
+    allwize.setWizeNetworkId(WIZE_NETWORK_ID);
 
     allwize.dump(DEBUG_SERIAL);
 
