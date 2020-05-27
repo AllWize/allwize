@@ -1,0 +1,11 @@
+digraph "AllWize::_getAddress"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node87 [label="AllWize::_getAddress",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node87 -> Node88 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node88 [label="AllWize::_setSlot",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a2f7904041e91637ddf0cd56c6f8831ae",tooltip="Sets non-volatile memory contents starting from given address. "];
+  Node87 -> Node89 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node89 [label="AllWize::_getSlot",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac0142644d1c9f69b4c66ee2b5bfc5d82",tooltip="Returns the contents of consecutive memory addresses. "];
+}

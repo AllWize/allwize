@@ -36,5 +36,5 @@ var searchData=
   ['_5fwifi_5ftimer',['_wifi_timer',['../wifi_8cpp.html#a0247b9f0a4397a4738ad944f1b314dcd',1,'wifi.cpp']]],
   ['_5fwize_5fapplication',['_wize_application',['../classAllWize.html#a726ee95df1231651d49a4ac6a171a9ab',1,'AllWize']]],
   ['_5fwize_5fcontrol',['_wize_control',['../classAllWize.html#ac279aeac2d5962d748eb19135ae7b381',1,'AllWize']]],
-  ['_5fwize_5foperator_5fid',['_wize_operator_id',['../classAllWize.html#a494863b8252366abea2975aeaeddc8c3',1,'AllWize']]]
+  ['_5fwize_5fnetwork_5fid',['_wize_network_id',['../classAllWize.html#a93718d92dab55d503d6c49caa2497037',1,'AllWize']]]
 ];

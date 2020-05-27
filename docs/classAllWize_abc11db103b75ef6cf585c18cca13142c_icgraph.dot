@@ -1,0 +1,17 @@
+digraph "AllWize::ready"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1217 [label="AllWize::ready",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node1217 -> Node1218 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1218 [label="AllWize::wakeup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a20b9250f67d5dc1914359ba8356b53f2",tooltip="Wakes up the radio from sleep mode. "];
+  Node1217 -> Node1219 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1219 [label="AllWize::waitForReady",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086",tooltip="Waits for timeout millis for the module to be ready. "];
+  Node1219 -> Node1220 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1220 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4"];
+  Node1220 -> Node1221 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1221 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d"];
+  Node1217 -> Node1222 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1222 [label="AllWize::setBaudRate",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#aed088a11b03ac4ffd99036dec2591dfe",tooltip="Sets the UART baud rate, requires reset to take effect. "];
+}

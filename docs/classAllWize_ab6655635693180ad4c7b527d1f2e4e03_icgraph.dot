@@ -1,0 +1,15 @@
+digraph "AllWize::getMode"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1012 [label="AllWize::getMode",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node1012 -> Node1013 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1013 [label="AllWize::_decode",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a496979330409adb0e7241f763e4a4b16",tooltip="Decodes the current RX buffer contents. "];
+  Node1013 -> Node1014 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1014 [label="AllWize::available",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ae75c391473baf8107cae11f2134b7316",tooltip="Returns true if a new message has been received and decoded This method has to be called in the main ..."];
+  Node1014 -> Node1015 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1015 [label="wizeLoop",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd"];
+  Node1015 -> Node1016 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1016 [label="loop",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f"];
+}

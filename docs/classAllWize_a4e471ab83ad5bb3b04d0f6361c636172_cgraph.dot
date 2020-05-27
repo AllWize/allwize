@@ -1,0 +1,42 @@
+digraph "AllWize::ack"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node729 [label="AllWize::ack",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node729 -> Node730 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node730 [label="AllWize::setControlField",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#aedb6eec9766105625527f4895dffb8f3",tooltip="Sets the control field value. "];
+  Node730 -> Node731 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node731 [label="AllWize::_setSlot",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a594ee81885697cfe4dde313e2d3f6731",tooltip="Sets non-volatile memory contents starting from given address. "];
+  Node731 -> Node732 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node732 [label="AllWize::_getAddress",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792",tooltip="Return the physical memory address for the given slot. "];
+  Node731 -> Node733 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node733 [label="AllWize::_setMemory",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050",tooltip="Sets non-volatile memory contents starting from given address. "];
+  Node733 -> Node734 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node734 [label="AllWize::_sendCommand",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#aa396ffb4a719730440575425c981adef",tooltip="Sends a command with the given data. "];
+  Node734 -> Node735 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node735 [label="AllWize::_setConfig",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a493af0599b973f713192b175000264e6",tooltip="Sets or unsets config mode. "];
+  Node735 -> Node736 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node736 [label="AllWize::_flush",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551",tooltip="Flushes the serial line to the module. "];
+  Node735 -> Node737 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node737 [label="AllWize::_sendAndReceive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1",tooltip="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..."];
+  Node737 -> Node738 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node738 [label="AllWize::_send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9",tooltip="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. "];
+  Node737 -> Node739 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node739 [label="AllWize::_receive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb",tooltip="Listens to incoming data from the module until timeout or END_OF_RESPONSE. "];
+  Node739 -> Node740 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node740 [label="AllWize::_readBytesUntil",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c",tooltip="Reads the stream buffer up to a certain char or times out. "];
+  Node740 -> Node741 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node741 [label="AllWize::_timedRead",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf",tooltip="Reads a byte from the stream with a timeout. "];
+  Node735 -> Node738 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node735 -> Node742 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node742 [label="AllWize::_niceDelay",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72",tooltip="Does a non-blocking delay. "];
+  Node734 -> Node737 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node730 -> Node734 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node729 -> Node743 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node743 [label="AllWize::send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d",tooltip="Sends a byte array. "];
+  Node743 -> Node744 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node744 [label="AllWize::softReset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#aa22cb94ed64656f3ba3aef64c566e708",tooltip="Cleans the RX/TX line. "];
+  Node744 -> Node735 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node743 -> Node738 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}
