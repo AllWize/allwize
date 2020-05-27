@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.5] 2020-05-27
+### Fixed
+- Fix wrong L6 size
+
+### Changed
+- Wize2MQTT example now outputs a JSON with all data in it, also pings every 30s
+
 ## [1.1.4] 2019-08-22
 ### Fixed
 - Fix wrong buffer length when CI not WIZE (undocumented?)

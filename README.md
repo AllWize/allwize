@@ -2,7 +2,7 @@
 
 Arduino-compatible library to interface **RC1701HP-OSP/WIZE radio modules**.
 
-[![version](https://img.shields.io/badge/version-1.1.4-brightgreen.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-1.1.5-brightgreen.svg)](CHANGELOG.md)
 [![travis](https://travis-ci.com/Allwize/allwize.svg?branch=dev)](https://travis-ci.com/Allwize/allwize)
 [![codacy](https://img.shields.io/codacy/grade/5b0345d3b4994a1eb2e51f02fa9a5d22/dev.svg)](https://www.codacy.com/app/Allwize/allwize/dashboard)
 [![license](https://img.shields.io/github/license/AllWize/allwize.svg)](LICENSE)
@@ -47,7 +47,7 @@ Visit the [online documentation for the AllWize Library](https://allwize.github.
 
 ## License
 
-Copyright (C) 2018-2019 by AllWize ([http://allwize.io](http://allwize.io))
+Copyright (C) 2018-2020 by AllWize ([http://allwize.io](http://allwize.io))
 
 AllWize library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

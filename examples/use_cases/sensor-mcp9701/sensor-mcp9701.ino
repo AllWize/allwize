@@ -4,7 +4,7 @@ AllWize - MCP9701 Thermistor Slave Example
 
 Sends the data for the built-in MCP9701 thermistor in the AllWize K1.
 
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

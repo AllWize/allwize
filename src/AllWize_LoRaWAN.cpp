@@ -6,7 +6,7 @@ This code is based on Adafruit's TinyLora Library and thus
 
 Copyright (C) 2015, 2016 Ideetron B.V.
 Modified by Brent Rubell for Adafruit Industries.
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

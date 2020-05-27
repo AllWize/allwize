@@ -5,7 +5,7 @@ AllWize - WIZE 2 Serial Bridge
 Listens to messages on the same channel, data rate and CF and
 forwards them via serial to a listening service on a connected computer.
 
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

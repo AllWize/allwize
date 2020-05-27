@@ -8,7 +8,7 @@ You can enable the Cayenne LPP payload format decoder in your application server
 If using TTN it is under your application "Payload Formats" tab.
 If using LoRaServer configure it in your Device Profile.
 
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

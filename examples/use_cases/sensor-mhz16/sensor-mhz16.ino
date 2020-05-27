@@ -5,7 +5,7 @@ AllWize - MH-Z16 CO2 Sensor Example
 Sends the data for MH-Z16 sensor.
 It uses the PWM output connected to the AllWize K1 digital grove connector.
 
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

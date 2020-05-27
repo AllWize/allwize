@@ -5,7 +5,7 @@ AllWize K1 + Arduino Leonardo
 Listens to messages on the same channel and data rate
 and prints them out via the serial monitor.
 
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

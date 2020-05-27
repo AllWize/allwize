@@ -6,7 +6,7 @@ This test suite tests the hardware by running a series of commands over a RC1701
 This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
 
 
-Copyright (C) 2018-2019 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
