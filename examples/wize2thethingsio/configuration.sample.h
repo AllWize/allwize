@@ -24,8 +24,8 @@ Configuration file
 //------------------------------------------------------------------------------
 
 #define RESET_PIN               14
-#define RX_PIN                  12
-#define TX_PIN                  13
+#define RX_PIN                  5
+#define TX_PIN                  4
 
 //------------------------------------------------------------------------------
 // Wize configuration

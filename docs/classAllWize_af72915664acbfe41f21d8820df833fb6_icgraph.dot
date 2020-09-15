@@ -1,0 +1,15 @@
+digraph "AllWize::getAppendRSSI"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node820 [label="AllWize::getAppendRSSI",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node820 -> Node821 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node821 [label="AllWize::_decode",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a496979330409adb0e7241f763e4a4b16",tooltip="Decodes the current RX buffer contents. "];
+  Node821 -> Node822 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node822 [label="AllWize::available",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ae75c391473baf8107cae11f2134b7316",tooltip="Returns true if a new message has been received and decoded This method has to be called in the main ..."];
+  Node822 -> Node823 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node823 [label="wizeLoop",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd"];
+  Node823 -> Node824 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node824 [label="loop",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f"];
+}

@@ -1,0 +1,51 @@
+<map id="setup" name="setup">
+<area shape="rect" id="node2" href="$debug_8cpp.html#a71006570a31eff18a31dfc605380d29d" title="debugSetup" alt="" coords="118,461,209,488"/>
+<area shape="rect" id="node3" href="$wize_8cpp.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="122,512,205,539"/>
+<area shape="rect" id="node39" href="$ntp_8cpp.html#a847af86ba560289d959bed21d17349b2" title="ntpSetup" alt="" coords="126,855,201,881"/>
+<area shape="rect" id="node45" href="$forwarder_8cpp.html#a0af8c5cee19904701f9a0de74816f2b1" title="forwarderSetup" alt="" coords="108,905,219,932"/>
+<area shape="rect" id="node46" href="$wifi_8cpp.html#a38d7748bd0e2850cbf65c7e03ccd20cd" title="wifiSetup" alt="" coords="125,968,201,995"/>
+<area shape="rect" id="node50" href="$wifi_8cpp.html#a23a6f53d5284ae6a9d27420cceeb80c3" title="wifiConnect" alt="" coords="505,1069,595,1096"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa" title="Inits the module communications. " alt="" coords="288,639,395,665"/>
+<area shape="rect" id="node24" href="$classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086" title="Waits for timeout millis for the module to be ready. " alt="" coords="879,563,1035,589"/>
+<area shape="rect" id="node26" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="284,284,399,311"/>
+<area shape="rect" id="node32" href="$classAllWize.html#a66458505e82e3105cd5b4357bf02e3e8" title="Sets the data rate. " alt="" coords="475,461,625,488"/>
+<area shape="rect" id="node36" href="$classAllWize.html#a9923767d522f096380a594d7f4bbd828" title="Sets the communications channel (for MBUS_MODE_R2 only) " alt="" coords="479,5,621,32"/>
+<area shape="rect" id="node37" href="$classAllWize.html#a8894f865677d8a04b16fa38721e0a95e" title="Gets the channel stored in non&#45;volatile memory. " alt="" coords="271,512,412,539"/>
+<area shape="rect" id="node38" href="$classAllWize.html#ab52a8de7dee7626f4ac4434e980bb2be" title="Gets the data rate stored in non&#45;volatile memory. " alt="" coords="267,461,416,488"/>
+<area shape="rect" id="node5" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="498,715,602,741"/>
+<area shape="rect" id="node13" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="Does a non&#45;blocking delay. " alt="" coords="1511,664,1651,691"/>
+<area shape="rect" id="node20" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Searches for the module model. " alt="" coords="686,968,829,995"/>
+<area shape="rect" id="node21" href="$classAllWize.html#ac717b96d3682372b50506a1f49dc5791" title="Returns the module part number. " alt="" coords="469,664,631,691"/>
+<area shape="rect" id="node22" href="$classAllWize.html#ac0d6169d045fc89d16c17e8cfe838169" title="Returns the contents of single&#45;byte memory slot. " alt="" coords="489,512,611,539"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a49c6e7f221248b0f3a20247346da21f8" title="Resets the serial object. " alt="" coords="885,765,1029,792"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="1303,715,1441,741"/>
+<area shape="rect" id="node11" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="1727,765,1837,792"/>
+<area shape="rect" id="node16" href="$classAllWize.html#a594ee81885697cfe4dde313e2d3f6731" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="696,259,819,285"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="1526,765,1637,792"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e" title="Reads and caches the module memory. " alt="" coords="1086,816,1250,843"/>
+<area shape="rect" id="node14" href="$classAllWize.html#abe54eebd9c81044246d6657c0686f859" title="Reads the stream buffer up to a number of bytes. " alt="" coords="1301,867,1443,893"/>
+<area shape="rect" id="node10" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="1491,613,1672,640"/>
+<area shape="rect" id="node12" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="1720,613,1844,640"/>
+<area shape="rect" id="node15" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1509,867,1654,893"/>
+<area shape="rect" id="node17" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="883,348,1031,375"/>
+<area shape="rect" id="node18" href="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="883,259,1030,285"/>
+<area shape="rect" id="node19" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="1083,208,1253,235"/>
+<area shape="rect" id="node23" href="$classAllWize.html#a34b0c983476c007f65c9da0501a4037d" title="Returns the contents of memory address. " alt="" coords="684,493,831,520"/>
+<area shape="rect" id="node25" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="1115,613,1221,640"/>
+<area shape="rect" id="node27" href="$classAllWize.html#acfb7c6ac04ef8cefd4bc472bff2f1ee0" title="Sets the module in one of the available MBus modes. " alt="" coords="487,56,613,83"/>
+<area shape="rect" id="node28" href="$classAllWize.html#ae6b73decc8d7282c38a9437374ff26eb" title="Sets the network role. " alt="" coords="465,309,635,336"/>
+<area shape="rect" id="node29" href="$classAllWize.html#ab4907595aa6aa98fd7144fd81ee92c71" title="Sets the module in one of the available operations modes. " alt="" coords="470,107,630,133"/>
+<area shape="rect" id="node30" href="$classAllWize.html#acfb61dcd3146e1c21fab1338651359a5" title="Sets the sleep mode. " alt="" coords="471,360,629,387"/>
+<area shape="rect" id="node31" href="$classAllWize.html#a0982b5aa67cb6a8ef098b33cc9894004" title="Sets the RF power. " alt="" coords="485,157,615,184"/>
+<area shape="rect" id="node33" href="$classAllWize.html#a17db48a22fa545462cb9c09a3266e13d" title="Sets the data interface for receiving packets. " alt="" coords="464,411,636,437"/>
+<area shape="rect" id="node34" href="$classAllWize.html#aa32e17a16a67d8bcfea3fd62cbf1855e" title="Sets the RSSI mode value. " alt="" coords="465,259,635,285"/>
+<area shape="rect" id="node35" href="$classAllWize.html#aedb6eec9766105625527f4895dffb8f3" title="Sets the control field value. " alt="" coords="469,208,631,235"/>
+<area shape="rect" id="node40" href="$forwarder_8cpp.html#a669994b8bb195623adf0651c74fd48b7" title="forwarderPing" alt="" coords="290,880,393,907"/>
+<area shape="rect" id="node41" href="$wifi_8cpp.html#ab541d765a7171f3f51309fd02fb8d8af" title="wifiConnected" alt="" coords="497,917,603,944"/>
+<area shape="rect" id="node42" href="$ntp_8cpp.html#a38176e018674e131012199be52193c4d" title="ntpSynced" alt="" coords="508,968,592,995"/>
+<area shape="rect" id="node43" href="$ntp_8cpp.html#a10568245db35b122c3f432a867af3a1d" title="ntpDateTime" alt="" coords="501,816,599,843"/>
+<area shape="rect" id="node44" href="$forwarder_8cpp.html#a4663d8490737595a72f0c5cfd24e0f89" title="forwarderSend" alt="" coords="497,867,603,893"/>
+<area shape="rect" id="node47" href="$wifi_8cpp.html#a5af06e9a96f589c46add73113d213247" title="_wifiOnConnect" alt="" coords="284,968,399,995"/>
+<area shape="rect" id="node49" href="$wifi_8cpp.html#a42e60a46afb05263a0369bd874b17be1" title="_wifiOnDisconnect" alt="" coords="275,1019,407,1045"/>
+<area shape="rect" id="node48" href="$ntp_8cpp.html#aeeb729465bd4f0804f4978b61174e8e4" title="ntpConnect" alt="" coords="505,1019,595,1045"/>
+</map>

@@ -1,11 +1,14 @@
 <map id="AllWize::setPower" name="AllWize::setPower">
-<area shape="rect" id="node2" href="$classAllWize.html#a08c1705a0f66b27dc85700233a150cfb" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="184,56,331,83"/>
-<area shape="rect" id="node3" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="379,81,549,108"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="597,56,736,83"/>
-<area shape="rect" id="node6" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="784,107,965,133"/>
-<area shape="rect" id="node5" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="819,5,930,32"/>
-<area shape="rect" id="node7" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="1020,56,1131,83"/>
-<area shape="rect" id="node8" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incomming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="1013,107,1137,133"/>
-<area shape="rect" id="node9" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="1185,107,1353,133"/>
-<area shape="rect" id="node10" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1401,107,1547,133"/>
+<area shape="rect" id="node2" href="$classAllWize.html#a594ee81885697cfe4dde313e2d3f6731" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="184,56,307,83"/>
+<area shape="rect" id="node5" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="551,81,721,108"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a15521b383a1cf20ac9e7adf6bc90b792" title="Return the physical memory address for the given slot. " alt="" coords="355,5,503,32"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="355,56,502,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="769,107,908,133"/>
+<area shape="rect" id="node8" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="956,56,1137,83"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="991,107,1102,133"/>
+<area shape="rect" id="node9" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="1192,132,1303,159"/>
+<area shape="rect" id="node13" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="Does a non&#45;blocking delay. " alt="" coords="977,208,1117,235"/>
+<area shape="rect" id="node10" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="1185,56,1309,83"/>
+<area shape="rect" id="node11" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="1357,56,1525,83"/>
+<area shape="rect" id="node12" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1573,56,1719,83"/>
 </map>

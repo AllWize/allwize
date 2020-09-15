@@ -1,51 +1,45 @@
 <map id="AllWize::_flush" name="AllWize::_flush">
-<area shape="rect" id="node2" href="$classAllWize.html#a3103f8846a7cfb1151e9a72d254a69c3" title="Resets the serial object. " alt="" coords="593,61,743,87"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="847,1242,951,1269"/>
-<area shape="rect" id="node5" href="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba" title="Resets the module to factory settings. " alt="" coords="824,35,975,62"/>
-<area shape="rect" id="node6" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="164,542,303,569"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a1e7ba4d57a09224e8a735cb80263e16f" title="Inits the module communications. " alt="" coords="1040,727,1147,754"/>
-<area shape="rect" id="node7" href="$classAllWize.html#a9e38bd627db0ad557551b66e1b9897c4" title="Sets the radio module in sleep mode. " alt="" coords="383,347,489,374"/>
-<area shape="rect" id="node8" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="383,398,489,425"/>
-<area shape="rect" id="node11" href="$classAllWize.html#a97bd049b28f17fcb7fbad99f9d42c790" title="Dumps the current memory configuration to the given stream. " alt="" coords="383,1242,489,1269"/>
-<area shape="rect" id="node12" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="351,1597,521,1623"/>
-<area shape="rect" id="node31" href="$classAllWize.html#a02b15aea0053d11c206973706df9f4a0" title="Returns the contents of consecutive memory addresses. " alt="" coords="363,685,509,711"/>
-<area shape="rect" id="node9" href="$classAllWize.html#a20b9250f67d5dc1914359ba8356b53f2" title="Wakes up the radio from sleep mode. " alt="" coords="608,111,728,138"/>
-<area shape="rect" id="node10" href="$classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086" title="Waits for timeout millis for the module to be ready. " alt="" coords="590,162,746,189"/>
-<area shape="rect" id="node13" href="$classAllWize.html#a9923767d522f096380a594d7f4bbd828" title="Sets the communications channel (for MBUS_MODE_R2 only) " alt="" coords="829,1850,970,1877"/>
-<area shape="rect" id="node14" href="$classAllWize.html#a0982b5aa67cb6a8ef098b33cc9894004" title="Sets the RF power. " alt="" coords="834,1445,965,1471"/>
-<area shape="rect" id="node17" href="$classAllWize.html#a1ad16b71cc866e9f403e61b1916c451f" title="Sets the module in one of the available MBus modes. " alt="" coords="820,1394,979,1421"/>
-<area shape="rect" id="node19" href="$classAllWize.html#aedb6eec9766105625527f4895dffb8f3" title="Sets the control field value. " alt="" coords="818,1723,981,1750"/>
-<area shape="rect" id="node20" href="$classAllWize.html#ab4907595aa6aa98fd7144fd81ee92c71" title="Sets the module in one of the available operations modes. " alt="" coords="819,1647,979,1674"/>
-<area shape="rect" id="node21" href="$classAllWize.html#a451f2afd2c9a41ffa3fb3eaf8fd89023" title="Sets the default encryption key. " alt="" coords="610,1799,726,1826"/>
-<area shape="rect" id="node22" href="$classAllWize.html#ae44ffec387467a6d58848e3097b0a3fc" title="Sets new/specific access number. " alt="" coords="577,1850,759,1877"/>
-<area shape="rect" id="node23" href="$classAllWize.html#aa47617afc6afa09cb941992b60afd48b" title="Returns the RSSI of the last valid packet received TODO: values do not seem right and are not the sam..." alt="" coords="605,1343,731,1370"/>
-<area shape="rect" id="node24" href="$classAllWize.html#a6813b95f24544b78287954fed8d2fa60" title="Returns the internal temperature of the module. " alt="" coords="585,1546,751,1573"/>
-<area shape="rect" id="node25" href="$classAllWize.html#ad9bab2839e1df0359edcecdc1287221d" title="Returns the internal voltage of the module. " alt="" coords="599,1597,737,1623"/>
-<area shape="rect" id="node26" href="$classAllWize.html#a08c1705a0f66b27dc85700233a150cfb" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="595,1495,741,1522"/>
-<area shape="rect" id="node30" href="$classAllWize.html#a34b0c983476c007f65c9da0501a4037d" title="Returns the contents of single memory addresses. " alt="" coords="595,1698,741,1725"/>
-<area shape="rect" id="node15" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="1036,1521,1151,1547"/>
-<area shape="rect" id="node16" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="1040,1445,1147,1471"/>
-<area shape="rect" id="node18" href="$classAllWize.html#a5c455d5592a76becb86dc80ecc60e318" title="Sets the module in repeater mode. " alt="" coords="1032,1394,1155,1421"/>
-<area shape="rect" id="node27" href="$classAllWize.html#a66458505e82e3105cd5b4357bf02e3e8" title="Sets the data rate. " alt="" coords="825,1495,974,1522"/>
-<area shape="rect" id="node28" href="$classAllWize.html#acfb61dcd3146e1c21fab1338651359a5" title="Sets the sleep mode. " alt="" coords="820,1546,979,1573"/>
-<area shape="rect" id="node29" href="$classAllWize.html#aa32e17a16a67d8bcfea3fd62cbf1855e" title="Sets the RSSI mode value. " alt="" coords="815,1597,984,1623"/>
-<area shape="rect" id="node32" href="$classAllWize.html#a8894f865677d8a04b16fa38721e0a95e" title="Gets the channel stored in non&#45;volatile memory. " alt="" coords="597,431,739,458"/>
-<area shape="rect" id="node33" href="$classAllWize.html#a9e5bf5f57dda3daf82d86c59ff9e7467" title="Gets the RF power stored in non&#45;volatile memory. " alt="" coords="603,482,733,509"/>
-<area shape="rect" id="node34" href="$classAllWize.html#ab52a8de7dee7626f4ac4434e980bb2be" title="Gets the data rate stored in non&#45;volatile memory. " alt="" coords="593,533,743,559"/>
-<area shape="rect" id="node35" href="$classAllWize.html#a1b11333048ddf4fa02fe8aa21e22830d" title="Gets the sleep mode stored in non&#45;volatile memory. " alt="" coords="589,583,747,610"/>
-<area shape="rect" id="node36" href="$classAllWize.html#a244d701f186f73d622ecc57286e0e1ea" title="Gets the preamble length frame format. " alt="" coords="594,634,742,661"/>
-<area shape="rect" id="node37" href="$classAllWize.html#a89dc5991c574226d707cf3f59ddf9b82" title="Gets the current timeout for auto sleep modes. " alt="" coords="598,685,738,711"/>
-<area shape="rect" id="node38" href="$classAllWize.html#a5ba307bbd3710c0bafdd9ae44aaf0925" title="Gets the current network role. " alt="" coords="583,735,753,762"/>
-<area shape="rect" id="node39" href="$classAllWize.html#a3d723e9a6bf8417d196f3c6961b31c66" title="Gets the current LED control. " alt="" coords="587,786,749,813"/>
-<area shape="rect" id="node40" href="$classAllWize.html#a1b67d7074600f4097f483305c3b3db81" title="Gets the control field value stored in non&#45;volatile memory. " alt="" coords="587,837,749,863"/>
-<area shape="rect" id="node41" href="$classAllWize.html#a4bd269450531bac0e1495617990a0e56" title="Gets the install modevalue stored in non&#45;volatile memory. " alt="" coords="588,887,748,914"/>
-<area shape="rect" id="node42" href="$classAllWize.html#aaac3f5de0bdf7f61b3d547cd99282c21" title="Gets the encrypt flag setting. " alt="" coords="587,938,749,965"/>
-<area shape="rect" id="node43" href="$classAllWize.html#a74d06cbb120d0b74987edd7fa6a8accd" title="Gets the decrypt flag setting. " alt="" coords="586,989,750,1015"/>
-<area shape="rect" id="node44" href="$classAllWize.html#a1a0f30d3bdd0aa6e9d7363237fd4d6a4" title="Gets the default encryption key. " alt="" coords="589,1039,747,1066"/>
-<area shape="rect" id="node45" href="$classAllWize.html#affe1d0ad7168d1311fb455a1898d0fe4" title="Returns the Manufacturer ID. " alt="" coords="609,1090,727,1117"/>
-<area shape="rect" id="node46" href="$classAllWize.html#a18ead3d5c58de35fe90c756014aa69ba" title="Returns the Unique ID as a byte array &#160;* uid UID. " alt="" coords="609,1141,727,1167"/>
-<area shape="rect" id="node47" href="$classAllWize.html#a44a8f3b0f8bceeaaad70fc5533365562" title="Returns the module version from non&#45;volatile memory. " alt="" coords="599,1191,737,1218"/>
-<area shape="rect" id="node48" href="$classAllWize.html#ac47dd707240ab13ad5e84c6dc924e204" title="Returns the device version from non&#45;volatile memory. " alt="" coords="601,263,735,290"/>
-<area shape="rect" id="node49" href="$classAllWize.html#a48dccaac94d8e75a05cd19fdd682803e" title="Returns the contents of the memory from a certain address as an HEX String. " alt="" coords="575,315,761,356"/>
-<area shape="rect" id="node50" href="$classAllWize.html#a1b356935cb6a521c673efef3ecf5610d" title="Returns the contents of the memory from a certain address as a String object. " alt="" coords="569,381,767,407"/>
+<area shape="rect" id="node2" href="$classAllWize.html#a49c6e7f221248b0f3a20247346da21f8" title="Resets the serial object. " alt="" coords="589,109,733,136"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="164,312,303,338"/>
+<area shape="rect" id="node3" href="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3" title="Resets the radio module. " alt="" coords="844,109,948,136"/>
+<area shape="rect" id="node7" href="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba" title="Resets the module to factory settings. " alt="" coords="821,236,971,262"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa" title="Inits the module communications. " alt="" coords="1065,160,1171,186"/>
+<area shape="rect" id="node5" href="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4" title="wizeSetup" alt="" coords="1244,426,1327,453"/>
+<area shape="rect" id="node6" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="1375,426,1429,453"/>
+<area shape="rect" id="node9" href="$classAllWize.html#aa22cb94ed64656f3ba3aef64c566e708" title="Cleans the RX/TX line. " alt="" coords="370,920,502,946"/>
+<area shape="rect" id="node17" href="$classAllWize.html#a9e38bd627db0ad557551b66e1b9897c4" title="Sets the radio module in sleep mode. " alt="" coords="383,970,489,997"/>
+<area shape="rect" id="node18" href="$classAllWize.html#abc11db103b75ef6cf585c18cca13142c" title="Test whether the radio module is ready or not. " alt="" coords="383,312,489,338"/>
+<area shape="rect" id="node22" href="$classAllWize.html#aa396ffb4a719730440575425c981adef" title="Sends a command with the given data. " alt="" coords="351,717,521,744"/>
+<area shape="rect" id="node41" href="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e" title="Reads and caches the module memory. " alt="" coords="354,185,518,212"/>
+<area shape="rect" id="node44" href="$classAllWize.html#a02b15aea0053d11c206973706df9f4a0" title="Returns the contents of consecutive memory addresses. " alt="" coords="363,33,509,60"/>
+<area shape="rect" id="node10" href="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d" title="Sends a byte array. " alt="" coords="609,1072,712,1098"/>
+<area shape="rect" id="node14" href="$classAllWize.html#ae75c391473baf8107cae11f2134b7316" title="Returns true if a new message has been received and decoded This method has to be called in the main ..." alt="" coords="597,1148,724,1174"/>
+<area shape="rect" id="node11" href="$classAllWize.html#abaf41b1ea4c1ffe08c65be9612a58639" title="Sends c&#45;string. " alt="" coords="845,1122,947,1149"/>
+<area shape="rect" id="node12" href="$classAllWize.html#a4e471ab83ad5bb3b04d0f6361c636172" title="Sends an ACK. " alt="" coords="848,742,944,769"/>
+<area shape="rect" id="node13" href="$classAllWize__LoRaWAN.html#a99faabcc5e67ed0a2dfde556f9025fcd" title="Function to assemble and send a LoRaWAN package. " alt="" coords="809,1072,983,1098"/>
+<area shape="rect" id="node15" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="857,1173,935,1200"/>
+<area shape="rect" id="node16" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="1095,1173,1141,1200"/>
+<area shape="rect" id="node19" href="$classAllWize.html#a20b9250f67d5dc1914359ba8356b53f2" title="Wakes up the radio from sleep mode. " alt="" coords="601,362,721,389"/>
+<area shape="rect" id="node20" href="$classAllWize.html#ac9921fd74e29e23c3c7cb237c2e34086" title="Waits for timeout millis for the module to be ready. " alt="" coords="1040,350,1196,377"/>
+<area shape="rect" id="node21" href="$classAllWize.html#aed088a11b03ac4ffd99036dec2591dfe" title="Sets the UART baud rate, requires reset to take effect. " alt="" coords="585,261,736,288"/>
+<area shape="rect" id="node23" href="$classAllWize.html#a9923767d522f096380a594d7f4bbd828" title="Sets the communications channel (for MBUS_MODE_R2 only) " alt="" coords="1047,730,1189,757"/>
+<area shape="rect" id="node24" href="$classAllWize.html#a0982b5aa67cb6a8ef098b33cc9894004" title="Sets the RF power. " alt="" coords="595,514,726,541"/>
+<area shape="rect" id="node27" href="$classAllWize.html#acfb7c6ac04ef8cefd4bc472bff2f1ee0" title="Sets the module in one of the available MBus modes. " alt="" coords="598,464,723,490"/>
+<area shape="rect" id="node29" href="$classAllWize.html#aedb6eec9766105625527f4895dffb8f3" title="Sets the control field value. " alt="" coords="579,565,742,592"/>
+<area shape="rect" id="node31" href="$classAllWize.html#ab4907595aa6aa98fd7144fd81ee92c71" title="Sets the module in one of the available operations modes. " alt="" coords="581,869,741,896"/>
+<area shape="rect" id="node32" href="$classAllWize.html#a451f2afd2c9a41ffa3fb3eaf8fd89023" title="Sets the default encryption key. " alt="" coords="603,616,719,642"/>
+<area shape="rect" id="node33" href="$classAllWize.html#ae44ffec387467a6d58848e3097b0a3fc" title="Sets new/specific access number. " alt="" coords="569,666,752,693"/>
+<area shape="rect" id="node34" href="$classAllWize.html#aa47617afc6afa09cb941992b60afd48b" title="Returns the RSSI of the last valid packet received TODO: values do not seem right and are not the sam..." alt="" coords="598,717,723,744"/>
+<area shape="rect" id="node35" href="$classAllWize.html#a6813b95f24544b78287954fed8d2fa60" title="Returns the internal temperature of the module. " alt="" coords="577,768,744,794"/>
+<area shape="rect" id="node36" href="$classAllWize.html#ad9bab2839e1df0359edcecdc1287221d" title="Returns the internal voltage of the module. " alt="" coords="592,818,729,845"/>
+<area shape="rect" id="node37" href="$classAllWize.html#a34b0c983476c007f65c9da0501a4037d" title="Returns the contents of memory address. " alt="" coords="587,920,734,946"/>
+<area shape="rect" id="node39" href="$classAllWize.html#a1ea5bba23570f50e5326108f31c00050" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="587,1021,734,1048"/>
+<area shape="rect" id="node25" href="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9" title="Sets the module in master mode. " alt="" coords="839,540,953,566"/>
+<area shape="rect" id="node26" href="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88" title="Sets the module in slave mode. " alt="" coords="843,489,949,516"/>
+<area shape="rect" id="node28" href="$classAllWize.html#a5c455d5592a76becb86dc80ecc60e318" title="Sets the module in repeater mode. " alt="" coords="835,438,957,465"/>
+<area shape="rect" id="node30" href="$classAllWize__LoRaWAN.html#a744997b05e64e223306d6a4b737d5d18" title="Stores the application and network keys for ABP activation. " alt="" coords="800,590,992,617"/>
+<area shape="rect" id="node38" href="$classAllWize.html#ac0142644d1c9f69b4c66ee2b5bfc5d82" title="Returns the contents of consecutive memory addresses. " alt="" coords="835,920,957,946"/>
+<area shape="rect" id="node40" href="$classAllWize.html#a2f7904041e91637ddf0cd56c6f8831ae" title="Sets non&#45;volatile memory contents starting from given address. " alt="" coords="835,1021,957,1048"/>
+<area shape="rect" id="node42" href="$classAllWize.html#a97bd049b28f17fcb7fbad99f9d42c790" title="Dumps the current memory configuration to the given stream. " alt="" coords="607,210,714,237"/>
+<area shape="rect" id="node43" href="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564" title="Searches for the module model. " alt="" coords="825,160,967,186"/>
 </map>

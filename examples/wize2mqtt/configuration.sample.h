@@ -7,6 +7,18 @@ Configuration file
 #pragma once
 
 //------------------------------------------------------------------------------
+// Payload data format
+//------------------------------------------------------------------------------
+
+#define DECODE_PAYLOAD          1
+
+#define PAYLOAD_CSV             1
+#define PAYLOAD_MBUS            2
+#define PAYLOAD_LPP             3
+
+#define PAYLOAD_ENCODING        PAYLOAD_LPP
+
+//------------------------------------------------------------------------------
 // General configuration
 //------------------------------------------------------------------------------
 
@@ -24,8 +36,8 @@ Configuration file
 //------------------------------------------------------------------------------
 
 #define RESET_PIN               14
-#define RX_PIN                  12
-#define TX_PIN                  13
+#define RX_PIN                  5
+#define TX_PIN                  4
 
 //------------------------------------------------------------------------------
 // Wize configuration
@@ -45,4 +57,9 @@ Configuration file
 #define MQTT_PASS               ""
 #define MQTT_QOS                2
 #define MQTT_RETAIN             0
-#define MQTT_TOPIC              "device/%s/field_%u"    // UID, field#
+
+//------------------------------------------------------------------------------
+// Forwarder
+//------------------------------------------------------------------------------
+
+#define PING_INTERVAL           30000

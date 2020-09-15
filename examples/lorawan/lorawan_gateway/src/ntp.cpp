@@ -7,6 +7,7 @@ NTP MODULE
 #include "ntp.h"
 #include "debug.h"
 #include "configuration.h"
+#include "forwarder.h"
 
 #include <TimeLib.h>
 #include <NtpClientLib.h>
@@ -50,6 +51,7 @@ void ntpSetup() {
             }
         } else {
             DEBUG_MSG("[NTP] Current time: %s\n", NTP.getTimeDateString(NTP.getFirstSync()).c_str());
+            forwarderPing();
         }
     });
 

@@ -1,0 +1,5 @@
+<map id="AllWize::read" name="AllWize::read">
+<area shape="rect" id="node2" href="$classAllWize__LoRaWAN.html#aa4c26ec51ccaac634ffbc5363f811469" title="Returns latest received message (rebuilds LoRaWan header if necessary) " alt="" coords="153,5,324,32"/>
+<area shape="rect" id="node3" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="372,5,449,32"/>
+<area shape="rect" id="node4" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="497,5,544,32"/>
+</map>

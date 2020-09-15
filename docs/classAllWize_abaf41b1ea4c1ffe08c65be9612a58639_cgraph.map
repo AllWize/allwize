@@ -1,4 +1,12 @@
 <map id="AllWize::send" name="AllWize::send">
-<area shape="rect" id="node2" href="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d" title="Sends a byte array. " alt="" coords="156,5,259,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="307,5,417,32"/>
+<area shape="rect" id="node2" href="$classAllWize.html#aa2841d5e0db15785559d4bb474b76f1d" title="Sends a byte array. " alt="" coords="156,31,259,57"/>
+<area shape="rect" id="node3" href="$classAllWize.html#aa22cb94ed64656f3ba3aef64c566e708" title="Cleans the RX/TX line. " alt="" coords="307,81,439,108"/>
+<area shape="rect" id="node7" href="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9" title="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. " alt="" coords="909,107,1020,133"/>
+<area shape="rect" id="node4" href="$classAllWize.html#a493af0599b973f713192b175000264e6" title="Sets or unsets config mode. " alt="" coords="487,107,625,133"/>
+<area shape="rect" id="node5" href="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551" title="Flushes the serial line to the module. " alt="" coords="709,56,819,83"/>
+<area shape="rect" id="node6" href="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1" title="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..." alt="" coords="673,157,855,184"/>
+<area shape="rect" id="node11" href="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72" title="Does a non&#45;blocking delay. " alt="" coords="694,208,834,235"/>
+<area shape="rect" id="node8" href="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb" title="Listens to incoming data from the module until timeout or END_OF_RESPONSE. " alt="" coords="903,157,1027,184"/>
+<area shape="rect" id="node9" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="1075,157,1243,184"/>
+<area shape="rect" id="node10" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="1291,157,1436,184"/>
 </map>

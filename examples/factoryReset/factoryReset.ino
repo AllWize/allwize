@@ -4,7 +4,7 @@ AllWize - Returns the module to factory settings
 
 Resets the module non-volatile memory to factory settings.
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+#include "AllWize.h"
 
 // -----------------------------------------------------------------------------
 // Board definitions
@@ -39,15 +41,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_AVR_LEONARDO
 
 #if defined(ARDUINO_ARCH_SAMD)
-    #define RESET_PIN           7
-    #define MODULE_SERIAL       Serial1
-    #define DEBUG_SERIAL        SerialUSB
+    
+    #if defined(ARDUINO_ALLWIZE_K2)
+        #define RESET_PIN           PIN_WIZE_RESET
+        #define MODULE_SERIAL       SerialWize
+        #define DEBUG_SERIAL        SerialUSB
+    #else
+        #define RESET_PIN           7
+        #define MODULE_SERIAL       Serial1
+        #define DEBUG_SERIAL        SerialUSB
+    #endif
+
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
     #define RESET_PIN           14
-    #define RX_PIN              12
-    #define TX_PIN              13
+    #define RX_PIN              5
+    #define TX_PIN              4
     #define DEBUG_SERIAL        Serial
 #endif // ARDUINO_ARCH_ESP8266
 
@@ -59,11 +69,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_ARCH_ESP32
 
 // -----------------------------------------------------------------------------
-// Config & globals
+// Globals
 // -----------------------------------------------------------------------------
 
-#include "AllWize.h"
-AllWize * allwize;
+#if defined(MODULE_SERIAL)
+    AllWize allwize(&MODULE_SERIAL, RESET_PIN);
+#else
+    AllWize allwize(RX_PIN, TX_PIN, RESET_PIN);
+#endif
 
 // -----------------------------------------------------------------------------
 // Main
@@ -77,26 +90,23 @@ void setup() {
     DEBUG_SERIAL.println("AllWize - Factory reset");
     DEBUG_SERIAL.println();
 
-    // Create and init AllWize object
-    #if defined(MODULE_SERIAL)
-        allwize = new AllWize(&MODULE_SERIAL, RESET_PIN);
-    #else
-        allwize = new AllWize(RX_PIN, TX_PIN, RESET_PIN);
-    #endif
-    allwize->begin();
-    if (!allwize->waitForReady()) {
+    // Init AllWize object
+    allwize.begin();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true);
     }
 
-    allwize->factoryReset();
-    if (!allwize->waitForReady()) {
+    allwize.factoryReset();
+    if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("Error reconnecting to the module after Factory Reset!");
         while (true);
     }
 
-    allwize->dump(DEBUG_SERIAL);
+    allwize.dump(DEBUG_SERIAL);
 
 }
 
-void loop() {}
+void loop() {
+    delay(1);
+}

@@ -1,6 +1,7 @@
-// -----------------------------------------------------------------------------
-// RC1701HP
-// -----------------------------------------------------------------------------
+/**
+ * @file RC1701HP.h
+ * RC1701HP command and memory codes header file
+ */
 
 // Module signature
 #define MODULE_SIGNATURE                "RC1701"
@@ -10,7 +11,7 @@ enum {
     
     MODULE_UNKNOWN,
     
-    MODULE_WMBUS4,
+    MODULE_MBUS4,
     MODULE_OSP,
     MODULE_WIZE,
 
@@ -18,10 +19,26 @@ enum {
 
 };
 
+// Special characters
+#define END_OF_RESPONSE                 '>'
+#define START_BYTE                      0x68
+#define STOP_BYTE                       0x16
+
+// Special command keys
+#define CMD_ENTER_CONFIG                (char) 0x00
+#define CMD_EXIT_CONFIG                 (char) 0x58
+#define CMD_NO_RESPONSE                 (char) 0xFB
+#define CMD_KEY_CHALLENGE               (char) 0xFC
+#define CMD_IDLE_ENABLE_RF              (char) 0xFD
+#define CMD_IDLE_DISABLE_RF             (char) 0xFF
+#define CMD_AWAKE                       (char) 0xFF     // Deprecated
+#define CMD_EXIT_MEMORY                 (char) 0xFF     // Deprecated
+
 // Command keys
 #define CMD_AUTO_MESSAGE_FLAGS          'A'
 #define CMD_BIND                        'B'
 #define CMD_CHANNEL                     'C'
+#define CMD_PING                        'D'
 #define CMD_ENCRYPT                     'E'
 #define CMD_CONTROL_FIELD               'F'
 #define CMD_MBUS_MODE                   'G'
@@ -166,10 +183,13 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define CHANNEL_41                      41
 
 // Data rates
-#define DATARATE_2400bps                0x01
-#define DATARATE_4800bps                0x02
-#define DATARATE_19200bps               0x04
-#define DATARATE_6400bps                0x05
+#define DATARATE_2400bps                0x01    // Only OSP & WIZE
+#define DATARATE_4800bps                0x02    // Only OSP & WIZE
+#define DATARATE_6400bps                0x03    // Only WIZE
+#define DATARATE_19200bps               0x04    // Only OSP
+#define DATARATE_6400bps_OSP            0x05    // Only OSP
+
+static const uint32_t DATARATES[4] = {2400, 4800, 6400, 9600};
 
 // Power modes
 #define POWER_14dBm                     0x01
@@ -207,13 +227,6 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define NETWORK_ROLE_MASTER             0x01
 #define NETWORK_ROLE_REPEATER           0x02
 
-// Timeouts
-#define TIMEOUT_32MS                    0x01
-#define TIMEOUT_48MS                    0x02
-#define TIMEOUT_64MS                    0x03
-#define TIMEOUT_2S                      0x7C
-#define TIMEOUT_4S                      0xF9
-
 // LED Control
 #define LED_CONTROL_DISABLED            0x00
 #define LED_CONTROL_RX_TX               0x01
@@ -238,6 +251,7 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define PREAMBLE_FORMAT_B               0x02
 
 // Encryption Keys
+#define ENCRYPTION_KEY_NONE             0x00
 #define ENCRYPTION_KEY_01               0x01
 #define ENCRYPTION_KEY_02               0x02
 #define ENCRYPTION_KEY_03               0x03
@@ -255,3 +269,17 @@ static const uint8_t MEM_ADDRESS[MODULE_MAX-1][MEM_MAX_SLOTS] = {
 #define ENCRYPTION_KEY_CHANGE           0x0F
 #define ENCRYPTION_KEY_AUTH             0x10
 
+// Baud rates
+#define BAUDRATE_2400                   0x01
+#define BAUDRATE_4800                   0x02
+#define BAUDRATE_9600                   0x03
+#define BAUDRATE_14400                  0x04
+#define BAUDRATE_19200                  0x05
+#define BAUDRATE_28800                  0x06
+#define BAUDRATE_38400                  0x07
+#define BAUDRATE_57600                  0x08
+#define BAUDRATE_76800                  0x09
+#define BAUDRATE_115200                 0x0A
+#define BAUDRATE_230400                 0x0B
+
+static const uint32_t BAUDRATES[11] = {2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76800, 115200, 230400};

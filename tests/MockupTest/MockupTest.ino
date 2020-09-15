@@ -5,7 +5,7 @@ AllWize - Mockup Test suite
 This test suite uses Aunit unit testing framework (https://github.com/bxparks/AUnit)
 and RC1701XX_Mockup class that mocks up the RC1701XX radio module
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -100,20 +100,20 @@ testF(CustomTest, get_channel) {
 
 testF(CustomTest, set_mbus_mode) {
     uint8_t mode = MBUS_MODE_OSP;
-    allwize->setMBusMode(mode);
+    allwize->setMode(mode);
     uint8_t expected[] = {0x00, 'G', mode, 0x58};
     compare(sizeof(expected), expected);
 }
 
 testF(CustomTest, set_mbus_mode_persist) {
     uint8_t mode = MBUS_MODE_OSP;
-    allwize->setMBusMode(mode, true);
+    allwize->setMode(mode, true);
     uint8_t expected[] = {0x00, 'M', 0x03, mode, 0xFF, 0x58, 0x00, 'G', mode, 0x58};
     compare(sizeof(expected), expected);
 }
 
 testF(CustomTest, get_mbus_mode) {
-    allwize->getMBusMode();
+    allwize->getMode();
     uint8_t expected[] = {0x00, 'Y', 0x03, 0x58};
     compare(sizeof(expected), expected);
 }

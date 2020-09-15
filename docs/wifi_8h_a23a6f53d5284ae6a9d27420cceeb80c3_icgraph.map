@@ -1,0 +1,5 @@
+<map id="wifiConnect" name="wifiConnect">
+<area shape="rect" id="node2" href="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d" title="setup" alt="" coords="448,5,503,32"/>
+<area shape="rect" id="node3" href="$wifi_8cpp.html#a42e60a46afb05263a0369bd874b17be1" title="_wifiOnDisconnect" alt="" coords="144,31,276,57"/>
+<area shape="rect" id="node4" href="$wifi_8h.html#a38d7748bd0e2850cbf65c7e03ccd20cd" title="wifiSetup" alt="" coords="324,31,400,57"/>
+</map>

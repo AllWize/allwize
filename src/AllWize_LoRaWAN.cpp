@@ -6,7 +6,7 @@ This code is based on Adafruit's TinyLora Library and thus
 
 Copyright (C) 2015, 2016 Ideetron B.V.
 Modified by Brent Rubell for Adafruit Industries.
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018-2020 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,27 +23,76 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+/**
+ * @file AllWize_LoRaWAN.cpp
+ * AllWize library LoRaWAN wrapper code file
+ */
+
 #include "AllWize_LoRaWAN.h"
 
 /**
- * @brief   Stores the application and network keys for ABP activation
- * @param   Device addres
- * @param   Application Session Key
- * @param   Network Session Key
+ * @brief           Stores the application and network keys for ABP activation
+ * @param DevAddr   Device addres
+ * @param AppSKey   Application Session Key
+ * @param NwkSKey   Network Session Key
+ * @return          Allways true since ABP joins never fail
  */
 bool AllWize_LoRaWAN::joinABP(uint8_t *DevAddr, uint8_t *AppSKey, uint8_t * NwkSKey) {
+    
     memcpy(_devaddr, DevAddr, 4);
     memcpy(_appskey, AppSKey, 16);
     memcpy(_nwkskey, NwkSKey, 16);
+    
+    #if ALLWIZE_LORAWAN_REDUCE_SIZE    
+        setControlField(LORAWAN_C_FIELD_MASK | (LORAWAN_MAC_HEADER >> 4));
+    #endif
+
+    uint32_t uid = 0;
+    for (uint8_t i=0; i<4; i++) {
+        uid = (uid << 8) + DevAddr[i];
+    }
+    setUID(uid);
+
     return true;
+
 }
 
 /**
- * @brief   Function to assemble and send a LoRaWAN package.
- * @param   Pointer to the array of data to be transmitted.
- * @param   Frame counter for transfer frames.
- * @param   Length of data to be sent.
- * @param   Frame Port (defaults to 0x01)
+ * @brief               Returns latest received message (rebuilds LoRaWan header if necessary)
+ * @return              New message
+ */
+allwize_message_t AllWize_LoRaWAN::read() {
+    
+    allwize_message_t raw = AllWize::read();
+
+    // Rebuilds LoRaWAN MAC header and payload from
+    // Wize header info if C-Field matches LORAWAN_C_FIELD_MASK mask
+    if ((raw.c & LORAWAN_C_FIELD_MASK) == LORAWAN_C_FIELD_MASK) {
+        uint8_t tmp[RX_BUFFER_SIZE];
+        tmp[0] = (raw.c & 0x0F) << 4;
+        tmp[1] = raw.address[3];
+        tmp[2] = raw.address[2];
+        tmp[3] = raw.address[1];
+        tmp[4] = raw.address[0];
+        tmp[5] = LORAWAN_FRAME_CONTROL;
+        tmp[6] = raw.wize_counter & 0xFF;
+        tmp[7] = raw.wize_counter >> 8;
+        tmp[8] = raw.wize_application;
+        memcpy(&tmp[9], raw.data, raw.len);
+        raw.len += 9;
+        memcpy(raw.data, tmp, raw.len);
+    }
+
+    return raw;
+
+}
+
+/**
+ * @brief               Function to assemble and send a LoRaWAN package.
+ * @param Data          Pointer to the array of data to be transmitted.
+ * @param Data_Length   Length of data to be sent.
+ * @param Frame_Port    Frame Port (defaults to 0x01)
+ * @return              True if message was sent successfully, false otherwise
  */
 bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Port) {
   
@@ -53,23 +102,6 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     uint8_t LoRaWAN_Data_Length = 0;
     uint8_t MIC[4] = {0};
 
-    // Direction of frame is up
-    uint8_t Direction = 0x00;
-
-    // Unconfirmed data up
-    //  [7..5] MType (010 unconfirmed up, 100 confirmed up,...)
-    //  [4..2] RFU 
-    //  [1..0] Major
-    uint8_t Mac_Header = 0x40;
-
-    // Frame control
-    // [7] ADR
-    // [6] ADRACKReq
-    // [5] ACK
-    // [4] ClassB
-    // [3..0] FOptsLen
-    uint8_t Frame_Control = 0x00;
-
     // Make a copy of Data
     uint8_t tmpData[Data_Length];
     for (int i = 0; i < Data_Length; i++) {
@@ -77,19 +109,19 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     }
 
     // Encrypt Data (data argument is overwritten in this function)
-    Encrypt_Payload(tmpData, Data_Length, _frame_counter, Direction);
+    Encrypt_Payload(tmpData, Data_Length, _counter, LORAWAN_DIRECTION);
 
     // MAC Header
-    LoRaWAN_Data[0] = Mac_Header;
+    LoRaWAN_Data[0] = LORAWAN_MAC_HEADER;
     
     // MAC Payload - Frame Header
     LoRaWAN_Data[1] = _devaddr[3];
     LoRaWAN_Data[2] = _devaddr[2];
     LoRaWAN_Data[3] = _devaddr[1];
     LoRaWAN_Data[4] = _devaddr[0];
-    LoRaWAN_Data[5] = Frame_Control;
-    LoRaWAN_Data[6] = (_frame_counter & 0x00FF);
-    LoRaWAN_Data[7] = ((_frame_counter >> 8) & 0x00FF);
+    LoRaWAN_Data[5] = LORAWAN_FRAME_CONTROL;
+    LoRaWAN_Data[6] = (_counter & 0x00FF);
+    LoRaWAN_Data[7] = ((_counter >> 8) & 0x00FF);
 
     // MAC Payload - Frame Port
     LoRaWAN_Data[8] = Frame_Port;
@@ -104,28 +136,45 @@ bool AllWize_LoRaWAN::send(uint8_t *Data, uint8_t Data_Length, uint8_t Frame_Por
     LoRaWAN_Data_Length += Data_Length;
 
     // Calculate MIC
-    Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _frame_counter, Direction);
+    Calculate_MIC(LoRaWAN_Data, MIC, LoRaWAN_Data_Length, _counter, LORAWAN_DIRECTION);
 
     // Load MIC in package
     for(i = 0; i < 4; i++) {
-        LoRaWAN_Data[i + LoRaWAN_Data_Length] = MIC[i];
+        LoRaWAN_Data[LoRaWAN_Data_Length + i] = MIC[i];
     }
     LoRaWAN_Data_Length += 4;
 
-    // Update frame counter
-    ++_frame_counter;
+    #if defined(ALLWIZE_DEBUG_PORT)
+        ALLWIZE_DEBUG_PORT.print("[LORAWAN] PHYPayload: ");
+        char buff[6];
+        for(i = 0; i < LoRaWAN_Data_Length; i++) {
+            snprintf(buff, sizeof(buff), "%02X", LoRaWAN_Data[i]);
+            ALLWIZE_DEBUG_PORT.print(buff);
+        }
+        ALLWIZE_DEBUG_PORT.println();
+    #endif
+
+    #if ALLWIZE_LORAWAN_REDUCE_SIZE    
+        setWizeApplication(Frame_Port);
+        #define ALLWIZE_LORAWAN_SKIP_BYTES 9
+    #else 
+        #define ALLWIZE_LORAWAN_SKIP_BYTES 0
+    #endif
 
     // Send Package
-    return AllWize::send(LoRaWAN_Data, LoRaWAN_Data_Length);
+    return AllWize::send(&LoRaWAN_Data[ALLWIZE_LORAWAN_SKIP_BYTES], LoRaWAN_Data_Length - ALLWIZE_LORAWAN_SKIP_BYTES);
 
 }
 
+// ----------------------------------------------------------------------------
+
 /**
- * @brief   Function used to encrypt and decrypt the data in a LoRaWAN data packet.
- * @param   Data Pointer to the data to decrypt or encrypt.
- * @param   Number of bytes to be transmitted.
- * @param   Frame_Counter. Counts upstream frames.
- * @param   Direction of message (is up).
+ * @brief               Function used to encrypt and decrypt the data in a LoRaWAN data packet.
+ * @param Data          Data Pointer to the data to decrypt or encrypt.
+ * @param Data_Length   Number of bytes to be transmitted.
+ * @param Frame_Counter Frame_Counter. Counts upstream frames.
+ * @param Direction     Direction of message (is up).
+ * @private
  */
 void AllWize_LoRaWAN::Encrypt_Payload(uint8_t *Data, uint8_t Data_Length, uint16_t Frame_Counter, uint8_t Direction) {
     
@@ -144,6 +193,7 @@ void AllWize_LoRaWAN::Encrypt_Payload(uint8_t *Data, uint8_t Data_Length, uint16
     }
 
     for (i = 1; i <= Number_of_Blocks; i++) {
+
         Block_A[0] = 0x01;
         Block_A[1] = 0x00;
         Block_A[2] = 0x00;
@@ -189,12 +239,13 @@ void AllWize_LoRaWAN::Encrypt_Payload(uint8_t *Data, uint8_t Data_Length, uint16
 }
 
 /**
- * @brief   Function used to calculate the validity of data messages.
- * @param   Data Pointer to the data to decrypt or encrypt.
- * @param   Number of bytes to be transmitted.
- * @param   Pointer to MIC array (4 bytes).
- * @param   Frame counter of upstream frames.
- * @param   Direction of message (is up?).
+ * @brief               Function used to calculate the validity of data messages.
+ * @param Data          Data Pointer to the data to decrypt or encrypt.
+ * @param Final_MIC     Pointer to MIC array (4 bytes).
+ * @param Data_Length   Number of bytes to be transmitted.
+ * @param Frame_Counter Frame counter of upstream frames.
+ * @param Direction     Direction of message (is up?).
+ * @private
 */
 void AllWize_LoRaWAN::Calculate_MIC(uint8_t *Data, uint8_t *Final_MIC, uint8_t Data_Length, uint16_t Frame_Counter, uint8_t Direction) {
     
@@ -203,19 +254,23 @@ void AllWize_LoRaWAN::Calculate_MIC(uint8_t *Data, uint8_t *Final_MIC, uint8_t D
 
     uint8_t Key_K1[16] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
     uint8_t Key_K2[16] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
 
     //uint8_t Data_Copy[16];
 
     uint8_t Old_Data[16] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
     uint8_t New_Data[16] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
 
     uint8_t Number_of_Blocks = 0x00;
     uint8_t Incomplete_Block_Size = 0x00;
@@ -344,9 +399,10 @@ void AllWize_LoRaWAN::Calculate_MIC(uint8_t *Data, uint8_t *Final_MIC, uint8_t D
 }
 
 /**
- * @brief   Function used to generate keys for the MIC calculation.
- * @param   Pointer to Key1.
- * @param   Pointer to Key2.
+ * @brief       Function used to generate keys for the MIC calculation.
+ * @param K1    Pointer to Key1.
+ * @param K2    Pointer to Key2.
+ * @private
  */
 void AllWize_LoRaWAN::Generate_Keys(uint8_t *K1, uint8_t *K2) {
 
@@ -394,6 +450,11 @@ void AllWize_LoRaWAN::Generate_Keys(uint8_t *K1, uint8_t *K2) {
 
 }
 
+/**
+ * @brief       Round-shifts data to the left
+ * @param Data  Data buffer
+ * @private
+ */
 void AllWize_LoRaWAN::Shift_Left(uint8_t *Data) {
 
     uint8_t i;
@@ -422,9 +483,10 @@ void AllWize_LoRaWAN::Shift_Left(uint8_t *Data) {
 }
 
 /**
- * @brief   Function to XOR two character arrays.
- * @param   A pointer to the calculated data.
- * @param   A pointer to the data to be xor'd.
+ * @brief           Function to XOR two character arrays.
+ * @param New_Data  A pointer to the calculated data.
+ * @param Old_Data  A pointer to the data to be xor'd.
+ * @private
  */
 void AllWize_LoRaWAN::XOR(uint8_t *New_Data, uint8_t *Old_Data) {
 
@@ -462,9 +524,10 @@ const uint8_t PROGMEM AllWize_LoRaWAN::S_Table[16][16] = {
 	};
 
 /**
- * @brief   Function used to perform AES encryption.
- * @param   Pointer to the data to decrypt or encrypt.
- * @param   Pointer to AES encryption key.
+ * @brief       Function used to perform AES encryption.
+ * @param Data  Pointer to the data to decrypt or encrypt.
+ * @param Key   Pointer to AES encryption key.
+ * @private
  */
 void AllWize_LoRaWAN::AES_Encrypt(uint8_t *Data, const uint8_t *Key) {
     
@@ -535,9 +598,10 @@ void AllWize_LoRaWAN::AES_Encrypt(uint8_t *Data, const uint8_t *Key) {
 }
 
 /**
- * @brief   Function performs AES AddRoundKey step.
- * @param   Pointer to the round subkey.
- * @param   Pointer to bytes of the states-to-be-xor'd.
+ * @brief           Function performs AES AddRoundKey step.
+ * @param Round_Key Pointer to the round subkey.
+ * @param *State    Pointer to bytes of the states-to-be-xor'd.
+ * @private
  */
 void AllWize_LoRaWAN::AES_Add_Round_Key(uint8_t *Round_Key, uint8_t (*State)[4]) {
     
@@ -552,8 +616,10 @@ void AllWize_LoRaWAN::AES_Add_Round_Key(uint8_t *Round_Key, uint8_t (*State)[4])
 }
 
 /**
- * @brief   Function performs AES SubBytes step.
- * @param   Individual byte, from state array.
+ * @brief       Function performs AES SubBytes step.
+ * @param Byte  Individual byte, from state array.
+ * @return      Byte from the S_Table table
+ * @private
  */
 uint8_t AllWize_LoRaWAN::AES_Sub_Byte(uint8_t Byte) {
 
@@ -570,8 +636,9 @@ uint8_t AllWize_LoRaWAN::AES_Sub_Byte(uint8_t Byte) {
 }
 
 /**
- * @brief   Function performs AES ShiftRows step.
- * @param   Pointer to state array.
+ * @brief           Function performs AES ShiftRows step.
+ * @param *State    Pointer to state array.
+ * @private
  */
 void AllWize_LoRaWAN::AES_Shift_Rows(uint8_t (*State)[4]) {
 
@@ -601,8 +668,9 @@ void AllWize_LoRaWAN::AES_Shift_Rows(uint8_t (*State)[4]) {
 }
 
 /**
- * @brief   Function performs AES MixColumns step.
- * @param   Pointer to state array.
+ * @brief           Function performs AES MixColumns step.
+ * @param *State    Pointer to state array.
+ * @private
  */
 void AllWize_LoRaWAN::AES_Mix_Collums(uint8_t (*State)[4]) {
     
@@ -628,9 +696,10 @@ void AllWize_LoRaWAN::AES_Mix_Collums(uint8_t (*State)[4]) {
 }
 
 /**
- * @brief   Function performs AES Round Key Calculation.
- * @param   Number of rounds to perform (depends on key size).
- * @param   Pointer to round key.
+ * @brief           Function performs AES Round Key Calculation.
+ * @param Round     Number of rounds to perform (depends on key size).
+ * @param Round_Key Pointer to round key.
+ * @private
  */
 void AllWize_LoRaWAN::AES_Calculate_Round_Key(uint8_t Round, uint8_t *Round_Key) {
     
