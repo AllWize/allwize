@@ -485,6 +485,7 @@ bool AllWize::available() {
     if ((_pointer > 0) && (millis() - when > 100)) {
         
         response = _decode();
+        _length = _pointer;
         _pointer = 0;
         
         // If we don't soft-reset the line the RX channel gets stalled
@@ -502,6 +503,23 @@ bool AllWize::available() {
  */
 allwize_message_t AllWize::read() {
     return _message;
+}
+
+/**
+ * @brief               Returns pointer to the last message raw data buffer
+ *                      Should be copied right away since any new incomming message with overwrite it
+ * @return              Message buffer
+ */
+uint8_t * AllWize::getBuffer() {
+    return _buffer;
+}
+
+/**
+ * @brief               Returns the length of the last message raw data buffer
+ * @return              Message length
+ */
+uint8_t AllWize::getLength() {
+    return _length;
 }
 
 /**

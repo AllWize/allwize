@@ -114,6 +114,8 @@ class AllWize {
         bool available();
         bool enableRX(bool enable);
         allwize_message_t read();
+        uint8_t * getBuffer();
+        uint8_t getLength();
 
         void setControlInformation(uint8_t ci);
         uint8_t getControlInformation();
@@ -283,6 +285,7 @@ class AllWize {
         allwize_message_t _message;
         uint8_t _buffer[RX_BUFFER_SIZE];
         uint8_t _pointer = 0;
+        uint8_t _length = 0;
 
 };
 
