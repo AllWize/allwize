@@ -55,7 +55,7 @@ void wizeSetup() {
     allwize.begin();
     if (!allwize.waitForReady()) {
         DEBUG_SERIAL.println("[WIZE] Error connecting to the module, check your wiring!");
-        while (true);
+        while (true) delay(1);
     }
 
     allwize.master();
@@ -87,7 +87,7 @@ void wizeDebugMessage(allwize_message_t message) {
             message.man,
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
+            message.wize_control, message.wize_network_id, message.wize_application, message.wize_counter,
             (int16_t) message.rssi / -2
         );
     } else {

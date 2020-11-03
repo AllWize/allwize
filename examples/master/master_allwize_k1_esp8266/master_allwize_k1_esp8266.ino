@@ -62,8 +62,8 @@ RESET   RST 	Reset 	                        RST
 */
 
 #define RESET_PIN               14
-#define RX_PIN                  12
-#define TX_PIN                  13
+#define RX_PIN                  4
+#define TX_PIN                  5
 #define DEBUG_SERIAL            Serial
 
 // -----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void wizeDebugMessage(allwize_message_t message) {
             message.man,
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
+            message.wize_control, message.wize_network_id, message.wize_application, message.wize_counter,
             (int16_t) message.rssi / -2
         );
     } else {
