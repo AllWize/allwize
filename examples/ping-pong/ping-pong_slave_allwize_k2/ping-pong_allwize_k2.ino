@@ -60,7 +60,7 @@ AllWize allwize(&MODULE_SERIAL, RESET_PIN);
 
 void wizeSetup() {
 
-    DEBUG_SERIAL.println("Initializing radio module");
+    DEBUG_SERIAL.println("[WIZE] Initializing radio module");
 
     // Init AllWize object
     allwize.begin();
@@ -76,7 +76,7 @@ void wizeSetup() {
     allwize.setUID(WIZE_UID);
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRate());
+    snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize.getChannel(), allwize.getDataRateSpeed(allwize.getDataRate()));
     DEBUG_SERIAL.print(buffer);
 
 }
@@ -95,18 +95,6 @@ void wizeDebug() {
             DEBUG_SERIAL.print(buffer);
         }
         DEBUG_SERIAL.println();
-
-}
-
-void wizeSend(const char * payload) {
-
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "[WIZE] Sending '%s'\n", payload);
-    DEBUG_SERIAL.print(buffer);
-
-    if (!allwize.send(payload)) {
-        DEBUG_SERIAL.println("[WIZE] Error sending message");
-    }
 
 }
 
