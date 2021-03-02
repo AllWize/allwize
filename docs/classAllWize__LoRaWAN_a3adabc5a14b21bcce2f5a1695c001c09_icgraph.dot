@@ -1,0 +1,10 @@
+digraph "AllWize_LoRaWAN::Encrypt_Payload"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="AllWize_LoRaWAN::Encrypt\l_Payload",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Function used to encrypt and decrypt the data in a LoRaWAN data packet."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize_LoRaWAN::send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize__LoRaWAN.html#a99faabcc5e67ed0a2dfde556f9025fcd",tooltip="Function to assemble and send a LoRaWAN package."];
+}

@@ -1,17 +1,18 @@
 digraph "AllWize::setMode"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node1530 [label="AllWize::setMode",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node1530 -> Node1531 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1531 [label="AllWize::master",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9",tooltip="Sets the module in master mode. "];
-  Node1531 -> Node1532 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1532 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4"];
-  Node1532 -> Node1533 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1533 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d"];
-  Node1530 -> Node1534 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1534 [label="AllWize::slave",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88",tooltip="Sets the module in slave mode. "];
-  Node1530 -> Node1535 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1535 [label="AllWize::repeater",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a5c455d5592a76becb86dc80ecc60e318",tooltip="Sets the module in repeater mode. "];
+  rankdir="RL";
+  Node1 [label="AllWize::setMode",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Sets the module in one of the available MBus modes."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::master",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9",tooltip="Sets the module in master mode."];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4",tooltip=" "];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d",tooltip=" "];
+  Node1 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="AllWize::repeater",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a5c455d5592a76becb86dc80ecc60e318",tooltip="Sets the module in repeater mode."];
+  Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="AllWize::slave",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88",tooltip="Sets the module in slave mode."];
 }

@@ -4,7 +4,7 @@ AllWize K1 + ESP32-based Board
 
 Simple slave that sends an auto-increment number every 5 seconds.
 
-Copyright (C) 2018-2020 by AllWize <github@allwize.io>
+Copyright (C) 2018-2021 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,21 +1,20 @@
 digraph "AllWize::setControlField"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node1358 [label="AllWize::setControlField",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node1358 -> Node1359 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1359 [label="AllWize::master",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9",tooltip="Sets the module in master mode. "];
-  Node1359 -> Node1360 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1360 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4"];
-  Node1360 -> Node1361 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1361 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d"];
-  Node1358 -> Node1362 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1362 [label="AllWize::slave",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88",tooltip="Sets the module in slave mode. "];
-  Node1358 -> Node1363 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1363 [label="AllWize::ack",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a4e471ab83ad5bb3b04d0f6361c636172",tooltip="Sends an ACK. "];
-  Node1358 -> Node1364 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1364 [label="AllWize_LoRaWAN::joinABP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize__LoRaWAN.html#a744997b05e64e223306d6a4b737d5d18",tooltip="Stores the application and network keys for ABP activation. "];
-  Node1364 -> Node1365 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1365 [label="AllWize_LoRaWAN::AllWize\l_LoRaWAN",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize__LoRaWAN.html#ac5b05857f081334c65f538e1625af1fc"];
+  rankdir="RL";
+  Node1 [label="AllWize::setControlField",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Sets the control field value."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::ack",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a4e471ab83ad5bb3b04d0f6361c636172",tooltip="Sends an ACK."];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="AllWize_LoRaWAN::joinABP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize__LoRaWAN.html#a744997b05e64e223306d6a4b737d5d18",tooltip="Stores the application and network keys for ABP activation."];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="AllWize::master",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a4bc5852f9e7b1b561d58824c9cdc25c9",tooltip="Sets the module in master mode."];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4",tooltip=" "];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d",tooltip=" "];
+  Node1 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="AllWize::slave",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a04923626b08d628f4fa4ecef2f424f88",tooltip="Sets the module in slave mode."];
 }

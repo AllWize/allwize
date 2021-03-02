@@ -3,6 +3,19 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.6] 2021-03-02
+### Fixed
+- Fix byte order in wize frame timestamp
+
+### Added
+- Added several examples (TPL5111, transparent master)
+- Added MAC2 check only flag methods
+- Wize channel numbering (CHANNEL_100 to CHANNEL_150)
+- Using seconds since boot for wize frame timestamp
+
+### Deprecated
+- Removed deprecated operator_id
+
 ## [1.1.5] 2020-05-27
 ### Fixed
 - Fix wrong L6 size

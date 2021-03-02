@@ -1,5 +1,0 @@
-<map id="AllWize::send" name="AllWize::send">
-<area shape="rect" id="node2" href="$classAllWize.html#abaf41b1ea4c1ffe08c65be9612a58639" title="Sends c&#45;string. " alt="" coords="191,5,294,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a4e471ab83ad5bb3b04d0f6361c636172" title="Sends an ACK. " alt="" coords="195,56,291,83"/>
-<area shape="rect" id="node4" href="$classAllWize__LoRaWAN.html#a99faabcc5e67ed0a2dfde556f9025fcd" title="Function to assemble and send a LoRaWAN package. " alt="" coords="156,107,329,133"/>
-</map>

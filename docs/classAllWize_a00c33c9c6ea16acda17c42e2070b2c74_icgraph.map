@@ -1,5 +1,0 @@
-<map id="AllWize::_getSlotAsHexString" name="AllWize::_getSlotAsHexString">
-<area shape="rect" id="node2" href="$classAllWize.html#af5845d6ca0dcab9a6b334c23315601ca" title="Returns the Manufacturer ID. " alt="" coords="277,5,396,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a9b1ffa7c920060bb835003f064c0da49" title="Returns the Unique ID string. " alt="" coords="278,56,395,83"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464" title="Returns the module serial number. " alt="" coords="251,107,423,133"/>
-</map>

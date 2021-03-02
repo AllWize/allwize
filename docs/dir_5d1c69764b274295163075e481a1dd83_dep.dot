@@ -1,0 +1,15 @@
+digraph "examples/lorawan/lorawan_gateway" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_c2c6dbbb93a63a6ce99f05b7722cbefb {
+    graph [ bgcolor="#ddddee", pencolor="black", label="lorawan" fontname="Helvetica", fontsize="10", URL="dir_c2c6dbbb93a63a6ce99f05b7722cbefb.html"]
+  subgraph clusterdir_5d1c69764b274295163075e481a1dd83 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_5d1c69764b274295163075e481a1dd83.html"];
+    dir_5d1c69764b274295163075e481a1dd83 [shape=plaintext label="lorawan_gateway"];
+    dir_3e5a10d42a3ad3fd08781deeaee93ba6 [shape=box label="src" color="black" fillcolor="white" style="filled" URL="dir_3e5a10d42a3ad3fd08781deeaee93ba6.html"];
+  }
+  }
+  dir_68267d1309a1af8e8297ef4c3efbcdba [shape=box label="src" URL="dir_68267d1309a1af8e8297ef4c3efbcdba.html"];
+  dir_3e5a10d42a3ad3fd08781deeaee93ba6->dir_68267d1309a1af8e8297ef4c3efbcdba [headlabel="4", labeldistance=1.5 headhref="dir_000020_000021.html"];
+}

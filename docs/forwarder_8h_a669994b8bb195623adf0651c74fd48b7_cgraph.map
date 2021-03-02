@@ -1,6 +1,0 @@
-<map id="forwarderPing" name="forwarderPing">
-<area shape="rect" id="node2" href="$wifi_8cpp.html#ab541d765a7171f3f51309fd02fb8d8af" title="wifiConnected" alt="" coords="157,5,262,32"/>
-<area shape="rect" id="node3" href="$ntp_8cpp.html#a38176e018674e131012199be52193c4d" title="ntpSynced" alt="" coords="167,56,251,83"/>
-<area shape="rect" id="node4" href="$ntp_8cpp.html#a10568245db35b122c3f432a867af3a1d" title="ntpDateTime" alt="" coords="161,107,258,133"/>
-<area shape="rect" id="node5" href="$forwarder_8cpp.html#a4663d8490737595a72f0c5cfd24e0f89" title="forwarderSend" alt="" coords="156,157,263,184"/>
-</map>

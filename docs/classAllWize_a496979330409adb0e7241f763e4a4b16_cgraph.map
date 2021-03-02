@@ -1,5 +1,0 @@
-<map id="AllWize::_decode" name="AllWize::_decode">
-<area shape="rect" id="node2" href="$classAllWize.html#ab6655635693180ad4c7b527d1f2e4e03" title="Gets the MBus mode stored in non&#45;volatile memory. " alt="" coords="201,5,326,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#a25a3c09558ff3d794bf5a150d3be6c4c" title="Gets the data interface for receiving packets. " alt="" coords="177,56,349,83"/>
-<area shape="rect" id="node4" href="$classAllWize.html#af72915664acbfe41f21d8820df833fb6" title="Gets the current RSSI mode value. " alt="" coords="179,107,348,133"/>
-</map>

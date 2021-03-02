@@ -5,7 +5,7 @@ AllWize - BME280 Slave Example
 Shows how to use aBME280 sensor (temperature, humidity & pressure)
 to send environmental data.
 
-Copyright (C) 2018-2020 by AllWize <github@allwize.io>
+Copyright (C) 2018-2021 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

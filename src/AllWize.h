@@ -2,7 +2,7 @@
 
 AllWize Library
 
-Copyright (C) 2018-2020 by AllWize <github@allwize.io>
+Copyright (C) 2018-2021 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -114,6 +114,8 @@ class AllWize {
         bool available();
         bool enableRX(bool enable);
         allwize_message_t read();
+        uint8_t * getBuffer();
+        uint8_t getLength();
 
         void setControlInformation(uint8_t ci);
         uint8_t getControlInformation();
@@ -135,6 +137,7 @@ class AllWize {
         void setDataInterface(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
         void setInstallMode(uint8_t mode, bool persist = false);
+        void setMAC2CheckOnlyFlag(uint8_t flag);
         void setEncryptFlag(uint8_t flag);
         void setDecryptFlag(uint8_t flag);
         void setKey(uint8_t reg, const uint8_t * key);
@@ -155,6 +158,7 @@ class AllWize {
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
         uint8_t getInstallMode();
+        uint8_t getMAC2CheckOnlyFlag();
         uint8_t getEncryptFlag();
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
@@ -274,7 +278,7 @@ class AllWize {
         String _fw;
 
         // Wize specific
-        uint8_t _wize_control = 0x00;
+        uint8_t _wize_control = 0x40;
         uint16_t _wize_network_id = 0;
         uint8_t _wize_application = 0xFE;
         uint16_t _counter = 0;
@@ -283,6 +287,7 @@ class AllWize {
         allwize_message_t _message;
         uint8_t _buffer[RX_BUFFER_SIZE];
         uint8_t _pointer = 0;
+        uint8_t _length = 0;
 
 };
 

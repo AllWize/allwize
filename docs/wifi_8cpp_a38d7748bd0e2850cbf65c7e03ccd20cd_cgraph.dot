@@ -1,0 +1,16 @@
+digraph "wifiSetup"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="wifiSetup",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="_wifiOnConnect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wifi_8cpp.html#a5af06e9a96f589c46add73113d213247",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="ntpConnect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ntp_8cpp.html#aeeb729465bd4f0804f4978b61174e8e4",tooltip=" "];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="_wifiOnDisconnect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wifi_8cpp.html#a42e60a46afb05263a0369bd874b17be1",tooltip=" "];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="wifiConnect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wifi_8cpp.html#a23a6f53d5284ae6a9d27420cceeb80c3",tooltip=" "];
+}

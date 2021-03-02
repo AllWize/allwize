@@ -1,26 +1,27 @@
 digraph "AllWize::_readBytes"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node248 [label="AllWize::_readBytes",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node248 -> Node249 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node249 [label="AllWize::_cacheMemory",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e",tooltip="Reads and caches the module memory. "];
-  Node249 -> Node250 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node250 [label="AllWize::_resetSerial",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a49c6e7f221248b0f3a20247346da21f8",tooltip="Resets the serial object. "];
-  Node250 -> Node251 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node251 [label="AllWize::reset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3",tooltip="Resets the radio module. "];
-  Node251 -> Node252 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node252 [label="AllWize::begin",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa",tooltip="Inits the module communications. "];
-  Node252 -> Node253 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node253 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4"];
-  Node253 -> Node254 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node254 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d"];
-  Node250 -> Node255 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node255 [label="AllWize::factoryReset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba",tooltip="Resets the module to factory settings. "];
-  Node249 -> Node256 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node256 [label="AllWize::dump",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a97bd049b28f17fcb7fbad99f9d42c790",tooltip="Dumps the current memory configuration to the given stream. "];
-  Node249 -> Node257 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node257 [label="AllWize::_readModel",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564",tooltip="Searches for the module model. "];
-  Node257 -> Node252 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  rankdir="RL";
+  Node1 [label="AllWize::_readBytes",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Reads the stream buffer up to a number of bytes."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::_cacheMemory",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a66d3d78edddcc8dfde0cfb1b6deec56e",tooltip="Reads and caches the module memory."];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="AllWize::_readModel",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ae8c87383e24fc244c5f90c204b813564",tooltip="Searches for the module model."];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="AllWize::begin",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa",tooltip="Inits the module communications."];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4",tooltip=" "];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d",tooltip=" "];
+  Node2 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="AllWize::_resetSerial",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a49c6e7f221248b0f3a20247346da21f8",tooltip="Resets the serial object."];
+  Node7 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="AllWize::factoryReset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba",tooltip="Resets the module to factory settings."];
+  Node7 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="AllWize::reset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3",tooltip="Resets the radio module."];
+  Node9 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="AllWize::dump",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a97bd049b28f17fcb7fbad99f9d42c790",tooltip="Dumps the current memory configuration to the given stream."];
 }

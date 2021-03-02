@@ -1,17 +1,18 @@
 digraph "AllWize::_resetSerial"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node382 [label="AllWize::_resetSerial",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node382 -> Node383 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node383 [label="AllWize::reset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3",tooltip="Resets the radio module. "];
-  Node383 -> Node384 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node384 [label="AllWize::begin",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa",tooltip="Inits the module communications. "];
-  Node384 -> Node385 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node385 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4"];
-  Node385 -> Node386 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node386 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d"];
-  Node382 -> Node387 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node387 [label="AllWize::factoryReset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba",tooltip="Resets the module to factory settings. "];
+  rankdir="RL";
+  Node1 [label="AllWize::_resetSerial",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Resets the serial object."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::factoryReset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a33273da3cd44bc21a930c6f572b902ba",tooltip="Resets the module to factory settings."];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="AllWize::reset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a8ea0b58caedcde0af56ffc5547cb84a3",tooltip="Resets the radio module."];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="AllWize::begin",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a221a7145fd37d4c5fccb786a74d9ceaa",tooltip="Inits the module communications."];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="wizeSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$wize_8h.html#a6bd811aed13d28451110ad176dabf3c4",tooltip=" "];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8cpp.html#a4fc01d736fe50cf5b977f755b675f11d",tooltip=" "];
 }

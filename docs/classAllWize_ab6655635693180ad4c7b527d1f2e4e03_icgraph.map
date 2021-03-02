@@ -1,6 +1,0 @@
-<map id="AllWize::getMode" name="AllWize::getMode">
-<area shape="rect" id="node2" href="$classAllWize.html#a496979330409adb0e7241f763e4a4b16" title="Decodes the current RX buffer contents. " alt="" coords="179,5,303,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#ae75c391473baf8107cae11f2134b7316" title="Returns true if a new message has been received and decoded This method has to be called in the main ..." alt="" coords="351,5,477,32"/>
-<area shape="rect" id="node4" href="$wize_8h.html#af9253c855c25f3da04c29b2dbcda1ebd" title="wizeLoop" alt="" coords="525,5,603,32"/>
-<area shape="rect" id="node5" href="$main_8cpp.html#afe461d27b9c48d5921c00d521181f12f" title="loop" alt="" coords="651,5,697,32"/>
-</map>

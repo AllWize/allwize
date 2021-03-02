@@ -1,13 +1,14 @@
 digraph "AllWize::_getSlotAsHexString"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node176 [label="AllWize::_getSlotAsHexString",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node176 -> Node177 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node177 [label="AllWize::getMID",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#af5845d6ca0dcab9a6b334c23315601ca",tooltip="Returns the Manufacturer ID. "];
-  Node176 -> Node178 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node178 [label="AllWize::getUID",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a9b1ffa7c920060bb835003f064c0da49",tooltip="Returns the Unique ID string. "];
-  Node176 -> Node179 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node179 [label="AllWize::getSerialNumber",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464",tooltip="Returns the module serial number. "];
+  rankdir="RL";
+  Node1 [label="AllWize::_getSlotAsHexString",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Returns the contents of the memory from a certain address as an HEX String."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::getMID",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#af5845d6ca0dcab9a6b334c23315601ca",tooltip="Returns the Manufacturer ID."];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="AllWize::getSerialNumber",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464",tooltip="Returns the module serial number."];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="AllWize::getUID",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a9b1ffa7c920060bb835003f064c0da49",tooltip="Returns the Unique ID string."];
 }

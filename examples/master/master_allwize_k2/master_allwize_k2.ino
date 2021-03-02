@@ -5,7 +5,7 @@ AllWize K2
 Listens to messages on the same channel and data rate
 and prints them out via the serial monitor.
 
-Copyright (C) 2018-2020 by AllWize <github@allwize.io>
+Copyright (C) 2018-2021 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ void wizeDebugMessage(allwize_message_t message) {
             message.man,
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
+            message.wize_control, message.wize_network_id, message.wize_application, message.wize_counter,
             (int16_t) message.rssi / -2
         );
     } else {

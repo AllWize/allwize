@@ -1,6 +1,0 @@
-<map id="AllWize::_bin2hex" name="AllWize::_bin2hex">
-<area shape="rect" id="node2" href="$classAllWize.html#a00c33c9c6ea16acda17c42e2070b2c74" title="Returns the contents of the memory from a certain address as an HEX String. " alt="" coords="180,56,377,83"/>
-<area shape="rect" id="node3" href="$classAllWize.html#af5845d6ca0dcab9a6b334c23315601ca" title="Returns the Manufacturer ID. " alt="" coords="452,5,571,32"/>
-<area shape="rect" id="node4" href="$classAllWize.html#a9b1ffa7c920060bb835003f064c0da49" title="Returns the Unique ID string. " alt="" coords="453,56,570,83"/>
-<area shape="rect" id="node5" href="$classAllWize.html#a0a0ac3f0d56a60c6baa5ddea443d4464" title="Returns the module serial number. " alt="" coords="425,107,597,133"/>
-</map>
