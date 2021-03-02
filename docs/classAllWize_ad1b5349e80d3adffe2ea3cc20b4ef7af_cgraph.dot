@@ -1,25 +1,26 @@
 digraph "AllWize::_sendCommand"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node536 [label="AllWize::_sendCommand",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node536 -> Node537 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node537 [label="AllWize::_setConfig",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a493af0599b973f713192b175000264e6",tooltip="Sets or unsets config mode. "];
-  Node537 -> Node538 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node538 [label="AllWize::_flush",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551",tooltip="Flushes the serial line to the module. "];
-  Node537 -> Node539 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node539 [label="AllWize::_sendAndReceive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1",tooltip="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..."];
-  Node539 -> Node540 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node540 [label="AllWize::_send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9",tooltip="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. "];
-  Node539 -> Node541 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node541 [label="AllWize::_receive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb",tooltip="Listens to incoming data from the module until timeout or END_OF_RESPONSE. "];
-  Node541 -> Node542 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node542 [label="AllWize::_readBytesUntil",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c",tooltip="Reads the stream buffer up to a certain char or times out. "];
-  Node542 -> Node543 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node543 [label="AllWize::_timedRead",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf",tooltip="Reads a byte from the stream with a timeout. "];
-  Node537 -> Node540 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node537 -> Node544 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node544 [label="AllWize::_niceDelay",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72",tooltip="Does a non-blocking delay. "];
-  Node536 -> Node539 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="AllWize::_sendCommand",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Sends a command with no data."];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::_sendAndReceive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#af4c575f742b3c2a837058846b83fbfe1",tooltip="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..."];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="AllWize::_receive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb",tooltip="Listens to incoming data from the module until timeout or END_OF_RESPONSE."];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="AllWize::_readBytesUntil",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c",tooltip="Reads the stream buffer up to a certain char or times out."];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="AllWize::_timedRead",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf",tooltip="Reads a byte from the stream with a timeout."];
+  Node2 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="AllWize::_send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9",tooltip="Sends a binary buffer to the module UART. Returns the number of bytes actually sent."];
+  Node1 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="AllWize::_setConfig",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a493af0599b973f713192b175000264e6",tooltip="Sets or unsets config mode."];
+  Node7 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="AllWize::_flush",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ace21941ce1a1174ef567c1a269ebf551",tooltip="Flushes the serial line to the module."];
+  Node7 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="AllWize::_niceDelay",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#afeed45d2a47e184092d6dcd64c22fb72",tooltip="Does a non-blocking delay."];
+  Node7 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }

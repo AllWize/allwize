@@ -1,15 +1,16 @@
 digraph "AllWize::_sendAndReceive"
 {
+ // LATEX_PDF_SIZE
   edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
   node [fontname="Helvetica",fontsize="10",shape=record];
   rankdir="LR";
-  Node438 [label="AllWize::_sendAndReceive",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node438 -> Node439 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node439 [label="AllWize::_send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9",tooltip="Sends a binary buffer to the module UART. Returns the number of bytes actually sent. "];
-  Node438 -> Node440 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node440 [label="AllWize::_receive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb",tooltip="Listens to incoming data from the module until timeout or END_OF_RESPONSE. "];
-  Node440 -> Node441 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node441 [label="AllWize::_readBytesUntil",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c",tooltip="Reads the stream buffer up to a certain char or times out. "];
-  Node441 -> Node442 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node442 [label="AllWize::_timedRead",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf",tooltip="Reads a byte from the stream with a timeout. "];
+  Node1 [label="AllWize::_sendAndReceive",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Sends a binary buffer and waits for response. Returns the number of bytes received and stored in the ..."];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="AllWize::_receive",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a197c8bd0c47789acefd4e360ca697feb",tooltip="Listens to incoming data from the module until timeout or END_OF_RESPONSE."];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="AllWize::_readBytesUntil",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c",tooltip="Reads the stream buffer up to a certain char or times out."];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="AllWize::_timedRead",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf",tooltip="Reads a byte from the stream with a timeout."];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="AllWize::_send",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classAllWize.html#ac194cac5fd63b864ef567fb7a51a2ac9",tooltip="Sends a binary buffer to the module UART. Returns the number of bytes actually sent."];
 }

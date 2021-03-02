@@ -4,7 +4,7 @@ AllWize - Module Info Example
 
 Pretty-prints out the configuration settings stored in the module non-volatile memory.
 
-Copyright (C) 2018-2020 by AllWize <github@allwize.io>
+Copyright (C) 2018-2021 by AllWize <github@allwize.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,4 +1,0 @@
-<map id="AllWize::_receive" name="AllWize::_receive">
-<area shape="rect" id="node2" href="$classAllWize.html#a3cdbc480293b0e3c24107c549b485d5c" title="Reads the stream buffer up to a certain char or times out. " alt="" coords="177,5,345,32"/>
-<area shape="rect" id="node3" href="$classAllWize.html#ac33ba05cebc3de22babb477922a07eaf" title="Reads a byte from the stream with a timeout. " alt="" coords="393,5,539,32"/>
-</map>

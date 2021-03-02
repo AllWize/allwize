@@ -53,6 +53,7 @@ setControlField KEYWORD2
 setInstallMode KEYWORD2
 setEncryptFlag KEYWORD2
 setDecryptFlag KEYWORD2
+setMAC2CheckOnlyFlag KEYWORD2
 setKey KEYWORD2
 setDefaultKey KEYWORD2
 setAccessNumber KEYWORD2
@@ -71,6 +72,7 @@ getTimeout KEYWORD2
 getNetworkRole KEYWORD2
 getLEDControl KEYWORD2
 getInstallMode KEYWORD2
+getMAC2CheckOnlyFlag KEYWORD2
 getEncryptFlag KEYWORD2
 getDecryptFlag KEYWORD2
 getDefaultKey KEYWORD2
