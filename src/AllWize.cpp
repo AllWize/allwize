@@ -395,18 +395,19 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
     if (send_wize_transport_layer) {
         _send(_wize_control & 0xFF);        // Wize Control
         _send(_wize_network_id & 0xFF);     // Network ID HIGH
-        _send((_counter >> 0) & 0xFF);      // Frame counter LOW
         _send((_counter >> 8) & 0xFF);      // Frame counter HIGH
+        _send((_counter >> 0) & 0xFF);      // Frame counter LOW
         _send(_wize_application);           // Wize app indicator
     }
 
     // application payload
     if (len != _send(buffer, len)) return false;
 
-    // timestamp, TODO: add option to provide a timestamp
+    // timestamp, TODO: add option to provide a proper timestamp
     if (MODULE_WIZE == _module) {
-        _send(0);
-        _send(0);
+        unsigned long ts = millis() / 1000;
+        _send((ts >> 8) & 0xFF);
+        _send((ts >> 0) & 0xFF);
     }
 
     _access_number++;
@@ -523,7 +524,7 @@ uint8_t AllWize::getLength() {
 }
 
 /**
- * @brief               Sets the wize control field in the transpoprt layer
+ * @brief               Sets the wize control field in the transport layer
  * @param wize_control  Wize Control (defined the key to be used)
  * @return              True is correctly set
  */
@@ -869,6 +870,24 @@ void AllWize::setInstallMode(uint8_t mode, bool persist) {
  */
 uint8_t AllWize::getInstallMode() {
     return _getSlot(MEM_INSTALL_MODE);
+}
+
+/**
+ * @brief               Sets the MAC 2 Check Only flag setting
+ * @param flag          Flag
+ */
+void AllWize::setMAC2CheckOnlyFlag(uint8_t flag) {
+    if (0 == flag || 1 == flag) {
+        _setSlot(MEM_MAC_2_CHECK_ONLY_FLAG, flag);
+    }
+}
+
+/**
+ * @brief               Gets the MAC 2 Check Only flag setting
+ * @return              Flag
+ */
+uint8_t AllWize::getMAC2CheckOnlyFlag() {
+    return _getSlot(MEM_MAC_2_CHECK_ONLY_FLAG);
 }
 
 /**

@@ -137,6 +137,7 @@ class AllWize {
         void setDataInterface(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
         void setInstallMode(uint8_t mode, bool persist = false);
+        void setMAC2CheckOnlyFlag(uint8_t flag);
         void setEncryptFlag(uint8_t flag);
         void setDecryptFlag(uint8_t flag);
         void setKey(uint8_t reg, const uint8_t * key);
@@ -157,6 +158,7 @@ class AllWize {
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
         uint8_t getInstallMode();
+        uint8_t getMAC2CheckOnlyFlag();
         uint8_t getEncryptFlag();
         uint8_t getDecryptFlag();
         void getDefaultKey(uint8_t * key);
@@ -276,7 +278,7 @@ class AllWize {
         String _fw;
 
         // Wize specific
-        uint8_t _wize_control = 0x00;
+        uint8_t _wize_control = 0x40;
         uint16_t _wize_network_id = 0;
         uint8_t _wize_application = 0xFE;
         uint16_t _counter = 0;
