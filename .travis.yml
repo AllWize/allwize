@@ -1,6 +1,6 @@
 language: python
 python:
-    - '2.7'
+    - '3.6'
 sudo: false
 cache:
     directories:
@@ -10,5 +10,7 @@ install:
     - git clone https://github.com/AllWize/allwize-boards && pushd allwize-boards && ./pio-install.sh 0.1.1 && popd
 script:
     - pushd examples/moduleInfo && pio run -e leonardo -e mkrzero -e esp8266 && popd
-#    - pushd examples/slave/slave_allwize_k2 && pio run -e leonardo -e mkrzero -e esp8266 && popd
+    - pushd examples/slave/slave_allwize_k1_leonardo && pio run && popd
+    - pushd examples/slave/slave_allwize_k1_esp8266 && pio run && popd
+    - pushd examples/master/master_allwize_k1_esp8266_transparent && pio run && popd
     - pushd examples/wize2mqtt && cp configuration.sample.h configuration.h && pio run && popd
