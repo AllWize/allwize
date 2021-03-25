@@ -6,7 +6,7 @@ Listens to messages on the same channel, data rate.
 Decrypts the message using module built-in features and
 prints them out via the serial monitor.
 
-Copyright (C) 2018 by AllWize <github@allwize.io>
+Copyright (C) 2018 by AllWize <github@allwize->io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -47,10 +47,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif // ARDUINO_ARCH_SAMD
 
 #if defined(ARDUINO_ARCH_ESP8266)
-    #define RESET_PIN           14
-    #define RX_PIN              12
-    #define TX_PIN              13
-    #define DEBUG_SERIAL        Serial
+    #define RESET_PIN               14
+    #define RX_PIN                  5
+    #define TX_PIN                  4
+    #define DEBUG_SERIAL            Serial
 #endif // ARDUINO_ARCH_ESP8266
 
 #if defined(ARDUINO_ARCH_ESP32)
@@ -68,12 +68,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
 
-#define SLAVE_MID               0x1011
-#define SLAVE_UID               0x20212223
+#define SLAVE_MID               0x06FA          // AWZ
+#define SLAVE_UID               0x01020304      // Test device
 #define SLAVE_VERSION           0x01
 #define SLAVE_TYPE              0x01
 #define SLAVE_REGISTER          0x01
-uint8_t SLAVE_KEY[16] = { 0x4F, 0x0E, 0x26, 0x90, 0x2B, 0x0E, 0x2A, 0x54, 0x77, 0xB9, 0xA6, 0x30, 0x93, 0x54, 0xC1, 0x62 };
+uint8_t KMAC_KEY[16] = { 0x71, 0x5A, 0xD8, 0x83, 0x5B, 0xC9, 0x54, 0x70, 0x26, 0x0B, 0xA3, 0x40, 0x92, 0xA8, 0x73, 0x98 };
+uint8_t KENC_KEY[16] = { 0x4F, 0x0E, 0x26, 0x90, 0x2B, 0x0E, 0x2A, 0x54, 0x77, 0xB9, 0xA6, 0x30, 0x93, 0x54, 0xC1, 0x62 };
 
 // -----------------------------------------------------------------------------
 // Wize
@@ -101,71 +102,53 @@ void wizeSetup() {
     allwize->setDataRate(WIZE_DATARATE);
 
     // Register slave
+    allwize->setKmac(KMAC_KEY);
+    allwize->setKenc(SLAVE_REGISTER, KENC_KEY);
     allwize->bindSlave(SLAVE_REGISTER, SLAVE_MID, SLAVE_UID, SLAVE_VERSION, SLAVE_TYPE);
-    allwize->setKey(SLAVE_REGISTER, SLAVE_KEY);
+    allwize->setMAC2CheckOnlyFlag(1);
 
-    //allwize->dump(DEBUG_SERIAL);
+    delay(1000);
+
+    allwize->binds(DEBUG_SERIAL);
+    allwize->dump(DEBUG_SERIAL);
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "[WIZE] Listening... CH %d, DR %d\n", allwize->getChannel(), allwize->getDataRate());
-    DEBUG_SERIAL.print(buffer);
-
-}
-
-void wizeDebugMessage(allwize_message_t message) {
-
-    // Code to pretty-print the message
-    char buffer[512];
-    if (CONTROL_INFORMATION_WIZE == message.ci) {
-        snprintf(
-            buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: { ",
-            message.c,
-            message.man,
-            message.address[0], message.address[1],
-            message.address[2], message.address[3],
-            message.type, message.version,
-            message.wize_control, message.wize_operator_id, message.wize_application, message.wize_counter,
-            (int16_t) message.rssi / -2
-        );
+    if (MODULE_WIZE == allwize->getModuleType()) {
+        snprintf(buffer, sizeof(buffer), "[WIZE] Channel   : %d (WIZE_%d)\n", allwize->getChannel(), allwize->getChannel() * 10 + 90); DEBUG_SERIAL.print(buffer);
     } else {
-        snprintf(
-            buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, TYPE: 0x%02X, VERSION: 0x%02X, CI: 0x%02X, RSSI: %d, DATA: { ",
-            message.c,
-            message.man,
-            message.address[0], message.address[1],
-            message.address[2], message.address[3],
-            message.type, message.version,
-            message.ci, (int16_t) message.rssi / -2
-        );
+        snprintf(buffer, sizeof(buffer), "[WIZE] Channel   : %d\n", allwize->getChannel()); DEBUG_SERIAL.print(buffer);
     }
-    DEBUG_SERIAL.print(buffer);
-
-    for (uint8_t i=0; i<message.len; i++) {
-        char ch = message.data[i];
-        snprintf(buffer, sizeof(buffer), "0x%02X ", ch);
-        DEBUG_SERIAL.print(buffer);
-    }
-    DEBUG_SERIAL.print("}, STR: \"");
-    DEBUG_SERIAL.print((char *) message.data);
-    DEBUG_SERIAL.println("\"");
+    snprintf(buffer, sizeof(buffer), "[WIZE] Frequency : %.6f MHz\n", allwize->getFrequency(allwize->getChannel())); DEBUG_SERIAL.print(buffer);
+    snprintf(buffer, sizeof(buffer), "[WIZE] Datarate  : %d bps\n", allwize->getDataRateSpeed(allwize->getDataRate())); DEBUG_SERIAL.print(buffer);
+    DEBUG_SERIAL.print("[WIZE] Listening...\n");
 
 }
+
 
 void wizeLoop() {
 
     if (allwize->available()) {
 
-        // Get the message
-        allwize_message_t message = allwize->read();
+        // Get the RAW message
+        uint8_t * message = allwize->getBuffer();
+        uint8_t length = allwize->getLength();
 
-        // Show it to console
-        wizeDebugMessage(message);
+        // Print it
+        char buffer[6];
+        DEBUG_SERIAL.print("[WIZE] Received: ");
+        for (uint8_t i=1; i<length-1; i++) { // first & last bytes are start & stop bytes, no need to print them
+            snprintf(buffer, sizeof(buffer), "%02X", message[i]);
+            DEBUG_SERIAL.print(buffer);
+        }
+        DEBUG_SERIAL.println();
+
+        //allwize->sendChallenge(KENC_KEY);
+        //allwize->sendNoResponse();
 
     }
 
 }
+
 
 // -----------------------------------------------------------------------------
 // Main

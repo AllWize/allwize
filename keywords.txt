@@ -51,13 +51,15 @@ setLEDControl KEYWORD2
 setDataInterface KEYWORD2
 setControlField KEYWORD2
 setInstallMode KEYWORD2
+setAccessNumber KEYWORD2
+setBaudRate KEYWORD2
+
 setEncryptFlag KEYWORD2
 setDecryptFlag KEYWORD2
 setMAC2CheckOnlyFlag KEYWORD2
-setKey KEYWORD2
-setDefaultKey KEYWORD2
-setAccessNumber KEYWORD2
-setBaudRate KEYWORD2
+setKenc KEYWORD2
+setKmac KEYWORD2
+selectKenc KEYWORD2
 
 getChannel KEYWORD2
 getPower KEYWORD2
@@ -72,12 +74,12 @@ getTimeout KEYWORD2
 getNetworkRole KEYWORD2
 getLEDControl KEYWORD2
 getInstallMode KEYWORD2
-getMAC2CheckOnlyFlag KEYWORD2
-getEncryptFlag KEYWORD2
-getDecryptFlag KEYWORD2
-getDefaultKey KEYWORD2
 getBaudRate KEYWORD2
 getBaudRateSpeed KEYWORD2
+
+getEncryptFlag KEYWORD2
+getDecryptFlag KEYWORD2
+getMAC2CheckOnlyFlag KEYWORD2
 
 getRSSI KEYWORD2
 getTemperature KEYWORD2
@@ -86,10 +88,10 @@ getMID KEYWORD2
 setMID KEYWORD2
 getUID KEYWORD2
 setUID KEYWORD2
-getVersion KEYWORD2
-setVersion KEYWORD2
-getDevice KEYWORD2
-setDevice KEYWORD2
+getDeviceVersion KEYWORD2
+setDeviceVersion KEYWORD2
+getDeviceType KEYWORD2
+setDeviceType KEYWORD2
 getPartNumber KEYWORD2
 getRequiredHardwareVersion KEYWORD2
 getFirmwareVersion KEYWORD2
@@ -99,7 +101,6 @@ getDataRateSpeed KEYWORD2
 getModuleType KEYWORD2
 getModuleTypeName KEYWORD2
 
-setWizeControl KEYWORD2
 setWizeNetworkId KEYWORD2
 setWizeApplication KEYWORD2
 setCounter KEYWORD2

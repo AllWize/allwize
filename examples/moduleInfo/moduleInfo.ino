@@ -234,7 +234,11 @@ void wizeSetup() {
 void setup() {
 
     DEBUG_SERIAL.begin(115200);
-    while (!DEBUG_SERIAL && millis() < 5000);
+    #if defined(ARDUINO_ARCH_ESP8266) or defined(ARDUINO_ARCH_ESP32)
+        delay(5000);
+    #else
+        while (!DEBUG_SERIAL && millis() < 5000);
+    #endif
     DEBUG_SERIAL.println();
     DEBUG_SERIAL.println("AllWize - Module Info");
     DEBUG_SERIAL.println();
@@ -266,8 +270,8 @@ void setup() {
 
     format("Manufacturer ID", allwize.getMID(), true);
     format("Unique ID", allwize.getUID(), true);
-    format("Device Type", allwize.getDevice());
-    format("Device Version", allwize.getVersion());
+    format("Device Type", allwize.getDeviceType());
+    format("Device Version", allwize.getDeviceVersion());
     format("Part Number", allwize.getPartNumber());
     format("Firmware Version", allwize.getFirmwareVersion());
     format("Req. Hardware Version", allwize.getRequiredHardwareVersion());

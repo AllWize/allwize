@@ -46,6 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
 #define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define WIZE_VERSION                    0x01
 
 #ifndef USE_MEMORY_CACHE
 #define USE_MEMORY_CACHE                1
@@ -61,7 +62,8 @@ typedef struct {
     uint8_t len;
     uint8_t data[RX_BUFFER_SIZE];
     uint8_t rssi;
-    uint8_t wize_control;
+    uint8_t wize_version;
+    uint8_t wize_key;
     uint8_t wize_network_id;
     uint16_t wize_counter;
     uint8_t wize_application;
@@ -186,7 +188,7 @@ class AllWize {
         String getModuleTypeName();
 
         // Wize specific
-        bool setWizeControl(uint8_t wize_control);
+        bool setWizeKey(uint8_t wize_key);
         void setWizeOperatorId(uint8_t wize_network_id);
         void setWizeNetworkId(uint8_t wize_network_id);
         void setWizeApplication(uint8_t wize_application);
@@ -278,7 +280,6 @@ class AllWize {
         String _fw;
 
         // Wize specific
-        uint8_t _wize_control = 0x40;
         uint16_t _wize_network_id = 0;
         uint8_t _wize_application = 0xFE;
         uint16_t _counter = 0;

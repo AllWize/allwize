@@ -393,7 +393,8 @@ bool AllWize::send(uint8_t *buffer, uint8_t len) {
 
     // transport layer
     if (send_wize_transport_layer) {
-        _send(_wize_control & 0xFF);        // Wize Control
+        uint8_t l6ctrl = (WIZE_VERSION << 5) + (_wize_key & 0xFF);
+        _send(l6ctrl);                      // Wize Control
         _send(_wize_network_id & 0xFF);     // Network ID HIGH
         _send((_counter >> 8) & 0xFF);      // Frame counter HIGH
         _send((_counter >> 0) & 0xFF);      // Frame counter LOW
@@ -527,14 +528,15 @@ uint8_t AllWize::getLength() {
     return _length;
 }
 
+
 /**
- * @brief               Sets the wize control field in the transport layer
- * @param wize_control  Wize Control (defined the key to be used)
+ * @brief               Sets the current Kenc registry to use
+ * @param wize_key  	index of the registry
  * @return              True is correctly set
  */
-bool AllWize::setWizeControl(uint8_t wize_control) {
-    if ((wize_control < 1) || (14 < wize_control)) return false;
-    _wize_control = wize_control;
+bool AllWize::setWizeKey(uint8_t wize_key) {
+    if (wize_key > 14) return false;
+    _wize_key = wize_key;
     return true;
 }
 
@@ -1699,7 +1701,9 @@ bool AllWize::_decode() {
             bytes_not_in_app += 5;
             
             // Wize control
-            _message.wize_control = _buffer[in++];
+            uint8_t l6ctrl = _buffer[in++];
+            _message.wize_key = l6ctrl & 0x0F;
+            _message.wize_version = l6ctrl >> 6;
 
             // Wize operator ID
             _message.wize_network_id = _buffer[in++];
