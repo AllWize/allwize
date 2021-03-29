@@ -228,6 +228,10 @@ bool AllWize::factoryReset() {
     return false;
 }
 
+// -----------------------------------------------------------------------------
+// Working modes
+// -----------------------------------------------------------------------------
+
 /**
  * @brief               Sets the module in master mode
  */
@@ -261,6 +265,10 @@ void AllWize::repeater() {
     setMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_REPEATER);
 }
+
+// -----------------------------------------------------------------------------
+// Comms management
+// -----------------------------------------------------------------------------
 
 /**
  * @brief               Sets the radio module in sleep mode
@@ -299,6 +307,10 @@ bool AllWize::waitForReady(uint32_t timeout) {
     }
     return false;
 }
+
+// -----------------------------------------------------------------------------
+// Debug information
+// -----------------------------------------------------------------------------
 
 /**
  * @brief               Dumps the current memory configuration to the given stream
@@ -356,6 +368,10 @@ void AllWize::dump(Stream &debug) {
     debug.println();
 
 }
+
+// -----------------------------------------------------------------------------
+// Transmit & receive
+// -----------------------------------------------------------------------------
 
 /**
  * @brief               Sends a byte array
@@ -525,18 +541,18 @@ uint8_t AllWize::getLength() {
 }
 
 // -----------------------------------------------------------------------------
-// Wize specific
+// Wize frame specific
 // -----------------------------------------------------------------------------
 
 /**
  * @brief               Sets the current Kenc registry to use
+ * @brief               Use AllWize::selectKenc instead
  * @param wize_key      0 for no ecruption, 1-14 to select a key
+ * @deprecated
  * @return              True is correctly set
  */
 bool AllWize::setWizeKey(uint8_t wize_key) {
-    if (wize_key > 14) return false;
-    _wize_key = wize_key;
-    return true;
+    return selectKenc(wize_key);
 }
 
 /**
@@ -579,6 +595,199 @@ uint16_t AllWize::getCounter() {
     return _counter; 
 }
 
+// -----------------------------------------------------------------------------
+// Encryption
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief               Sets the MAC 2 Check Only flag setting
+ * @param flag          Flag
+ */
+void AllWize::setMAC2CheckOnlyFlag(uint8_t flag) {
+    if (0 == flag || 1 == flag) {
+        _setSlot(MEM_MAC_2_CHECK_ONLY_FLAG, flag);
+    }
+}
+
+/**
+ * @brief               Gets the MAC 2 Check Only flag setting
+ * @return              Flag
+ */
+uint8_t AllWize::getMAC2CheckOnlyFlag() {
+    return _getSlot(MEM_MAC_2_CHECK_ONLY_FLAG);
+}
+
+/**
+ * @brief               Sets the encrypt flag setting
+ * @param flag          Encrypt flag
+ */
+void AllWize::setEncryptFlag(uint8_t flag) {
+    if (0 == flag || 1 == flag || 3 == flag) {
+        _setSlot(MEM_ENCRYPT_FLAG, flag);
+    }
+}
+
+/**
+ * @brief               Gets the encrypt flag setting
+ * @return              Encrypt flag
+ */
+uint8_t AllWize::getEncryptFlag() {
+    return _getSlot(MEM_ENCRYPT_FLAG);
+}
+
+/**
+ * @brief               Sets the decrypt flag setting
+ * @param flag          Decrypt flag
+ */
+void AllWize::setDecryptFlag(uint8_t flag) {
+    _setSlot(MEM_DECRYPT_FLAG, flag);
+}
+
+/**
+ * @brief               Gets the decrypt flag setting
+ * @return              Decrypt flag
+ */
+uint8_t AllWize::getDecryptFlag() {
+    return _getSlot(MEM_DECRYPT_FLAG);
+}
+
+/**
+ * @brief               Sets a KENC encryption key
+ * @param type          0 for KENC keys, 1 for KMAC, KCHG and KLOG
+ * @param slot          If KENC: Register number (1-128), slave only 1-16, else KMAC=1, KCHG=2 and KLOG=3
+ * @param key           A 16-byte encryption key as binary array
+ */
+void AllWize::_setKey(uint8_t type, uint8_t slot, const uint8_t * key) {
+    uint8_t data[18];
+    data[0] = type;
+    data[1] = slot;
+    memcpy(&data[2], key, 16);
+    _sendCommand(CMD_KEY_REGISTER, data, sizeof(data));
+}
+
+
+/**
+ * @brief               Sets a KENC encryption key
+ * @param slot          Register number (1-128), slave only 1-16
+ * @param key           A 16-byte encryption key as binary array
+ */
+void AllWize::setKenc(uint8_t slot, const uint8_t * key) {
+    if ((slot < 1) || (128 < slot)) return;
+    _setKey(0, slot, key);
+}
+
+/**
+ * @brief               Sets the KMAC encryption key
+ * @param key           A 16-byte encryption key as binary array
+ */
+void AllWize::setKmac(const uint8_t * key) {
+    _setKey(1, 0, key);
+}
+
+/**
+ * @brief               Sets the KCHG encryption key
+ * @param key           A 16-byte encryption key as binary array
+ */
+void AllWize::setKchg(const uint8_t * key) {
+    _setKey(1, 1, key);
+}
+
+/**
+ * @brief               Send a key challenge to the radio module to decrypt the latest received message
+ * @param key           A binary buffer holding the key (16 bytes)
+ */
+void AllWize::keyChallenge(uint8_t * key) {
+    _send(0xFC);
+    _send(key, 16);
+    //_send(0xFF);
+}
+
+/**
+ * @brief               Sets the current Kenc registry to use
+ * @param slot          0 for no encryption, 1-14 to select a key
+ * @return              True is correctly set
+ */
+bool AllWize::selectKenc(uint8_t slot) {
+    if (slot > 14) return false;
+    _wize_key = slot;
+    return true;
+}
+
+/**
+ * @brief               Resets the KMAC, KCHG and KENC keys up to the given slot
+ * @param slot          Slot to reset KENC keys up to
+ * @return              True is correctly set
+ */
+void AllWize::resetKeys(uint8_t slot) {
+    uint8_t key[16] = {0};
+    _setKey(1, 0, key);
+    _setKey(1, 1, key);
+    for (uint8_t i=1; i<=slot; i++) {
+        _setKey(0, i, key);
+    }
+}
+
+/**
+ * @brief                   Registers a slave in the master module
+ *                          The registry value is used for decrption
+ * @param slot              Register number (1-254)
+ * @param manufacturer_id   Manufacturer ID (2 bytes)
+ * @param unique_id         Unique ID (4 bytes)
+ * @param version           Device version (1 byte)
+ * @param type              Device type (1 byte)
+ */
+void AllWize::bindSlave(uint8_t slot, uint16_t manufacturer_id, uint32_t unique_id, uint8_t version, uint8_t type) {
+    if ((slot < 1) || (254 < slot)) return;
+    uint8_t data[9];
+    uint8_t i = 0;
+    data[i++] = slot;
+    data[i++] = (manufacturer_id >> 0) & 0xFF;
+    data[i++] = (manufacturer_id >> 8) & 0xFF;
+    data[i++] = (unique_id >>  0) & 0xFF;
+    data[i++] = (unique_id >>  8) & 0xFF;
+    data[i++] = (unique_id >> 16) & 0xFF;
+    data[i++] = (unique_id >> 24) & 0xFF;
+    data[i++] = version;
+    data[i++] = type;
+    _sendCommand(CMD_BIND, data, sizeof(data));
+}
+
+/**
+ * @brief               List binded devices
+ * @param debug         Data stream to dump the data to
+ */
+void AllWize::binds(Stream &debug, uint8_t limit) {
+
+    char ch[16];
+    uint8_t len = 0;
+    
+    debug.println();
+    debug.println("Slaves");
+    debug.println("------------------------------------------------------");
+
+    for (uint8_t i=1; i<=limit; i++) {
+
+        snprintf(ch, sizeof(ch), "%03d: ", i);
+        debug.print(ch);
+
+        len = _sendCommand(CMD_LIST_BINDING, i);
+        if (len == 8) {
+            for (uint8_t j=0; j<8; j++) {
+                snprintf(ch, sizeof(ch), "%02X", _buffer[j]);
+                debug.print(ch);
+            }
+
+        } else {
+            debug.print("ERROR");
+        }
+        debug.println();
+
+    }
+
+    debug.println();
+    debug.println();
+
+}
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
@@ -917,121 +1126,6 @@ void AllWize::setAccessNumber(uint8_t value) {
 }
 
 // -----------------------------------------------------------------------------
-// Encryption
-// -----------------------------------------------------------------------------
-
-/**
- * @brief               Sets the MAC 2 Check Only flag setting
- * @param flag          Flag
- */
-void AllWize::setMAC2CheckOnlyFlag(uint8_t flag) {
-    if (0 == flag || 1 == flag) {
-        _setSlot(MEM_MAC_2_CHECK_ONLY_FLAG, flag);
-    }
-}
-
-/**
- * @brief               Gets the MAC 2 Check Only flag setting
- * @return              Flag
- */
-uint8_t AllWize::getMAC2CheckOnlyFlag() {
-    return _getSlot(MEM_MAC_2_CHECK_ONLY_FLAG);
-}
-
-/**
- * @brief               Sets the encrypt flag setting
- * @param flag          Encrypt flag
- */
-void AllWize::setEncryptFlag(uint8_t flag) {
-    if (0 == flag || 1 == flag || 3 == flag) {
-        _setSlot(MEM_ENCRYPT_FLAG, flag);
-    }
-}
-
-/**
- * @brief               Gets the encrypt flag setting
- * @return              Encrypt flag
- */
-uint8_t AllWize::getEncryptFlag() {
-    return _getSlot(MEM_ENCRYPT_FLAG);
-}
-
-/**
- * @brief               Sets the decrypt flag setting
- * @param flag          Decrypt flag
- */
-void AllWize::setDecryptFlag(uint8_t flag) {
-    _setSlot(MEM_DECRYPT_FLAG, flag);
-}
-
-/**
- * @brief               Gets the decrypt flag setting
- * @return              Decrypt flag
- */
-uint8_t AllWize::getDecryptFlag() {
-    return _getSlot(MEM_DECRYPT_FLAG);
-}
-
-/**
- * @brief               Sets a KENC encryption key
- * @param type          0 for KENC keys, 1 for KMAC, KCHG and KLOG
- * @param reg           If KENC: Register number (1-128), slave only 1-16, else KMAC=1, KCHG=2 and KLOG=3
- * @param key           A 16-byte encryption key as binary array
- */
-void AllWize::_setKey(uint8_t type, uint8_t reg, const uint8_t * key) {
-    uint8_t data[18];
-    data[0] = type;
-    data[1] = reg;
-    memcpy(&data[2], key, 16);
-    _sendCommand(CMD_KEY_REGISTER, data, sizeof(data));
-}
-
-
-/**
- * @brief               Sets a KENC encryption key
- * @param reg           Register number (1-128), slave only 1-16
- * @param key           A 16-byte encryption key as binary array
- */
-void AllWize::setKenc(uint8_t reg, const uint8_t * key) {
-    if ((reg < 1) || (128 < reg)) return;
-    _setKey(0, reg, key);
-}
-
-/**
- * @brief               Sets the KMAC encryption key
- * @param key           A 16-byte encryption key as binary array
- */
-void AllWize::setKmac(const uint8_t * key) {
-    _setKey(1, 0, key);
-}
-
-/**
- * @brief               Send a key challenge to the radio module to decrypt the latest received message
- * @param key           A binary buffer holding the key (16 bytes)
- */
-void AllWize::keyChallenge(uint8_t *key) {
-    _send(0xFC);
-    _send(key, 16);
-    //_send(0xFF);
-}
-
-/**
- * @brief               Registers a slave in the master module
- *                      The registry value is used for decrption
- * @param reg           Register number (1-128)
- */
-void AllWize::bindSlave(uint8_t reg, uint16_t manufacturer_id, uint32_t unique_id, uint8_t version, uint8_t type) {
-    if ((reg < 1) || (128 < reg)) return;
-    uint8_t data[9];
-    data[0] = reg;
-    memcpy(&data[1], manufacturer_id, 2);
-    memcpy(&data[3], unique_id, 4);
-    data[7] = version;
-    data[8] = type;
-    _sendCommand(CMD_BIND, data, 9);
-}
-
-// -----------------------------------------------------------------------------
 
 /**
  * @brief               Returns the RSSI of the last valid packet received
@@ -1121,7 +1215,7 @@ bool AllWize::setUID(uint32_t uid) {
  * @brief               Returns the device version from non-volatile memory
  * @return              Version
  */
-uint8_t AllWize::getVersion() {
+uint8_t AllWize::getDeviceVersion() {
     return _getSlot(MEM_VERSION);
 }
 
@@ -1129,7 +1223,7 @@ uint8_t AllWize::getVersion() {
  * @brief               Sets the device version
  * @param version       Device version
  */
-void AllWize::setVersion(uint8_t version) {
+void AllWize::setDeviceVersion(uint8_t version) {
     _setSlot(MEM_VERSION, version);
 }
 
@@ -1137,7 +1231,7 @@ void AllWize::setVersion(uint8_t version) {
  * @brief               Returns the device type from non-volatile memory
  * @return              Device
  */
-uint8_t AllWize::getDevice() {
+uint8_t AllWize::getDeviceType() {
     return _getSlot(MEM_DEVICE);
 }
 
@@ -1145,7 +1239,7 @@ uint8_t AllWize::getDevice() {
  * @brief               Sets the device type
  * @param type          Device type
  */
-void AllWize::setDevice(uint8_t type) {
+void AllWize::setDeviceType(uint8_t type) {
     _setSlot(MEM_DEVICE, type);
 }
 

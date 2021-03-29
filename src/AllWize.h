@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RX_BUFFER_SIZE                  255
 #define DEFAULT_TIMEOUT                 100
 #define HARDWARE_SERIAL_PORT            1
-#define DEFAULT_MBUS_MODE               MBUS_MODE_N1
+#define DEFAULT_MBUS_MODE               MBUS_MODE_N2
 #define WIZE_VERSION                    0x01
 
 #ifndef USE_MEMORY_CACHE
@@ -165,10 +165,10 @@ class AllWize {
         bool setMID(uint16_t mid);
         String getUID();
         bool setUID(uint32_t uid);
-        uint8_t getVersion();
-        void setVersion(uint8_t version);
-        uint8_t getDevice();
-        void setDevice(uint8_t type);
+        uint8_t getDeviceVersion();
+        void setDeviceVersion(uint8_t version);
+        uint8_t getDeviceType();
+        void setDeviceType(uint8_t type);
         String getPartNumber();
         String getRequiredHardwareVersion();
         String getFirmwareVersion();
@@ -193,10 +193,14 @@ class AllWize {
         uint8_t getEncryptFlag();
         void setDecryptFlag(uint8_t flag);
         uint8_t getDecryptFlag();
-        void setKenc(uint8_t reg, const uint8_t * key);
-        void setKmac(uint8_t reg, const uint8_t * key);
-        void keyChallenge(uint8_t *key);
-        void bindSlave(uint8_t reg, uint16_t manufacturer_id, uint32_t unique_id, uint8_t version, uint8_t type);
+        void setKenc(uint8_t slot, const uint8_t * key);
+        void setKmac(const uint8_t * key);
+        void setKchg(const uint8_t * key);
+        bool selectKenc(uint8_t slot);
+        void resetKeys(uint8_t slot = 0);
+        void keyChallenge(uint8_t * key);
+        void bindSlave(uint8_t slot, uint16_t manufacturer_id, uint32_t unique_id, uint8_t version, uint8_t type);
+        void binds(Stream &debug, uint8_t limit = 10);
 
     protected:
 

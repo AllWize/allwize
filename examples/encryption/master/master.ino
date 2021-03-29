@@ -109,8 +109,8 @@ void wizeSetup() {
 
     delay(1000);
 
-    allwize->binds(DEBUG_SERIAL);
     allwize->dump(DEBUG_SERIAL);
+    allwize->binds(DEBUG_SERIAL);
 
     char buffer[64];
     if (MODULE_WIZE == allwize->getModuleType()) {
@@ -118,7 +118,7 @@ void wizeSetup() {
     } else {
         snprintf(buffer, sizeof(buffer), "[WIZE] Channel   : %d\n", allwize->getChannel()); DEBUG_SERIAL.print(buffer);
     }
-    snprintf(buffer, sizeof(buffer), "[WIZE] Frequency : %.6f MHz\n", allwize->getFrequency(allwize->getChannel())); DEBUG_SERIAL.print(buffer);
+    snprintf(buffer, sizeof(buffer), "[WIZE] Frequency : %ld Hz\n", long(1000000 * allwize->getFrequency(allwize->getChannel()))); DEBUG_SERIAL.print(buffer);
     snprintf(buffer, sizeof(buffer), "[WIZE] Datarate  : %d bps\n", allwize->getDataRateSpeed(allwize->getDataRate())); DEBUG_SERIAL.print(buffer);
     DEBUG_SERIAL.print("[WIZE] Listening...\n");
 
