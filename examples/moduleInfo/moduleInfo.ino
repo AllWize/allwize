@@ -206,6 +206,31 @@ void format(const char * name, int value, bool asHex = false) {
 // Radio
 // -----------------------------------------------------------------------------
 
+unsigned char wizeAutoBaud() {
+
+    char baudrates[] = { 
+        BAUDRATE_19200, BAUDRATE_2400, BAUDRATE_4800, BAUDRATE_9600, 
+        BAUDRATE_14400, BAUDRATE_28800, BAUDRATE_38400, BAUDRATE_57600, 
+        BAUDRATE_76800, BAUDRATE_115200, BAUDRATE_230400 };
+
+    for(unsigned char i=0; i<sizeof(baudrates);i++) {
+        
+        unsigned char baudrate = baudrates[i];
+        DEBUG_SERIAL.print("Checking baudrate ");
+        DEBUG_SERIAL.println(allwize.getBaudRateSpeed(baudrate));
+        
+        allwize.begin(baudrate);
+        if (allwize.waitForReady()) {
+            return baudrate;
+        }
+
+    }
+
+    return 0;
+
+
+}
+
 void wizeSetup() {
 
     DEBUG_SERIAL.println("Initializing radio module");
@@ -216,14 +241,13 @@ void wizeSetup() {
     #endif
 
     // Init AllWize object
-    allwize.begin();
-
-    if (!allwize.waitForReady()) {
+    unsigned char baudrate = wizeAutoBaud();
+    if (baudrate == 0) {
         DEBUG_SERIAL.println("Error connecting to the module, check your wiring!");
         while (true) delay(1);
     }
 
-    DEBUG_SERIAL.println("Radio module OK");
+    DEBUG_SERIAL.print("Radio module OK");
 
 }
 
