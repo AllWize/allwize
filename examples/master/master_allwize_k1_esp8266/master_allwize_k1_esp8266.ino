@@ -112,12 +112,12 @@ void wizeDebugMessage(allwize_message_t message) {
     if (CI_WIZE == message.ci) {
         snprintf(
             buffer, sizeof(buffer),
-            "[WIZE] C: 0x%02X, CI: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, CONTROL: %d, OPID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: 0x",
+            "[WIZE] C: 0x%02X, CI: 0x%02X, MAN: %s, ADDR: 0x%02X%02X%02X%02X, VERSION: %d, KEY: %d, NETID: %d, APPID: %d, COUNTER: %d, RSSI: %d, DATA: 0x",
             message.c, message.ci, 
             message.man,
             message.address[0], message.address[1],
             message.address[2], message.address[3],
-            message.wize_control, message.wize_network_id, message.wize_application, message.wize_counter,
+            message.wize_version, message.wize_key, message.wize_network_id, message.wize_application, message.wize_counter,
             (int16_t) message.rssi / -2
         );
     } else {

@@ -144,9 +144,9 @@ void loop() {
 
     // Build payload
     payload.reset();
-    payload.addField(MBUS_CODE_ACCESS_NUMBER, count++);
-    payload.addField(MBUS_CODE_FLOW_TEMPERATURE_C, getTemperature());
-    payload.addField(MBUS_CODE_PRESSURE_BAR, -3, getPressure()); // 1hPa == 1mbar
+    payload.addField(MBUS_CODE::ACCESS_NUMBER, count++);
+    payload.addField(MBUS_CODE::FLOW_TEMPERATURE_C, getTemperature());
+    payload.addField(MBUS_CODE::PRESSURE_BAR, -3, getPressure()); // 1hPa == 1mbar
 
     // Send the string as payload
     wizeSend(payload.getBuffer(), payload.getSize());
