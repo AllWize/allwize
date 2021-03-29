@@ -235,10 +235,10 @@ bool AllWize::factoryReset() {
 /**
  * @brief               Sets the module in master mode
  */
-void AllWize::master() {
+void AllWize::master(uint8_t mode) {
     setMode(DEFAULT_MBUS_MODE, true);
     setNetworkRole(NETWORK_ROLE_MASTER);
-    setInstallMode(INSTALL_MODE_HOST);
+    setInstallMode(mode);
     setSleepMode(SLEEP_MODE_DISABLE);
     setPower(POWER_20dBm);
     setDataRate(DATARATE_2400bps);

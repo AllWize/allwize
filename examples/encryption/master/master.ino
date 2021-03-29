@@ -97,21 +97,40 @@ void wizeSetup() {
         while (true);
     }
 
-    allwize->master();
+    // Decryption will only work if you use INSTALL_MODE_NORMAL (0x00)
+    // as it need to filter based on addresses in order to locate the correct key.
+    // Default mode in the AllWize library is INSTALL_MODE_HOST (0x02)
+    allwize->master(INSTALL_MODE_NORMAL);
+    
+    // Setting setMAC2CheckOnlyFlag will also pass (encrypted) messages from slaves that are not registered.
+    // Unfortunately this is not working as expected for Radiocrafts WIZE 1.05 firmware. 
+    // Setting it will pass all message without decrypt, including those for bound slaves.
+    allwize->setMAC2CheckOnlyFlag(0);
+    
+    // Same as with the rest of the examples, channel and datarate must match between master and slaves.
     allwize->setChannel(WIZE_CHANNEL, true);
     allwize->setDataRate(WIZE_DATARATE);
 
-    // Register slave
+    // KMAC must be the same for all devices in the same network.
     allwize->setKmac(KMAC_KEY);
-    allwize->setKenc(SLAVE_REGISTER, KENC_KEY);
+
+    // We register the slave by MID, UID, version and type to a given slot,
+    // we then must store the KENC key for that slave in the same slot number.
     allwize->bindSlave(SLAVE_REGISTER, SLAVE_MID, SLAVE_UID, SLAVE_VERSION, SLAVE_TYPE);
-    allwize->setMAC2CheckOnlyFlag(1);
+    allwize->setKenc(SLAVE_REGISTER, KENC_KEY);
+
+    // Keys (KENC, KMAC,...) are stored in the module flash. Once set they will remain. 
+    // In particular a mismatching KMAC will effectively filter out any messages not
+    // belonging to the same network. An easy way to reset them is to set all keys to 0,
+    // this must be done on the master and slaves:
+    //
+    // allwize->resetKeys();
 
     delay(1000);
 
+    // Debug data
     allwize->dump(DEBUG_SERIAL);
     allwize->binds(DEBUG_SERIAL);
-
     char buffer[64];
     if (MODULE_WIZE == allwize->getModuleType()) {
         snprintf(buffer, sizeof(buffer), "[WIZE] Channel   : %d (WIZE_%d)\n", allwize->getChannel(), allwize->getChannel() * 10 + 90); DEBUG_SERIAL.print(buffer);
@@ -123,7 +142,6 @@ void wizeSetup() {
     DEBUG_SERIAL.print("[WIZE] Listening...\n");
 
 }
-
 
 void wizeLoop() {
 

@@ -122,7 +122,7 @@ class AllWize {
         void setControlInformation(uint8_t ci);
         uint8_t getControlInformation();
 
-        void master();
+        void master(uint8_t mode = INSTALL_MODE_HOST);
         void slave();
         void repeater();
 
