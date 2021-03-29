@@ -507,10 +507,6 @@ allwize_message_t AllWize::read() {
     return _message;
 }
 
-// -----------------------------------------------------------------------------
-// Wize specific
-// -----------------------------------------------------------------------------
-
 /**
  * @brief               Returns pointer to the last message raw data buffer
  *                      Should be copied right away since any new incomming message with overwrite it
@@ -528,10 +524,13 @@ uint8_t AllWize::getLength() {
     return _length;
 }
 
+// -----------------------------------------------------------------------------
+// Wize specific
+// -----------------------------------------------------------------------------
 
 /**
  * @brief               Sets the current Kenc registry to use
- * @param wize_key  	index of the registry
+ * @param wize_key      0 for no ecruption, 1-14 to select a key
  * @return              True is correctly set
  */
 bool AllWize::setWizeKey(uint8_t wize_key) {
@@ -878,6 +877,45 @@ uint8_t AllWize::getInstallMode() {
     return _getSlot(MEM_INSTALL_MODE);
 }
 
+/**
+ * @brief               Sets the UART baud rate, requires reset to take effect
+ * @param value         Value from 1 to 11
+ */
+void AllWize::setBaudRate(uint8_t value) {
+    if ((0 < value) & (value < 12)) {
+        if (ready()) _setSlot(MEM_UART_BAUD_RATE, value);
+        _baudrate = BAUDRATES[value-1];
+    }
+}
+
+/**
+ * @brief               Gets the UART baud rate
+ * @return              Value (1 byte)
+ */
+uint8_t AllWize::getBaudRate() {
+    return _getSlot(MEM_UART_BAUD_RATE);
+}
+
+/**
+ * @brief               Gets the UART baud rate speed in bps
+ * @param value         Baudrate code
+ * @return              UART speed
+ */
+uint32_t AllWize::getBaudRateSpeed(uint8_t value) {
+    if ((0 < value) & (value < 12)) {
+        return BAUDRATES[value-1];
+    }
+    return 0;
+}
+
+/**
+ * @brief               Sets new/specific access number.
+ * @param value         New access number
+ */
+void AllWize::setAccessNumber(uint8_t value) {
+    _sendCommand(CMD_ACCESS_NUMBER, value);
+}
+
 // -----------------------------------------------------------------------------
 // Encryption
 // -----------------------------------------------------------------------------
@@ -935,40 +973,36 @@ uint8_t AllWize::getDecryptFlag() {
 }
 
 /**
- * @brief               Sets an encryption key
+ * @brief               Sets a KENC encryption key
+ * @param type          0 for KENC keys, 1 for KMAC, KCHG and KLOG
+ * @param reg           If KENC: Register number (1-128), slave only 1-16, else KMAC=1, KCHG=2 and KLOG=3
+ * @param key           A 16-byte encryption key as binary array
+ */
+void AllWize::_setKey(uint8_t type, uint8_t reg, const uint8_t * key) {
+    uint8_t data[18];
+    data[0] = type;
+    data[1] = reg;
+    memcpy(&data[2], key, 16);
+    _sendCommand(CMD_KEY_REGISTER, data, sizeof(data));
+}
+
+
+/**
+ * @brief               Sets a KENC encryption key
  * @param reg           Register number (1-128), slave only 1-16
  * @param key           A 16-byte encryption key as binary array
  */
-void AllWize::setKey(uint8_t reg, const uint8_t *key) {
+void AllWize::setKenc(uint8_t reg, const uint8_t * key) {
     if ((reg < 1) || (128 < reg)) return;
-    uint8_t data[17];
-    data[0] = reg;
-    memcpy(&data[1], key, 16);
-    _sendCommand(CMD_KEY_REGISTER, data, 17);
+    _setKey(0, reg, key);
 }
 
 /**
- * @brief               Sets the default encryption key (not used in WIZE)
+ * @brief               Sets the KMAC encryption key
  * @param key           A 16-byte encryption key as binary array
  */
-void AllWize::setDefaultKey(const uint8_t *key) {
-    _setSlot(MEM_DEFAULT_KEY, (uint8_t *)key, 16);
-}
-
-/**
- * @brief               Gets the default encryption key (not used in WIZE)
- * @param key           A binary buffer to store the key (16 bytes)
- */
-void AllWize::getDefaultKey(uint8_t *key) {
-    _getSlot(MEM_DEFAULT_KEY, key, 16);
-}
-
-/**
- * @brief               Sets new/specific access number.
- * @param value         New access number
- */
-void AllWize::setAccessNumber(uint8_t value) {
-    _sendCommand(CMD_ACCESS_NUMBER, value);
+void AllWize::setKmac(const uint8_t * key) {
+    _setKey(1, 0, key);
 }
 
 /**
@@ -995,37 +1029,6 @@ void AllWize::bindSlave(uint8_t reg, uint16_t manufacturer_id, uint32_t unique_i
     data[7] = version;
     data[8] = type;
     _sendCommand(CMD_BIND, data, 9);
-}
-
- /**
- * @brief               Sets the UART baud rate, requires reset to take effect
- * @param value         Value from 1 to 11
- */
-void AllWize::setBaudRate(uint8_t value) {
-    if ((0 < value) & (value < 12)) {
-        if (ready()) _setSlot(MEM_UART_BAUD_RATE, value);
-        _baudrate = BAUDRATES[value-1];
-    }
-}
-
-/**
- * @brief               Gets the UART baud rate
- * @return              Value (1 byte)
- */
-uint8_t AllWize::getBaudRate() {
-    return _getSlot(MEM_UART_BAUD_RATE);
-}
-
-/**
- * @brief               Gets the UART baud rate speed in bps
- * @param value         Baudrate code
- * @return              UART speed
- */
-uint32_t AllWize::getBaudRateSpeed(uint8_t value) {
-    if ((0 < value) & (value < 12)) {
-        return BAUDRATES[value-1];
-    }
-    return 0;
 }
 
 // -----------------------------------------------------------------------------

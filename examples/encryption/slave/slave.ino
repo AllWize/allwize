@@ -171,7 +171,10 @@ void loop() {
     wizeSend(payload, sizeof(payload));
     count++;
 
-    // Wait 5 seconds and redo
+    // Send the string as payload
+    wizeSend(payload, sizeof(payload));
+
+    // Wait 10 seconds and redo
     delay(10000);
 
 }

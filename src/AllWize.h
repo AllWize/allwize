@@ -139,11 +139,6 @@ class AllWize {
         void setDataInterface(uint8_t value);
         void setControlField(uint8_t value, bool persist = false);
         void setInstallMode(uint8_t mode, bool persist = false);
-        void setMAC2CheckOnlyFlag(uint8_t flag);
-        void setEncryptFlag(uint8_t flag);
-        void setDecryptFlag(uint8_t flag);
-        void setKey(uint8_t reg, const uint8_t * key);
-        void setDefaultKey(const uint8_t * key);
         void setAccessNumber(uint8_t value);
         void setBaudRate(uint8_t baudrate);
 
@@ -160,10 +155,6 @@ class AllWize {
         uint8_t getNetworkRole();
         uint8_t getLEDControl();
         uint8_t getInstallMode();
-        uint8_t getMAC2CheckOnlyFlag();
-        uint8_t getEncryptFlag();
-        uint8_t getDecryptFlag();
-        void getDefaultKey(uint8_t * key);
         uint8_t getBaudRate();
         uint32_t getBaudRateSpeed(uint8_t value);
 
@@ -194,6 +185,18 @@ class AllWize {
         void setWizeApplication(uint8_t wize_application);
         void setCounter(uint16_t counter);
         uint16_t getCounter();
+
+        // Encryption
+        void setMAC2CheckOnlyFlag(uint8_t flag);
+        uint8_t getMAC2CheckOnlyFlag();
+        void setEncryptFlag(uint8_t flag);
+        uint8_t getEncryptFlag();
+        void setDecryptFlag(uint8_t flag);
+        uint8_t getDecryptFlag();
+        void setKenc(uint8_t reg, const uint8_t * key);
+        void setKmac(uint8_t reg, const uint8_t * key);
+        void keyChallenge(uint8_t *key);
+        void bindSlave(uint8_t reg, uint16_t manufacturer_id, uint32_t unique_id, uint8_t version, uint8_t type);
 
     protected:
 
@@ -236,6 +239,9 @@ class AllWize {
         void _bin2hex(uint8_t * bin, char * hex, uint8_t len);
 
         void _niceDelay(uint32_t ms);
+
+        // Encryption
+        void _setKey(uint8_t type, uint8_t reg, const uint8_t * key);
 
     private:
 
@@ -280,6 +286,7 @@ class AllWize {
         String _fw;
 
         // Wize specific
+        uint8_t _wize_key = 0x00;
         uint16_t _wize_network_id = 0;
         uint8_t _wize_application = 0xFE;
         uint16_t _counter = 0;
