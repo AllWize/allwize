@@ -118,6 +118,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
 
+#define SLAVE_MID               0x06FA          // AWZ
+#define SLAVE_UID               0x01020304      // Test device
+#define SLAVE_VERSION           0x01
+#define SLAVE_TYPE              0x01
+#define SLAVE_REGISTER          0x01
+uint8_t KMAC_KEY[16] = { 0x71, 0x5A, 0xD8, 0x83, 0x5B, 0xC9, 0x54, 0x70, 0x26, 0x0B, 0xA3, 0x40, 0x92, 0xA8, 0x73, 0x98 };
+uint8_t KENC_KEY[16] = { 0x4F, 0x0E, 0x26, 0x90, 0x2B, 0x0E, 0x2A, 0x54, 0x77, 0xB9, 0xA6, 0x30, 0x93, 0x54, 0xC1, 0x62 };
+
 // -----------------------------------------------------------------------------
 // Globals
 // -----------------------------------------------------------------------------
@@ -144,10 +152,15 @@ void wizeSetup() {
         while (true);
     }
 
-    allwize.master();
+    allwize.master(INSTALL_MODE_NORMAL);
     allwize.setChannel(WIZE_CHANNEL, true);
     allwize.setPower(WIZE_POWER);
     allwize.setDataRate(WIZE_DATARATE);
+
+    allwize.setMAC2CheckOnlyFlag(0);
+    allwize.setKmac(KMAC_KEY);
+    allwize.bindSlave(SLAVE_REGISTER, SLAVE_MID, SLAVE_UID, SLAVE_VERSION, SLAVE_TYPE);
+    allwize.setKenc(SLAVE_REGISTER, KENC_KEY);
 
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "# Module type: %s\n", allwize.getModuleTypeName().c_str());
@@ -169,28 +182,17 @@ void wizeLoop() {
         // Get the message
         allwize_message_t message = allwize.read();
 
-        if (CI_WIZE == message.ci) {
-            snprintf(
-                buffer, sizeof(buffer),
-                "%02X%02X%02X%02X,%d,%d,",
-                message.address[0], message.address[1],
-                message.address[2], message.address[3],
-                message.wize_counter, (int16_t) message.rssi / -2
-            );
-        } else {
-            snprintf(
-                buffer, sizeof(buffer),
-                "%02X%02X%02X%02X,%d,%d,",
-                message.address[0], message.address[1],
-                message.address[2], message.address[3],
-                message.c, (int16_t) message.rssi / -2
-            );
-        }
-
+        snprintf(
+            buffer, sizeof(buffer),
+            "%d,%d,%d,",
+            allwize.getChannel(),
+            allwize.getDataRateSpeed(allwize.getDataRate()),
+            (int16_t) message.rssi / -2
+        );
         DEBUG_SERIAL.print(buffer);
 
-        for (uint8_t i=0; i<message.len; i++) {
-            snprintf(buffer, sizeof(buffer), "%02X", message.data[i]);
+        for (uint8_t i=1; i<allwize.getLength()-1; i++) {
+            snprintf(buffer, sizeof(buffer), "%02x", allwize.getBuffer()[i]);
             DEBUG_SERIAL.print(buffer);
         }
         DEBUG_SERIAL.println();

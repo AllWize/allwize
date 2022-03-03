@@ -27,22 +27,15 @@
 #
 
 import serial
-import requests
-from python_cayennelpp.decoder import decode
+import datetime
 
 # configuration
 SERIAL_PORT = "/dev/ttyACM0"
 SERIAL_BAUD = 115200
 
-IDB_DATABASE = "data"
-IDB_ENDPOINT = "http://localhost:8086/write?db=bridge"
-
-def send(data):
-    print("[IDB] Inserting %s" % data)
-    #requests.post(url = IDB_ENDPOINT, data = data)
-
 # parse message
 def parse(data):
+
     parts = data.decode().split(",")
     if len(parts) != 4:
         print("[PARSER] Wrong number of fields")
@@ -50,34 +43,17 @@ def parse(data):
     channel = parts[0]
     datarate = int(parts[1])
     rssi = int(parts[2])
-    raw = parts[3]
-    device = raw[4:20]
-    payload = raw[32:-6]
+    payload = parts[3]
+    ts = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    send("rssi,uid=%s value=%s" % (device, rssi))
+    print("%s,%s,%d,%d,%s" % (ts, channel, datarate, rssi, payload), flush=True)
 
-    fields = decode(payload)
-    if len(fields) == 0:
-        send("raw,uid=%s value=%s" % (device, payload))
-    else:
-        for f in fields:
-            name = f["name"].replace(' ', '_').lower()
-            if isinstance(f["value"], dict):
-                data = "%s,uid=%s" % (name, device)
-                sep = " "
-                for k, v in f["value"].items():
-                    name = k.replace(' ', '_').lower()
-                    data = "%s%s%s=%s" % (data, sep, name, v)
-                    sep = ","
-                send(data)
-                    
-            else:
-                send("%s,uid=%s value=%s" % (name, device, f["value"]))
+# header
+print("time,channel,datarate,rssi,payload", flush=True)
 
 # connect to device
 ser = serial.Serial(SERIAL_PORT, SERIAL_BAUD, timeout=0.5)
 while True:
     line = ser.readline()
     if len(line) and line[0] != "#":
-        print("[SERIAL] Received %s" % line.rstrip())
         parse(line.rstrip())

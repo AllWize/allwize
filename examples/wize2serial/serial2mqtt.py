@@ -53,23 +53,29 @@ def parse(data):
     if len(parts) != 4:
         print("[PARSER] Wrong number of fields")
         return
-    device = parts[0]
-    counter = parts[1]
-    rssi = parts[2]
-    payload = parts[3]
+    channel = parts[0]
+    datarate = int(parts[1])
+    rssi = int(parts[2])
+    raw = parts[3]
+    device = raw[4:20]
+    payload = raw[32:-6]
     fields = decode(payload)
 
-    for f in fields:
-        name = f["name"].replace(' ', '_').lower()
-        if isinstance(f["value"], dict):
-            for k, v in f["value"].items():
-                name = k.replace(' ', '_').lower()
+    fields = decode(payload)
+    if len(fields) == 0:
+        send("device/%s/raw" % (device), payload)
+    else:
+        for f in fields:
+            name = f["name"].replace(' ', '_').lower()
+            if isinstance(f["value"], dict):
+                for k, v in f["value"].items():
+                    name = k.replace(' ', '_').lower()
+                    topic = "device/%s/%s" % (device, name)
+                    send(topic, v)
+                    
+            else:
                 topic = "device/%s/%s" % (device, name)
-                send(topic, v)
-                
-        else:
-            topic = "device/%s/%s" % (device, name)
-            send(topic, f["value"])
+                send(topic, f["value"])
 
 # callback functions
 def on_connect(client, userdata, flags, rc):
