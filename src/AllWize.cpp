@@ -1806,7 +1806,7 @@ bool AllWize::_decode() {
             _message.wize_network_id = _buffer[in++];
 
             // Wize counter
-            _message.wize_counter = (_buffer[in + 1] << 8) + _buffer[in];
+            _message.wize_counter = (_buffer[in] << 8) + _buffer[in + 1];
             in += 2;
 
             // Wize application
