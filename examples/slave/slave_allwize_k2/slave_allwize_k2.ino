@@ -79,13 +79,17 @@ void wizeSetup() {
 
 }
 
-void wizeSend(const char * payload) {
+void wizeSend(uint8_t * payload, size_t len) {
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "[WIZE] Sending '%s'\n", payload);
-    DEBUG_SERIAL.print(buffer);
+    DEBUG_SERIAL.print("[WIZE] Sending: ");
+    for (uint8_t i = 0; i<len; i++) {
+        snprintf(buffer, sizeof(buffer), "%02X", payload[i]);
+        DEBUG_SERIAL.print(buffer);
+    }
+    DEBUG_SERIAL.print("\n");
 
-    if (!allwize.send(payload)) {
+    if (!allwize.send(payload, len)) {
         DEBUG_SERIAL.println("[WIZE] Error sending message");
     }
 
@@ -111,16 +115,17 @@ void setup() {
 void loop() {
 
     // This static variables will hold the number as int and char string
-    static uint8_t count = 0;
-    static char payload[4];
+    static unsigned int count = 0;
+    uint8_t payload[2] = {0};
 
     // Convert the number to a string
-    itoa(count, payload, 10);
+    payload[0] = (count >> 8) & 0xFF;
+    payload[1] = (count >> 0) & 0xFF;
 
     // Send the string as payload
-    wizeSend(payload);
+    wizeSend(payload, sizeof(payload));
 
-    // Increment the number (it will overflow at 255)
+    // Increment the number (it will overflow at 65536)
     count++;
 
     // Delay responses for 20 seconds
