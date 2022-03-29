@@ -44,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WIZE_CHANNEL            CHANNEL_04
 #define WIZE_POWER              POWER_20dBm
 #define WIZE_DATARATE           DATARATE_2400bps
-#define WIZE_UID                0x20212223
+#define WIZE_UID                0x12345678
 
 // -----------------------------------------------------------------------------
 // Globals
@@ -74,7 +74,10 @@ void wizeSetup() {
     allwize.setUID(WIZE_UID);
 
     allwize.dump(DEBUG_SERIAL);
-
+    DEBUG_SERIAL.print("[WIZE] Module type: "); DEBUG_SERIAL.println(allwize.getModuleTypeName().c_str());
+    DEBUG_SERIAL.print("[WIZE] MBUS mode: 0x"); DEBUG_SERIAL.println(allwize.getMode(), HEX);
+    DEBUG_SERIAL.print("[WIZE] Channel: "); DEBUG_SERIAL.println(allwize.getChannel());
+    DEBUG_SERIAL.print("[WIZE] Datarate: "); DEBUG_SERIAL.println(allwize.getDataRate());
     DEBUG_SERIAL.println("[WIZE] Ready...");
 
 }
